@@ -1,0 +1,33 @@
+dataSpec:
+    nInputs: 3
+    output:
+        nOutputs: 1
+        outputIndex: 1
+transformerSpec:
+    transformInput:
+        transformData: True
+        transformerClass: PowerTransformer
+        transformerOptions:
+            method: yeo-johnson
+            standardize: True
+        columns: 
+    transformOutput:
+        transformData: False
+        transformerClass: MinMaxScaler
+        transformerOptions: 
+trainingSpec:
+    modelClass: SingleGPRBF
+    likelihoodClass: GaussianLikelihood
+    learningRate: 0.5
+    learningIterations: 100
+    meanSpec:
+        constant_value: 0.0
+        optimize: True
+        transformer:
+    noiseless: False
+    botorch: False
+testingSpec:
+    test: False
+    testSize: 0.2
+    stratSplit: False 
+    kFold: False
