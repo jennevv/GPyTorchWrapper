@@ -118,9 +118,9 @@ def trace_model(model, len_training_data, transformer, num_inputs):
     if transformer is not None:
         test_x = transformer.transform(test_x)
 
-    test_x = torch.tensor(test_x, dtype=torch.float64)
+    test_x = torch.tensor(test_x, dtype=torch.float64, requires_grad=True)
 
-    with torch.no_grad(), gpytorch.settings.fast_pred_var(), gpytorch.settings.trace_mode(), gpytorch.settings.max_eager_kernel_size(
+    with gpytorch.settings.fast_pred_var(), gpytorch.settings.trace_mode(), gpytorch.settings.max_eager_kernel_size(
             len_training_data + len(test_x)):
         model.eval()
         pred = model(test_x)  # Do precomputation
