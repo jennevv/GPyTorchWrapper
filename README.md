@@ -106,7 +106,7 @@ The model can be saved in TorchScript format for deployment purposes using the p
 python pt2ts.py -i model.pth -o model.ts -c config.yaml 
 ```
 
-This model will output the predictions and the uncertainty of the model.  
+This model will be able to output the predictions and the uncertainty of the model for a given set of inputs x.  
 ```python
 import torch
 
