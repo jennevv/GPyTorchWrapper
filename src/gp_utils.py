@@ -12,7 +12,7 @@ import sklearn.preprocessing as transformer_module
 import torch
 import yaml
 
-import src.gp_models as model_module
+import src.models.gp_models as model_module
 
 
 class DataReader:
@@ -110,27 +110,6 @@ class ModelEvaluator:
 
         return corr
 
-
-def read_yaml(input_path: pathlib.Path) -> dict:
-    """
-    Read the input file and return a dictionary with the specifications.
-
-    Parameters
-    -----------
-    input_path : pathlib.Path
-                 Path to the input file
-
-    Returns
-    --------
-    input_dict : dict
-                 Dictionary containing the specifications
-    """
-    if isinstance(input_path, str):
-        input_path = Path(input_path)
-
-    with input_path.open('r') as f:
-        input_dict = yaml.safe_load(f)
-    return input_dict
 
 
 def get_transformer(transformer_spec: dict) -> object:
@@ -289,39 +268,3 @@ def transform_data(X: pd.DataFrame, transformer: object, columns:list=None) -> U
             return X, transformer
 
 
-def metadata_dict(**kwargs):
-    """Save the metadata to a dictionary"""
-    return kwargs
-
-
-def git_hash():
-    # Check if the current directory is a git repository
-    command = "git rev-parse --is-inside-work-tree"
-
-    # Get the result as text
-    is_git_repo = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-    if is_git_repo.returncode != 0:
-        short_hash = 'no_git_repo'
-        return short_hash
-    else:
-        command = "git rev-parse --short HEAD"
-
-        short_hash = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-        return short_hash.stdout.strip('\n')
-
-
-def dataframe_to_tensor(df, stack=False):
-    if not isinstance(df, pd.DataFrame) and not isinstance(df, pd.Series):
-        raise ValueError("Input must be a Pandas DataFrame or Series")
-
-    if stack:
-        tensors = [torch.tensor(df[col].to_numpy(), dtype=torch.float64) for col in df.columns]
-        stack = torch.stack(tensors, dim=-1)
-        return stack
-    else:
-        tensor = torch.tensor(df.to_numpy(), dtype=torch.float64)
-        if tensor.shape[1] == 1: # Possible problem with 2D dataframes
-            tensor = torch.flatten(tensor)
-        return tensor
