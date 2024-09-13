@@ -1,7 +1,6 @@
 import pathlib
-import pyyaml
-from src.config.config_reader import config_reader, Config
-from typing import Optional
+import yaml
+from src.config import create_config, Config
 
 def read_yaml(input_path: pathlib.Path | str) -> Config:
     """
@@ -24,8 +23,20 @@ def read_yaml(input_path: pathlib.Path | str) -> Config:
     if isinstance(input_path, str):
         input_path = pathlib.Path(input_path)
 
+    if not isinstance(input_path, pathlib.Path):
+        raise TypeError(f"Expected pathlib.Path, got {type(input_path)}")
+
+    if not input_path.exists():
+        raise FileNotFoundError(f"The file {input_path} does not exist")
+
     with input_path.open('r') as f:
         input_dict = yaml.safe_load(f)
-    return input_dict
+
+    try:
+        config = create_config(input_dict)
+    except:
+        raise NotImplementedError("Incorrect YAML file structure.")
+
+    return config
 
 

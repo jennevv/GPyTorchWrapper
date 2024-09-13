@@ -14,7 +14,7 @@ class TransformerConf:
     transform_data: bool
     transformer_class: str
     transformer_options: Optional[dict] = None
-    columns: Optional[List[int]] = None
+    columns: Optional[list[int]] = None
 
 
 @dataclass
