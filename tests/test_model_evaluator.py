@@ -1,11 +1,8 @@
 import pytest
 import torch
 import gpytorch
-from unittest.mock import Mock
 
-from pyro.contrib.cevae import Model
-
-from src.models.model_evaluator import ModelEvaluator  # adjust import path as needed
+from src.models.model_evaluate import ModelEvaluator
 
 
 class MockModel(gpytorch.models.ExactGP):

@@ -1,11 +1,9 @@
-from multiprocessing.managers import Value
-
 import numpy as np
 import pandas as pd
 import pytest
 from sklearn.preprocessing import StandardScaler
 
-from src.data import transform_data
+from src.data.data_transform import transform_data
 
 
 @pytest.fixture

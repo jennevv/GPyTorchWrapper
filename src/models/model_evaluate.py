@@ -1,6 +1,8 @@
 import gpytorch
 import torch
+import logging
 
+logger = logging.getLogger(__name__)
 
 class ModelEvaluator:
     """
@@ -67,3 +69,47 @@ class ModelEvaluator:
             corr.append(float(corr_matrix[0, 1]))
 
         return corr
+
+
+def evaluate_model(model, likelihood, train_x, train_y, test_x, test_y):
+    """
+    Evaluate the model on the training and test sets
+
+    Parameters
+    -----------
+    model : object
+            The trained model
+    likelihood : object
+                 The trained likelihood of the model
+    train_x : torch.Tensor
+              The input training data
+    train_y : torch.Tensor
+              The output training data
+    test_x : torch.Tensor
+             The input test data
+    test_y : torch.Tensor
+             The output test data
+
+    Returns
+    --------
+    train_rmse : list
+                 List containing the RMSE values for the training set
+    test_rmse : list or None
+                List containing the RMSE values for the test set
+    test_corr : list or None
+                List containing the correlation values for the test set
+    """
+    logger.info('Evaluating the model.')
+
+    evaluator = ModelEvaluator(model, likelihood)
+
+    train_rmse = evaluator.evaluate_rmse(train_x, train_y)
+    logger.info(f'train_rmse: {train_rmse}')
+    if test_x is not None:
+        test_rmse = evaluator.evaluate_rmse(test_x, test_y)
+        test_corr = evaluator.evaluate_correlation(test_x, test_y)
+        logger.info(f'test_rmse" {test_rmse}\ntest_corr: {test_corr}')
+        return train_rmse, test_rmse, test_corr
+
+    else:
+        return train_rmse, None, None

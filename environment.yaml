@@ -1,4 +1,4 @@
-name: GPyTorchWrapper
+fname: GPyTorchWrapper
 channels:
   - gpytorch
   - pytorch

@@ -1,6 +1,6 @@
 import pathlib
 import yaml
-from src.config import create_config, Config
+from .config_classes import create_config, Config
 
 def read_yaml(input_path: pathlib.Path | str) -> Config:
     """

@@ -1,7 +1,7 @@
 import sklearn.preprocessing as transformer_module
 import gpytorch.likelihoods as likelihood_module
 import src.models.gp_models as model_module
-from src.config import TransformerConf, TrainingConf
+from .config_classes import TransformerConf, TrainingConf
 
 
 def get_transformer(transformer_conf: TransformerConf) -> object:

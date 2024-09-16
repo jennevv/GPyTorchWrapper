@@ -1,7 +1,7 @@
 import pytest
 import pathlib
 
-from src.config import read_yaml
+from src.config.config_reader import read_yaml
 
 
 @pytest.fixture
@@ -33,6 +33,7 @@ def sample_yaml_file() -> pathlib.Path:
       learning_iterations: 100
       noiseless: false
       botorch: false
+      debug: True
 
     testing_conf:
       test: false

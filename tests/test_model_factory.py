@@ -1,9 +1,11 @@
-import pytest
-from src.config.model_factory import get_transformer, get_likelihood, get_model
-from src.config import TransformerConf, TrainingConf
 import gpytorch
+import pytest
 import sklearn
+
 import src.models.gp_models as model_module
+from src.config.config_classes import TransformerConf, TrainingConf
+from src.config.model_factory import get_transformer, get_likelihood, get_model
+
 
 def test_get_transformer():
     # Test with PowerTransformer and options
@@ -35,6 +37,7 @@ def test_get_transformer():
     with pytest.raises(AttributeError):
         get_transformer(transformer_conf)
 
+
 def test_get_likelihood():
     # Test with GaussianLikelihood
     training_conf = TrainingConf(
@@ -64,6 +67,7 @@ def test_get_likelihood():
         learning_iterations=100)
     with pytest.raises(AttributeError):
         get_likelihood(training_conf)
+
 
 def test_get_model():
     training_conf = TrainingConf(

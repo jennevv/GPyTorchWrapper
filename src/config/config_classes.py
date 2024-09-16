@@ -30,8 +30,9 @@ class TrainingConf:
     likelihood_class: str
     learning_rate: float
     learning_iterations: int
-    noiseless: bool = False
-    botorch: bool = False
+    noiseless: Optional[bool] = False
+    botorch: Optional[bool] = False
+    debug: Optional[bool] = True
 
 
 @dataclass
@@ -79,7 +80,8 @@ def create_config(config_dict: dict) -> Config:
             learning_rate=config_dict['training_conf']['learning_rate'],
             learning_iterations=config_dict['training_conf']['learning_iterations'],
             noiseless=config_dict['training_conf']['noiseless'],
-            botorch=config_dict['training_conf']['botorch']
+            botorch=config_dict['training_conf']['botorch'],
+            debug=config_dict['training_conf']['debug']
         ),
         testing_conf=TestingConf(
             test=config_dict['testing_conf']['test'],

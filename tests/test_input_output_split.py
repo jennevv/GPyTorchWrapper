@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
 
-from src.config import DataConf
-from src.data import input_output_split  # Replace 'your_module' with the actual module name
+from src.config.config_classes import DataConf
+from src.data.data_splitter import input_output_split
 
 
 @pytest.fixture
