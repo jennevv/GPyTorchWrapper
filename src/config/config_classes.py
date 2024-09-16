@@ -6,7 +6,7 @@ from typing import Optional
 class DataConf:
     num_inputs: int
     num_outputs: int
-    output_index: int
+    output_index: Optional[int | list[int]] = None
 
 
 @dataclass
