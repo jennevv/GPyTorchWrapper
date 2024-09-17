@@ -1,7 +1,7 @@
 data_conf:
   num_inputs: 3
-  num_outputs: 1
-  output_index: 0
+  num_outputs: 2
+  output_index:
 
 transform_conf:
   transform_input:
@@ -18,10 +18,10 @@ transform_conf:
     columns: null
 
 training_conf:
-  model_class: SingleGPRBF
-  likelihood_class: GaussianLikelihood
+  model_class: TestMultitaskGPModel
+  likelihood_class: MultitaskGaussianLikelihood
   learning_rate: 0.5
-  learning_iterations: 100
+  learning_iterations: 5
   noiseless: false
   botorch: false
   debug: True

@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 import numpy as np
@@ -5,9 +6,9 @@ import pandas as pd
 from sklearn.model_selection import StratifiedShuffleSplit, KFold, train_test_split
 
 from src.config.config_classes import DataConf, TestingConf, TrainingConf, TransformConf
-import logging
-
 from src.data.data_transform import transform
+from src.models.model_evaluate import evaluate_model
+from src.models.model_train import train_model
 from src.utils import dataframe_to_tensor
 
 logger = logging.getLogger(__name__)
@@ -42,7 +43,8 @@ def input_output_split(data: pd.DataFrame, data_conf: DataConf) -> tuple[pd.Data
         if isinstance(data_conf.output_index, int) or isinstance(data_conf.output_index, list):
             output_idx = data_conf.output_index
         else:
-            raise KeyError(f"The output index is not specified or not properly specified. Expected int or list[int], got {type(data_conf.output_index)}")
+            raise KeyError(
+                f"The output index is not specified or not properly specified. Expected int or list[int], got {type(data_conf.output_index)}")
     else:
         output_idx = [i for i in range(n_outputs)]
 
@@ -61,7 +63,8 @@ def input_output_split(data: pd.DataFrame, data_conf: DataConf) -> tuple[pd.Data
     return x, y
 
 
-def k_fold_split(x, y, training_conf, transformer_conf, data_conf, directory, split_size=0.2):
+def k_fold_split(x: pd.DataFrame, y: pd.DataFrame, training_conf: TrainingConf, transform_conf: TransformConf,
+                 data_conf: DataConf, directory: Path, split_size: float = 0.2) -> None:
     """
     Split the data using k-fold cross-validation
 
@@ -73,14 +76,18 @@ def k_fold_split(x, y, training_conf, transformer_conf, data_conf, directory, sp
         The output data
     training_conf : dict
                     Dictionary containing the training specifications
-    transformer_conf : dict
-                        Dictionary containing the transformer specifications
+    transform_conf : dict
+                    Dictionary containing the transformer specifications
     data_conf : dict
                 Dictionary containing the data specifications
     directory : pathlib.Path
                 The output directory
     split_size : float
-                 The size of the test set
+                The size of the test set
+
+    Returns
+    --------
+    None
     """
     logger.info("Starting k-fold split testing.")
 
@@ -100,11 +107,10 @@ def k_fold_split(x, y, training_conf, transformer_conf, data_conf, directory, sp
         test_y = y.iloc[test_index]
 
         train_x, train_y, test_x, test_y, input_transformer, output_transformer = transform(train_x, train_y, test_x,
-                                                                                            test_y, transformer_conf)
+                                                                                            test_y, transform_conf)
         train_x, train_y, test_x, test_y = map(dataframe_to_tensor, [train_x, train_y, test_x, test_y])
 
-        model, likelihood = train_model(train_x, train_y, training_conf=training_conf,
-                                        num_tasks=data_conf['output']['nOutputs'], input_transformer=input_transformer)
+        model, likelihood = train_model(train_x, train_y, training_conf=training_conf, num_tasks=data_conf.num_outputs)
 
         # Evaluate the model on the training and test sets
         train_rmse, test_rmse, test_corr = evaluate_model(model, likelihood, train_x, train_y, test_x, test_y)
@@ -210,7 +216,13 @@ def stratified_shuffle_split(x: pd.DataFrame, y: pd.DataFrame, n_bins: int = 5, 
     return train_x, test_x, train_y, test_y
 
 
-def split_data(x: pd.DataFrame, y: pd.DataFrame, data_conf: DataConf, transform_conf: TransformConf, training_conf: TrainingConf, testing_conf: TestingConf, directory):
+def split_data(x: pd.DataFrame, y: pd.DataFrame, data_conf: DataConf, transform_conf: TransformConf,
+               training_conf: TrainingConf, testing_conf: TestingConf, directory: Path) \
+        -> tuple[
+               pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame
+           ] | tuple[
+               pd.DataFrame, None, pd.DataFrame, None
+           ]:
     """
     Split the data into training and test sets.
     If neither kFold nor stratified shuffle split is selected, perform a random split.
@@ -232,17 +244,17 @@ def split_data(x: pd.DataFrame, y: pd.DataFrame, data_conf: DataConf, transform_
     directory : pathlib.Path
                 The output directory
     """
-    if testing_conf['test']:
-        if testing_conf['kFold']:
-            k_fold_split(x, y, training_conf=training_conf, transformer_conf=transform_conf, data_conf=data_conf,
-                         directory=directory, split_size=testing_conf['testSize'])
-            return x, y, None, None
-        elif testing_conf['stratSplit']:
-            train_x, test_x, train_y, test_y = stratified_shuffle_split(x, y, n_bins=testing_conf.num,
-                                                                        test_size=testing_conf['testSize'])
+    if testing_conf.test:
+        if testing_conf.kfold:
+            k_fold_split(x, y, training_conf=training_conf, transform_conf=transform_conf, data_conf=data_conf,
+                         directory=directory, split_size=testing_conf.test_size)
+            return x, None, y, None
+        elif testing_conf.strat_shuffle_split:
+            train_x, test_x, train_y, test_y = stratified_shuffle_split(x, y, n_bins=testing_conf.kfold_bins,
+                                                                        test_size=testing_conf.test_size)
             return train_x, test_x, train_y, test_y
         else:
-            train_x, test_x, train_y, test_y =  train_test_split(x, y, test_size=testing_conf['testSize'])
+            train_x, test_x, train_y, test_y = train_test_split(x, y, test_size=testing_conf.test_size)
             return train_x, test_x, train_y, test_y
     else:
-        return x, y, None, None
+        return x, None, y, None

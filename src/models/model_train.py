@@ -128,12 +128,16 @@ def training_loop(train_x: torch.Tensor, train_y: torch.Tensor, model, mll, opti
     # Plot the loss one last time
     loss_figure(loss_hash['loss'], loss_hash['iteration'])
 
-def print_model_parameters(model: object) -> None:
+def model_parameters(model: object) -> str:
+    parameters = []
+
     for param_name, param in model.named_parameters():
         if param.size() == 1:
-            logger.info(f'Parameter name: {param_name:42} value = {param.item()}')
+            parameters.append(f'Parameter name: {param_name:42} value = {param.item()}\n')
         else:
-            logger.info(f'Parameter name: {param_name:42} value = {param.tolist()}')
+            parameters.append(f'Parameter name: {param_name:42} value = {param.tolist()}\n')
+
+    return ''.join(parameters)
 
 
 def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: TrainingConf, num_tasks: int) -> tuple[object, object]:
@@ -171,7 +175,7 @@ def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: Tra
     likelihood_class = get_likelihood(training_conf)
     model_class = get_model(training_conf)
 
-    # Set noise size like sklearn WhiteKernel for comparison reasons
+    # Set noise constraint like sklearn WhiteKernel for comparison reasons
     if num_tasks > 1:
         likelihood = likelihood_class(num_tasks=num_tasks,
             noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
@@ -184,8 +188,7 @@ def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: Tra
 
     model = model_class(train_x, train_y, likelihood)
 
-    logger.info('Parameters before training:')
-    print_model_parameters(model)
+    logger.info(f'Parameters before training: \n{model_parameters(model)}')
 
     # Training in double precision
     model.double()
@@ -202,7 +205,6 @@ def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: Tra
         optimizer = define_optimizer(model, learning_rate)
         training_loop(train_x, train_y, model, mll, optimizer, learning_iterations, debug)
 
-    logger.info('Parameters after training:')
-    print_model_parameters(model)
+    logger.info(f'Parameters after training: \n{model_parameters(model)}')
 
     return model, likelihood

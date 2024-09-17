@@ -63,3 +63,9 @@ def test_input_output_split_error_missing_output_index(sample_data):
 
     with pytest.raises(KeyError):
         input_output_split(sample_data, data_conf)
+
+
+def test_input_output_split_wrong_index_type(sample_data):
+    data_conf = DataConf(num_inputs=2, num_outputs=2, output_index='output1')
+    with pytest.raises(KeyError):
+        X, y = input_output_split(sample_data, data_conf)

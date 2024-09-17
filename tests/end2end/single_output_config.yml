@@ -18,10 +18,10 @@ transform_conf:
     columns: null
 
 training_conf:
-  model_class: SingleGPRBF
+  model_class: TestModel
   likelihood_class: GaussianLikelihood
   learning_rate: 0.5
-  learning_iterations: 100
+  learning_iterations: 5
   noiseless: false
   botorch: false
   debug: True

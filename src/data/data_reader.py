@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import joblib
 import pandas as pd
 
@@ -11,11 +13,11 @@ class DataReader:
     def __init__(self):
         pass
 
-    def _read_csv(self, file) -> pd.DataFrame:
+    def _read_csv(self, file: str) -> pd.DataFrame:
         data = pd.read_csv(file)
         return data
 
-    def _read_pickle(self, file) -> pd.DataFrame:
+    def _read_pickle(self, file: str) -> pd.DataFrame:
         pickle = joblib.load(file)
         data = pickle['processed_dataset']
 
@@ -24,7 +26,7 @@ class DataReader:
 
         return data
 
-    def read_data(self, file, file_type) -> pd.DataFrame:
+    def read_data(self, file: str | Path, file_type: str) -> pd.DataFrame:
         """
         Parameters
         ----------

@@ -4,14 +4,19 @@ import pathlib
 from pathlib import Path
 from sys import platform
 
-from src.config import read_yaml
-from src.data import DataReader, transform, train_test_split, input_output_split
-from src.models import save_model, train_model, evaluate_model
+from src.config.config_reader import read_yaml
+from src.data.data_reader import DataReader
+from src.data.data_splitter import input_output_split, split_data
+from src.data.data_transform import transform
+from src.models.model_train import train_model
+from src.models.model_evaluate import evaluate_model
+from src.models.model_save import save_model
 from src.utils import metadata_dict, dataframe_to_tensor
 
 __author__ = 'Jenne Van Veerdeghem'
 __version__ = '0.0.1'
 
+logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Needed for training on HPC cluster
@@ -22,9 +27,8 @@ if platform == "linux":
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="GPR Training for H2O-Kr",
-        description="Train a Gaussian Process Regressor for the H2O-Kr system using GPytorch."
+        description="Train a Gaussian Process Regressor using GPytorch."
     )
-
     parser.add_argument(
         "-i",
         "--input",
@@ -32,7 +36,6 @@ def parse_args():
         required=True,
         help="File containing the data",
     )
-
     parser.add_argument(
         "-f",
         "--file_type",
@@ -40,14 +43,12 @@ def parse_args():
         required=True,
         help="Format of the data file. Can be either csv or pickle.",
     )
-
     parser.add_argument(
         "-c",
         "--config",
         required=True,
         help="The config file containing the script options.",
     )
-
     parser.add_argument(
         "-o",
         "--output",
@@ -55,7 +56,6 @@ def parse_args():
         required=True,
         help="Name of the output file containing the model and its metadata."
     )
-
     parser.add_argument(
         "-d",
         "--directory",
@@ -64,18 +64,8 @@ def parse_args():
         help="Output directory",
     )
 
-    parser.add_argument(
-        '--debug_off',
-        action='store_false',
-        help='Turn off debugging mode in the training loop.',
-        default=True
-    )
-
-
     args = parser.parse_args()
-
     args.input, args.config, args.directory = map(Path, [args.input, args.config, args.directory])
-
     # Allow for the creation of the output directory if it does not exist
     args.directory.mkdir(parents=True, exist_ok=True)
 
@@ -99,25 +89,23 @@ def main():
 
     # Data processing
     x, y = input_output_split(data, data_conf)
-    train_x, test_x, train_y, test_y = split_data(x, y, data_conf, transformer_conf, training_conf, testing_conf,
+    train_x, test_x, train_y, test_y = split_data(x, y, data_conf, transform_conf, training_conf, testing_conf,
                                                   args.directory)
     train_x, test_x, train_y, test_y, \
-        input_transformer, output_transformer = transform(train_x, train_y, test_x, test_y, transformer_conf)
+        input_transformer, output_transformer = transform(train_x, train_y, test_x, test_y, transform_conf)
 
     train_x, train_y = map(dataframe_to_tensor, [train_x, train_y])
     if test_x is not None:
         test_x, test_y = map(dataframe_to_tensor, [test_x, test_y])
 
     # Model training
-    model, likelihood = train_model(train_x, train_y, training_conf=training_conf,
-                                    num_tasks=data_conf['output']['nOutputs'],
-                                    input_transformer=input_transformer)
+    model, likelihood = train_model(train_x, train_y, training_conf, data_conf.num_outputs)
 
     # Evaluate the model on the training and test sets
     train_rmse, test_rmse, test_corr = evaluate_model(model, likelihood, train_x, train_y, test_x, test_y)
 
     # Save metadata to dictionaries
-    model_metadata = metadata_dict(model=model, training_spec=training_conf)
+    model_metadata = metadata_dict(model=model, training_conf=training_conf)
     training_metadata = metadata_dict(train_x=train_x, train_y=train_y, test_x=test_x, test_y=test_y,
                                       input_transformer=input_transformer, output_transformer=output_transformer)
     metrics_metadata = metadata_dict(train_rmse=train_rmse, test_rmse=test_rmse, test_corr=test_corr)

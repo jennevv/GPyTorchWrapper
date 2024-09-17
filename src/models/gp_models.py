@@ -8,7 +8,7 @@ class SingleGPRBF(models.ExactGP):
     def __init__(self, train_x, train_y, likelihood):
         super().__init__(train_x, train_y, likelihood)
         self.mean_module = means.ZeroMean()
-        self.covar_module = kernels.ScaleKernel(kernels.RBFKernel()) 
+        self.covar_module = kernels.ScaleKernel(kernels.RBFKernel()) + kernels.ConstantKernel()
 
     def forward(self, x):
         mean_x = self.mean_module(x)
@@ -54,14 +54,32 @@ class BIMultitaskRBF(models.ExactGP):
         
         n_output = 4
         
-        self.mean_module = means.ConstantMean(batch_shape=torch.Size([n_output]))
-        self.covar_module = kernels.ScaleKernel(kernels.RBFKernel(batch_shape=torch.Size([n_output])))
+        self.mean_module = means.MultitaskMean(
+            means.ConstantMean(), num_tasks=n_output
+        )
+        self.covar_module = kernels.MultitaskKernel(
+            kernels.RBFKernel(), num_tasks=n_output
+        )
         
     def forward(self, x):
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
-        return distributions.MultitaskMultivariateNormal.from_batch_mvn(
-            distributions.MultivariateNormal(mean_x, covar_x)
+        return distributions.MultitaskMultivariateNormal(mean_x, covar_x)
+
+
+class TestMultitaskGPModel(models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood):
+        super(TestMultitaskGPModel, self).__init__(train_x, train_y, likelihood)
+        self.mean_module = means.MultitaskMean(
+            means.ConstantMean(), num_tasks=2
         )
+        self.covar_module = kernels.MultitaskKernel(
+            kernels.RBFKernel(), num_tasks=2, rank=1
+        )
+
+    def forward(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        return distributions.MultitaskMultivariateNormal(mean_x, covar_x)
 
 

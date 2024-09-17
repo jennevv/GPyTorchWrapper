@@ -32,4 +32,4 @@ def dataframe_to_tensor(df):
 
     tensor = torch.from_numpy(df.to_numpy())
 
-    return tensor
+    return tensor.squeeze()
