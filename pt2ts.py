@@ -6,7 +6,8 @@ import gpytorch
 import numpy as np
 import torch
 
-from src.gp_utils import get_model, read_yaml, get_likelihood
+from src.config.config_reader import read_yaml
+from src.config.model_factory import get_likelihood, get_model
 
 warnings.filterwarnings("ignore") # Ignore warnings from the torch.jit.trace function
 
@@ -65,15 +66,15 @@ def main():
     args = parse_args()
 
     input_file = read_yaml(args.config)
-    input_data = input_file['dataSpec']
+    input_data = input_file.data_conf
 
     model_dump = torch.load(args.input)
 
     train_x, train_y = model_dump['training_data']['train_x'], model_dump['training_data']['train_y']
-    num_inputs = input_data['nInputs']
-    num_tasks = input_data['output']['nOutputs']
+    num_inputs = input_data.num_inputs
+    num_tasks = input_data.num_outputs
 
-    if input_file['transformerSpec']['transformInput']['transformData']:
+    if input_file.transform_conf.transform_input.transform_data:
         input_transformer = model_dump['training_data']['input_transformer']
     else:
         input_transformer = None
@@ -98,10 +99,14 @@ class MeanVarModelWrapper(torch.nn.Module):
 
 
 def load_model(input_file, model_dump, train_x, train_y, num_tasks):
-    likelihood_class = get_likelihood(input_file['trainingSpec'], num_tasks)
-    model_class = get_model(input_file['trainingSpec'])
+    likelihood_class = get_likelihood(input_file.training_conf)
+    model_class = get_model(input_file.training_conf)
 
-    likelihood = likelihood_class()
+    if num_tasks > 1:
+        likelihood = likelihood_class(num_tasks=num_tasks)
+    else:
+        likelihood = likelihood_class()
+
     model = model_class(train_x, train_y, likelihood)
 
     model.double()
