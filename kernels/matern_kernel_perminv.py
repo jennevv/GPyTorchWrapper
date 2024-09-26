@@ -8,7 +8,7 @@ from gpytorch.kernels import Kernel
 class MaternKernelPermInv(Kernel):
     has_lengthscale = True
 
-    def __init__(self, n_atoms, idx_equiv_atoms, nu=2.5, **kwargs):
+    def __init__(self, n_atoms: int, idx_equiv_atoms: list[list[int]], nu: float = 2.5, **kwargs):
         if nu not in {0.5, 1.5, 2.5}:
             raise NotImplementedError('Please select one of the following nu values: {0.5, 1.5, 2.5}')
         super(MaternKernelPermInv, self).__init__(**kwargs)
@@ -21,7 +21,7 @@ class MaternKernelPermInv(Kernel):
         self.permutations = self.generate_permutations(idx_equiv_atoms)
 
     @staticmethod
-    def generate_permutations(idx_equiv_atoms: list | list[list]):
+    def generate_permutations(idx_equiv_atoms: list[list[int]]) -> torch.Tensor:
         all_perms = []
         for group in idx_equiv_atoms:
             all_perms.append([list(p) for p in itertools.permutations(group)])
@@ -30,7 +30,7 @@ class MaternKernelPermInv(Kernel):
 
         perms = [sum((sublist for sublist in item), []) for item in perms]
 
-        torch.tensor(perms)
+        perms = torch.tensor(perms)
 
         return perms
 
