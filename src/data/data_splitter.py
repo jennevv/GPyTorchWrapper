@@ -106,9 +106,9 @@ def k_fold_split(x: pd.DataFrame, y: pd.DataFrame, training_conf: TrainingConf, 
         test_x = x.iloc[test_index]
         test_y = y.iloc[test_index]
 
-        train_x, train_y, test_x, test_y, input_transformer, output_transformer = transform(train_x, train_y, test_x,
+        train_x, test_x, train_y, test_y, input_transformer, output_transformer = transform(train_x, train_y, test_x,
                                                                                             test_y, transform_conf)
-        train_x, train_y, test_x, test_y = map(dataframe_to_tensor, [train_x, train_y, test_x, test_y])
+        train_x, test_x, train_y, test_y = map(dataframe_to_tensor, [train_x, test_x, train_y, test_y])
 
         model, likelihood = train_model(train_x, train_y, training_conf=training_conf, num_tasks=data_conf.num_outputs)
 
