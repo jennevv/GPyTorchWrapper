@@ -79,8 +79,8 @@ After training, the fitted transformers are available in the model pickle file.
 The `training_conf` section specifies the model architecture and the training parameters.  
 The `model_class` must be specified as one of the available models in the `gp_models.py` file.  
 
-Regular hyperparameter optimization in GPyTorch makes use of the Adam optimizer.
-Alternatively, the model can be trained using the BoTorch's Bayesian-based optimization for GPs.
+Regular hyperparameter optimization in GPyTorch makes use of the Adam optimizer for maximizng the log of the marginal likelihood (LML).
+Alternatively, the model can be trained using the BoTorch's Bayesian-based optimization of the LML.
 See more information about BoTorch [here](https://botorch.org/).
 
 **Note**: training is always performed in double precision.    
