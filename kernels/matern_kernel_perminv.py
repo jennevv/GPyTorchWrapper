@@ -18,7 +18,7 @@ class MaternKernelPermInv(Kernel):
         dims_cart = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
         self.dims = dims_cart
 
-        self.permutations = self.generate_permutations()
+        self.permutations = self.generate_permutations(idx_equiv_atoms)
 
     @staticmethod
     def generate_permutations(idx_equiv_atoms: list | list[list]):
