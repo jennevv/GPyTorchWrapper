@@ -4,7 +4,7 @@ I have created this to simplify modeling potential energy surface models for sma
 ## Installation
 
 Use the `environment.yml` file to install the necessary dependencies on a local machine.
-If you want to use an HPC cluster for training, the `environment_hpc.yml` contains the necessary packages optimized for intel CPUs available in the [Intel AI kit](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/install-intel-ai-analytics-toolkit-via-conda.html)
+If you want to use an HPC cluster for training, the `environment_hpc.yml` contains the necessary packages optimized for intel CPUs available in the [Intel AI kit](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/install-intel-ai-analytics-toolkit-via-conda.html).
 
 ```bash
 conda env create -f environment.yml
@@ -86,6 +86,14 @@ See more information about BoTorch [here](https://botorch.org/).
 **Note**: training is always performed in double precision.    
 
 #### testing_conf
+A GP model learns its hyperparameters without requiring a validation set.
+However, it might be interesting to compare the performance between different models or to have some vague idea of the model's actual performance without using a test set.
+For this reason, it is possible to split the dataset into a training and test test using three different methods:
+
+- Random split
+- Stratified shuffle split
+- K-fold split
+
 The `testing_conf` section specifies the testing parameters.  
 If `test` is `True` and the `test_size` is specified, the split will be random using scikit-learn's `train_test_split`.     
 
