@@ -177,14 +177,21 @@ def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: Tra
 
     # Set noise constraint like sklearn WhiteKernel for comparison reasons
     if num_tasks > 1:
-        likelihood = likelihood_class(num_tasks=num_tasks,
-            noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
+        if noiseless:
+            likelihood = likelihood_class(num_tasks=num_tasks,
+                                          noise_constraint=gpytorch.constraints.GreaterThan(1e-8))
+            likelihood.raw_task_noises.requires_grad = False
+        else:
+            likelihood = likelihood_class(num_tasks=num_tasks,
+                noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
     else:
-        likelihood = likelihood_class(
-            noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
-
-    if noiseless:
-        likelihood = set_noiseless(likelihood=likelihood, num_tasks=num_tasks)
+        if noiseless:
+            likelihood = likelihood_class(
+                noise_constraint=gpytorch.constraints.GreaterThan(1e-8))
+            likelihood.raw_noise.requires_grad = False
+        else:
+            likelihood = likelihood_class(
+                noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
 
     model = model_class(train_x, train_y, likelihood)
 
