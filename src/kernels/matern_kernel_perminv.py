@@ -8,10 +8,11 @@ from gpytorch.kernels import Kernel
 class MaternKernelPermInv(Kernel):
     has_lengthscale = True
 
-    def __init__(self, n_atoms: int, idx_equiv_atoms: list[list[int]], nu: float = 2.5, **kwargs):
+    def __init__(self, n_atoms: int, idx_equiv_atoms: list[list[int]], select_dims: list = None, nu: float = 2.5, **kwargs):
         if nu not in {0.5, 1.5, 2.5}:
             raise NotImplementedError('Please select one of the following nu values: {0.5, 1.5, 2.5}')
         super(MaternKernelPermInv, self).__init__(**kwargs)
+        self.select_dims = select_dims
         self.nu = nu
         self.idx_equiv_atoms = idx_equiv_atoms
 
@@ -19,6 +20,9 @@ class MaternKernelPermInv(Kernel):
         self.dims = dims_cart
 
         self.permutations = self.generate_permutations(idx_equiv_atoms)
+
+        self.mean = None
+        self.std = None
 
     @staticmethod
     def generate_permutations(idx_equiv_atoms: list[list[int]]) -> torch.Tensor:
@@ -84,7 +88,11 @@ class MaternKernelPermInv(Kernel):
 
             # Transform xyz coordinates to internuclear distances
             x1_interdist = self.xyz_to_invdist_torch(x1)
-            x2_perm_interdist = self.xyz_to_invdist_torch(x2)
+            x2_perm_interdist = self.xyz_to_invdist_torch(x2_perm)
+
+            if self.select_dims:
+                x1_interdist = x1_interdist[:, self.select_dims].clone()
+                x2_perm_interdist = x2_perm_interdist[:, self.select_dims].clone()
 
             mean = x1_interdist.reshape(-1, x1_interdist.size(-1)).mean(0)[(None,) * (x1_interdist.dim() - 1)]
 
@@ -104,6 +112,6 @@ class MaternKernelPermInv(Kernel):
             else:
                 raise NotImplementedError('Please select one of the following nu values: {0.5, 1.5, 2.5}')
 
-            k_sum += constant_component * exp_component
+            k_sum += (constant_component * exp_component)
 
         return 1 / num_perms * k_sum

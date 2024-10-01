@@ -82,7 +82,7 @@ class RBFKernelPermInv(Kernel):
 
             # Transform xyz coordinates to internuclear distances
             x1_interdist = self.xyz_to_invdist_torch(x1)
-            x2_perm_interdist = self.xyz_to_invdist_torch(x2)
+            x2_perm_interdist = self.xyz_to_invdist_torch(x2_perm)
 
             if (
                     x1.requires_grad
