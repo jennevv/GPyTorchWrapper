@@ -48,6 +48,12 @@ def test_loss_figure_exists(run_script_single_output):
     assert loss_fig.exists(), FileNotFoundError
     loss_fig.unlink()
 
+def test_loss_figure_exists_multiple(run_script_multi_output):
+    loss_fig = pathlib.Path("loss.png")
+    assert loss_fig.exists(), FileNotFoundError
+    loss_fig.unlink()
+
+
 def test_single_output_model_exists(run_script_single_output):
     for file in os.listdir('./test_single_model'):
         file = pathlib.Path(file)
