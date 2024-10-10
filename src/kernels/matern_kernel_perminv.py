@@ -1,81 +1,38 @@
-import itertools
 import math
 
 import torch
 from gpytorch.kernels import Kernel
+from torch import Tensor
+
+from src.utils.input_transformer import xyz_to_invdist_torch
+from src.utils.permutational_invariance import generate_permutations
 
 
 class MaternKernelPermInv(Kernel):
     has_lengthscale = True
 
-    def __init__(self, n_atoms: int, idx_equiv_atoms: list[list[int]], select_dims: list = None, nu: float = 2.5, **kwargs):
+    def __init__(self, n_atoms: int, idx_equiv_atoms: list[list[int]], select_dims: Tensor = None, nu: float = 2.5,
+                 **kwargs):
+        super().__init__(**kwargs)
+
         if nu not in {0.5, 1.5, 2.5}:
             raise NotImplementedError('Please select one of the following nu values: {0.5, 1.5, 2.5}')
-        super(MaternKernelPermInv, self).__init__(**kwargs)
+        if self.ard_num_dims is not None:
+            raise NotImplementedError(
+                'ARD is not supported for MaternKernelPermInv. This will lead to an ill-conditioned covariance matrix.')
+        if self.active_dims is not None:
+            raise NotImplementedError(
+                'Active dimensions are not supported for MaternKernelPermInv. Please use select_dims instead.')
+
+
         self.select_dims = select_dims
         self.nu = nu
         self.idx_equiv_atoms = idx_equiv_atoms
 
-        dims_cart = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
-        self.dims = dims_cart
+        dims = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
+        self.dims = dims
 
-        self.permutations = self.generate_permutations(idx_equiv_atoms)
-
-        self.mean = None
-        self.std = None
-
-    @staticmethod
-    def generate_permutations(idx_equiv_atoms: list[list[int]]) -> torch.Tensor:
-        all_perms = []
-        for group in idx_equiv_atoms:
-            all_perms.append([list(p) for p in itertools.permutations(group)])
-
-        perms = [list(tup) for tup in itertools.product(*all_perms)]
-
-        perms = [sum((sublist for sublist in item), []) for item in perms]
-
-        perms = torch.tensor(perms)
-
-        return perms
-
-    @staticmethod
-    def xyz_to_invdist_torch(x: torch.Tensor, index: bool = False) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
-        """
-        x is a tensor of shape (n, m) where m is the number of individual x, y, z coordinates
-        and n is the number of data points.
-
-        The x, y, z coordinates must be ordered as x1, y1, z1, x2, y2, z2, ... , xn, yn, zn
-
-        The final tensor containing the interatomic distances will have the shape (n, m/3) where m/3 is the number of atoms.
-        The order of the distances is d01, d02, ..., d12, d13, ..., d(m/3-2)(m/3-1)
-
-        :param x: torch.Tensor
-        :param index: bool, returns unique atom indices per distance
-        """
-
-        n, m = x.shape
-        num_atoms = m // 3
-
-        coords = x.reshape(n, num_atoms, 3)
-
-        # Calculate pairwise distances
-        diff = coords[:, :, None, :] - coords[:, None, :, :]
-        dist = torch.sqrt(torch.sum(diff ** 2, dim=-1) + 1e-8)
-
-        # Create a mask to zero out the diagonal (self-distances)
-        mask = torch.eye(num_atoms, dtype=torch.bool)
-        dist = dist.masked_fill(mask, 0)
-
-        # Upper triangular indices
-        triu_indices = torch.triu_indices(num_atoms, num_atoms, offset=1)
-
-        # Get the upper triangular part of the distance matrix
-        interdist = dist[:, triu_indices[0], triu_indices[1]]
-
-        if index:
-            return torch.pow(interdist, -1), torch.transpose(triu_indices, -1, -2)
-
-        return torch.pow(interdist, -1)
+        self.permutations = generate_permutations(idx_equiv_atoms)
 
     def forward(self, x1, x2, diag=False, **params):
         k_sum = 0
@@ -87,14 +44,14 @@ class MaternKernelPermInv(Kernel):
             x2_perm[:, self.dims[init_perm, :].flatten()] = x2[:, self.dims[p, :].flatten()]
 
             # Transform xyz coordinates to internuclear distances
-            x1_interdist = self.xyz_to_invdist_torch(x1)
-            x2_perm_interdist = self.xyz_to_invdist_torch(x2_perm)
+            x1_interdist = xyz_to_invdist_torch(x1)
+            x2_perm_interdist = xyz_to_invdist_torch(x2_perm)
 
-            if self.select_dims:
-                x1_interdist = x1_interdist[:, self.select_dims].clone()
-                x2_perm_interdist = x2_perm_interdist[:, self.select_dims].clone()
+            if self.select_dims is not None:
+                x1_interdist = x1_interdist.index_select(-1, self.select_dims)
+                x2_perm_interdist = x2_perm_interdist.index_select(-1, self.select_dims)
 
-            mean = x1_interdist.reshape(-1, x1_interdist.size(-1)).mean(0)[(None,) * (x1_interdist.dim() - 1)]
+            mean = x1_interdist.mean(dim=-2, keepdim=True)
 
             x1_ = (x1_interdist - mean).div(self.lengthscale)
             x2_ = (x2_perm_interdist - mean).div(self.lengthscale)
