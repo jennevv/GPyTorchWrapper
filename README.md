@@ -4,8 +4,7 @@ I have created this to simplify modeling potential energy surface models for sma
 ## Installation
 
 Use the `environment.yml` file to install the necessary dependencies on a local machine.
-If you want to use an HPC cluster for training, the `environment_hpc.yml` contains the necessary packages optimized for intel CPUs available in the [Intel AI kit](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/install-intel-ai-analytics-toolkit-via-conda.html).
-
+If you want to use an HPC cluster for training, the `environment_hpc.yml` contains the necessary packages optimized for intel CPUs available in the [Intel Software Development Tools]([https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2023-0/install-intel-ai-analytics-toolkit-via-conda.html](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2025-0/overview.html)).
 ```bash
 conda env create -f environment.yml
 ```
@@ -14,8 +13,9 @@ Activate the environment and install the package in development mode using pip.
 
 ```bash
 conda activate gpytorchwrapper
-pip install -e .
+pip install -e . --use-pep517
 ```
+Currently, GPU support, although supported by GPyTorch, is not available in the wrapper. When it is made available, a GPU specific conda environment will be added. 
 
 ## Usage
 ### Training a model
