@@ -10,11 +10,11 @@ If you want to use an HPC cluster for training, the `environment_hpc.yml` contai
 conda env create -f environment.yml
 ```
 
-Activate the environment and install the package in development mode using pip.
+Activate the environment and install the package in development mode using conda.
 
 ```bash
 conda activate gpytorchwrapper
-pip install -e .
+conda develop .
 ```
 
 ## Usage
