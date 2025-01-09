@@ -13,7 +13,7 @@ Activate the environment and install the package in development mode using pip.
 
 ```bash
 conda activate gpytorchwrapper
-pip install -e .
+pip install -e . --use-pep517
 ```
 Currently, GPU support, although supported by GPyTorch, is not available in the wrapper. When it is made available, a GPU specific conda environment will be added. 
 
