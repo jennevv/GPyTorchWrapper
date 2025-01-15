@@ -103,8 +103,8 @@ How to load the model is shown in the example below.
 ```python
 import torch
 import gpytorch
-from gpytorchwrapper.src import get_model, get_likelihood, read_yaml
-
+from gpytorchwrapper.src.config.config_reader import read_yaml
+from gpytorchwrapper.src.config.model_factory import  get_model, get_likelihood
 metadata = torch.load('model.pth')
 config = read_yaml('config.yaml')
 
@@ -136,3 +136,7 @@ model = torch.jit.load('model.ts')
 
 pred, pred_var = model(x)
 ```
+### Custom models
+Custom models can be added in the `gpytorchwrapper/plugins` directory.  
+The module's name of the module containing the custom model must start with `model_`
+
