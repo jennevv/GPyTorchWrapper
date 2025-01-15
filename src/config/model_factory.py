@@ -102,7 +102,7 @@ def get_model(training_conf: TrainingConf) -> object:
         for module in plugin_modules.values():
             if hasattr(module, selected_model):
                 logger.info(f"Loading model class {selected_model} from {module}.")
-                return getattr(model_module, selected_model)
+                return getattr(module, selected_model)
     else:
         raise NotImplementedError(f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder.")
 
