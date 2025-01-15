@@ -99,7 +99,7 @@ def get_model(training_conf: TrainingConf) -> object:
         logger.info(f"Loading model class {selected_model} from {model_module}.")
         return getattr(model_module, selected_model)
     elif plugin_modules != {}:
-        for module_name, module in plugin_modules.values():
+        for module in plugin_modules.values():
             if hasattr(module, selected_model):
                 logger.info(f"Loading model class {selected_model} from {module}.")
                 return getattr(model_module, selected_model)
