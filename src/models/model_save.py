@@ -2,9 +2,6 @@ from pathlib import Path
 
 import torch
 
-from src.utils import git_hash
-
-
 def save_model(model_state: object, model_metadata: dict, training_data: dict, metrics: dict, output: str, directory: Path) -> None:
     """
     Save the model to a .pth file
@@ -37,4 +34,4 @@ def save_model(model_state: object, model_metadata: dict, training_data: dict, m
         'training_data': training_data,
         'metrics': metrics}
 
-    torch.save(savestate, directory / f'{output}_{git_hash()}.pth')
+    torch.save(savestate, directory / f'{output}.pth')
