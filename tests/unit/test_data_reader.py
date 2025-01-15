@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from src.data.data_reader import DataReader
+from gpytorchwrapper.src.data.data_reader import DataReader
 import joblib
 import pandas as pd
 from pathlib import Path

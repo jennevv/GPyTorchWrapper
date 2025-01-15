@@ -2,7 +2,7 @@ import pytest
 import torch
 import gpytorch
 
-from src.models.model_evaluate import ModelEvaluator
+from gpytorchwrapper.src.models.model_evaluate import ModelEvaluator
 
 
 class MockModel(gpytorch.models.ExactGP):

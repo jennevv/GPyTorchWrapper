@@ -5,8 +5,8 @@ import logging
 
 from botorch import fit_gpytorch_mll
 
-from src.config.config_classes import TrainingConf
-from src.config.model_factory import get_likelihood, get_model
+from gpytorchwrapper.src.config.config_classes import TrainingConf
+from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,7 @@
 README.md
 setup.py
+plugins/__init__.py
+plugins/model_h2okr_s0.py
 src/__init__.py
 src.egg-info/PKG-INFO
 src.egg-info/SOURCES.txt
@@ -15,6 +17,7 @@ src/data/data_splitter.py
 src/data/data_transform.py
 src/kernels/__init__.py
 src/kernels/linear_kernel_perminv.py
+src/kernels/linearxmatern_kernel_perminv.py
 src/kernels/matern_kernel_invdist.py
 src/kernels/matern_kernel_perminv.py
 src/kernels/rbf_kernel_invdist.py
@@ -25,4 +28,6 @@ src/models/model_evaluate.py
 src/models/model_save.py
 src/models/model_train.py
 src/utils/__init__.py
+src/utils/input_transformer.py
 src/utils/misc.py
+src/utils/permutational_invariance.py

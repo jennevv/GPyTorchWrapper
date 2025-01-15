@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from sklearn.preprocessing import StandardScaler
 
-from src.data.data_transform import transform_data
+from gpytorchwrapper.src.data.data_transform import transform_data
 
 
 @pytest.fixture

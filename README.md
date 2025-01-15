@@ -98,19 +98,19 @@ The `testing_conf` section specifies the testing parameters.
 If `test` is `True` and the `test_size` is specified, the split will be random using scikit-learn's `train_test_split`.     
 
 ### Loading the model
-How to load the model is shown in the example below.    
+How to load the model is shown in the example below.
 
 ```python
 import torch
 import gpytorch
-from src.gp_utils import get_model, get_likelihood, read_yaml
+from gpytorchwrapper.src import get_model, get_likelihood, read_yaml
 
 metadata = torch.load('model.pth')
 config = read_yaml('config.yaml')
 
 train_x, train_y = metadata['training_data']['train_x'], metadata['training_data']['train_y']
 
-likelihood_class = get_likelihood(config['trainingSpec'], num_tasks=config['dataSpec']['output']['nOutputs'])  
+likelihood_class = get_likelihood(config['trainingSpec'], num_tasks=config['dataSpec']['output']['nOutputs'])
 model_class = get_model(config['trainingSpec'])
 
 likelihood = likelihood_class()

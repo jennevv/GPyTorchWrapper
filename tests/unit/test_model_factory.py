@@ -2,9 +2,9 @@ import gpytorch
 import pytest
 import sklearn
 
-import src.models.gp_models as model_module
-from src.config.config_classes import TransformerConf, TrainingConf
-from src.config.model_factory import get_transformer, get_likelihood, get_model
+import gpytorchwrapper.src.models.gp_models as model_module
+from gpytorchwrapper.src.config.config_classes import TransformerConf, TrainingConf
+from gpytorchwrapper.src.config.model_factory import get_transformer, get_likelihood, get_model
 
 
 def test_get_transformer():
@@ -85,5 +85,6 @@ def test_get_model():
         likelihood_class='GaussianLikelihood',
         learning_rate=0.1,
         learning_iterations=100)
-    with pytest.raises(AttributeError):
+
+    with pytest.raises(NotImplementedError):
         get_model(training_conf)

@@ -3,8 +3,8 @@ from typing import Optional
 
 import pandas as pd
 
-from src.config.config_classes import TransformConf
-from src.config.model_factory import get_transformer
+from gpytorchwrapper.src.config.config_classes import TransformConf
+from gpytorchwrapper.src.config.model_factory import get_transformer
 
 logger = logging.getLogger(__name__)
 

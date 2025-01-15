@@ -8,8 +8,8 @@ from gpytorch.priors import Prior
 from linear_operator.operators import MatmulLinearOperator, RootLinearOperator
 from torch import Tensor
 
-from src.utils.input_transformer import xyz_to_invdist_torch
-from src.utils.permutational_invariance import generate_permutations
+from gpytorchwrapper.src.utils.input_transformer import xyz_to_invdist_torch
+from gpytorchwrapper.src.utils.permutational_invariance import generate_permutations
 
 
 class LinearxMaternKernelPermInv(Kernel):
