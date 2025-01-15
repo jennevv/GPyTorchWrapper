@@ -2,7 +2,9 @@ import sklearn.preprocessing as transformer_module
 import gpytorch.likelihoods as likelihood_module
 import src.models.gp_models as model_module
 from .config_classes import TransformerConf, TrainingConf
+import logging
 
+logger = logging.getLogger(__name__)
 
 def get_transformer(transformer_conf: TransformerConf) -> object:
     """
@@ -63,7 +65,10 @@ def get_model(training_conf: TrainingConf) -> object:
                            The selected model class
     """
     selected_model = training_conf.model_class
-    return getattr(model_module, selected_model)
+    if hasattr(model_module, selected_model):
+        return getattr(model_module, selected_model)
+    else:
+        logger.error(f"The specified model class, {selected_model}, is not available in gp_models.py")
 
 
 
