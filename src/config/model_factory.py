@@ -1,4 +1,5 @@
 import importlib
+import os
 import pkgutil
 from dis import disco
 
@@ -55,7 +56,15 @@ def get_likelihood(training_conf: TrainingConf) -> object:
     selected_likelihood = training_conf.likelihood_class
     return getattr(likelihood_module, selected_likelihood)
 
-def get_plugins(path: str = '../../plugins'):
+def get_plugins(path: str = None):
+    if path is None:
+        # Dynamically find the plugins directory relative to this script
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.abspath(os.path.join(current_dir, '../../plugins'))
+
+    if not os.path.isdir(path):
+        raise FileNotFoundError(f"Plugins directory not found at {path}")
+
     sys.path.insert(0, path)
 
     discovered_plugins = {
@@ -95,7 +104,7 @@ def get_model(training_conf: TrainingConf) -> object:
                 logger.info(f"Loading model class {selected_model} from {module}.")
                 return getattr(model_module, selected_model)
     else:
-        logger.error(f"The specified model class, {selected_model}, is not available in gp_models.py")
+        raise NotImplementedError(f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder.")
 
 
 
