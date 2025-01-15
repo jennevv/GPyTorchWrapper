@@ -1,8 +1,15 @@
+import importlib
+import pkgutil
+from dis import disco
+
 import sklearn.preprocessing as transformer_module
 import gpytorch.likelihoods as likelihood_module
+from numpy.typing.mypy_plugin import plugin
+
 import src.models.gp_models as model_module
 from .config_classes import TransformerConf, TrainingConf
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +55,17 @@ def get_likelihood(training_conf: TrainingConf) -> object:
     selected_likelihood = training_conf.likelihood_class
     return getattr(likelihood_module, selected_likelihood)
 
+def get_plugins(path: str = '../../plugins'):
+    sys.path.insert(0, path)
+
+    discovered_plugins = {
+        name: importlib.import_module(name)
+        for finder, name, ispkg
+        in pkgutil.iter_modules()
+        if name.startswith('model_')
+    }
+
+    return discovered_plugins
 
 
 def get_model(training_conf: TrainingConf) -> object:
@@ -65,8 +83,17 @@ def get_model(training_conf: TrainingConf) -> object:
                            The selected model class
     """
     selected_model = training_conf.model_class
+
+    plugin_modules = get_plugins()
+
     if hasattr(model_module, selected_model):
+        logger.info(f"Loading model class {selected_model} from {model_module}.")
         return getattr(model_module, selected_model)
+    elif plugin_modules != {}:
+        for module_name, module in plugin_modules.values():
+            if hasattr(module, selected_model):
+                logger.info(f"Loading model class {selected_model} from {module}.")
+                return getattr(model_module, selected_model)
     else:
         logger.error(f"The specified model class, {selected_model}, is not available in gp_models.py")
 
