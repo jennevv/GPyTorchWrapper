@@ -1,7 +1,7 @@
 from gpytorch.kernels import RBFKernel
 from torch import Tensor
 
-from src.utils.input_transformer import xyz_to_invdist_torch
+from gpytorchwrapper.src.utils.input_transformer import xyz_to_invdist_torch
 
 
 class RBFKernelInvDist(RBFKernel):

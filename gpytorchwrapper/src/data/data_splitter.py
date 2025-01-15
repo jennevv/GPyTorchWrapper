@@ -5,11 +5,11 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import StratifiedShuffleSplit, KFold, train_test_split
 
-from src.config.config_classes import DataConf, TestingConf, TrainingConf, TransformConf
-from src.data.data_transform import transform
-from src.models.model_evaluate import evaluate_model
-from src.models.model_train import train_model
-from src.utils import dataframe_to_tensor
+from gpytorchwrapper.src.config.config_classes import DataConf, TestingConf, TrainingConf, TransformConf
+from gpytorchwrapper.src.data.data_transform import transform
+from gpytorchwrapper.src.models.model_evaluate import evaluate_model
+from gpytorchwrapper.src.models.model_train import train_model
+from gpytorchwrapper.src.utils import dataframe_to_tensor
 
 logger = logging.getLogger(__name__)
 

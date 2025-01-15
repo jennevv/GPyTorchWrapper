@@ -6,8 +6,8 @@ import gpytorch
 import numpy as np
 import torch
 
-from src.config.config_reader import read_yaml
-from src.config.model_factory import get_likelihood, get_model
+from gpytorchwrapper.src import read_yaml
+from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
 
 warnings.filterwarnings("ignore") # Ignore warnings from the torch.jit.trace function
 

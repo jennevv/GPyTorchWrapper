@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
 
-from src.config.config_classes import DataConf
-from src.data.data_splitter import input_output_split
+from gpytorchwrapper.src.config.config_classes import DataConf
+from gpytorchwrapper.src.data.data_splitter import input_output_split
 
 
 @pytest.fixture

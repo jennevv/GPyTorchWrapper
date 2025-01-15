@@ -57,7 +57,7 @@ def test_loss_figure_exists_multiple(run_script_multi_output):
 def test_single_output_model_exists(run_script_single_output):
     for file in os.listdir('./test_single_model'):
         file = pathlib.Path(file)
-        match = fnmatch.fnmatch(file.name, "test_model_single_output_*.pth")
+        match = fnmatch.fnmatch(file.name, "test_model_single_output.pth")
         if match:
             break
     else:
@@ -67,7 +67,7 @@ def test_single_output_model_exists(run_script_single_output):
 def test_multi_output_model_exists(run_script_multi_output):
     for file in os.listdir('./test_multi_model'):
         file = pathlib.Path(file)
-        match = fnmatch.fnmatch(file.name, "test_model_multi_output_*.pth")
+        match = fnmatch.fnmatch(file.name, "test_model_multi_output.pth")
         if match:
             break
     else:

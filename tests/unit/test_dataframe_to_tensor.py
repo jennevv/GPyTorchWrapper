@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import torch
 
-from src.utils.misc import dataframe_to_tensor
+from gpytorchwrapper.src.utils import dataframe_to_tensor
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 import pytest
 import pathlib
 
-from src.config.config_reader import read_yaml
+from gpytorchwrapper.src.config.config_reader import read_yaml
 
 
 @pytest.fixture

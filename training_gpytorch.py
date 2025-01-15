@@ -4,14 +4,14 @@ import pathlib
 from pathlib import Path
 from sys import platform
 
-from src.config.config_reader import read_yaml
-from src.data.data_reader import DataReader
-from src.data.data_splitter import input_output_split, split_data
-from src.data.data_transform import transform
-from src.models.model_train import train_model
-from src.models.model_evaluate import evaluate_model
-from src.models.model_save import save_model
-from src.utils import metadata_dict, dataframe_to_tensor
+from gpytorchwrapper.src.config.config_reader import read_yaml
+from gpytorchwrapper.src.data.data_reader import DataReader
+from gpytorchwrapper.src.data.data_splitter import input_output_split, split_data
+from gpytorchwrapper.src.data.data_transform import transform
+from gpytorchwrapper.src.models.model_train import train_model
+from gpytorchwrapper.src.models.model_evaluate import evaluate_model
+from gpytorchwrapper.src.models.model_save import save_model
+from gpytorchwrapper.src.utils import metadata_dict, dataframe_to_tensor
 
 __author__ = 'Jenne Van Veerdeghem'
 __version__ = '0.0.1'

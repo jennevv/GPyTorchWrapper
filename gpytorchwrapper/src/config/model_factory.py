@@ -1,13 +1,11 @@
 import importlib
 import os
 import pkgutil
-from dis import disco
 
 import sklearn.preprocessing as transformer_module
 import gpytorch.likelihoods as likelihood_module
-from numpy.typing.mypy_plugin import plugin
 
-import src.models.gp_models as model_module
+import gpytorchwrapper.src.models.gp_models as model_module
 from .config_classes import TransformerConf, TrainingConf
 import logging
 import sys
@@ -94,7 +92,6 @@ def get_model(training_conf: TrainingConf) -> object:
     selected_model = training_conf.model_class
 
     plugin_modules = get_plugins()
-
     if hasattr(model_module, selected_model):
         logger.info(f"Loading model class {selected_model} from {model_module}.")
         return getattr(model_module, selected_model)
@@ -103,6 +100,7 @@ def get_model(training_conf: TrainingConf) -> object:
             if hasattr(module, selected_model):
                 logger.info(f"Loading model class {selected_model} from {module}.")
                 return getattr(module, selected_model)
+        raise NotImplementedError(f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder.")
     else:
         raise NotImplementedError(f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder.")
 
