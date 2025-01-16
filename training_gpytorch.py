@@ -105,7 +105,7 @@ def main():
     train_rmse, test_rmse, test_corr = evaluate_model(model, likelihood, train_x, train_y, test_x, test_y)
 
     # Save metadata to dictionaries
-    model_metadata = metadata_dict(model=model, training_conf=training_conf)
+    model_metadata = metadata_dict(training_conf=training_conf)
     training_metadata = metadata_dict(train_x=train_x, train_y=train_y, test_x=test_x, test_y=test_y,
                                       input_transformer=input_transformer, output_transformer=output_transformer)
     metrics_metadata = metadata_dict(train_rmse=train_rmse, test_rmse=test_rmse, test_corr=test_corr)
