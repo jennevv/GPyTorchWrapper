@@ -36,14 +36,6 @@ def parse_args():
     )
 
     parser.add_argument(
-        "-c",
-        "--config",
-        type=str,
-        required=True,
-        help="Config file containing the script options which was used to train the model.",
-    )
-
-    parser.add_argument(
         "-d",
         "--directory",
         type=str,
@@ -54,7 +46,7 @@ def parse_args():
 
     args = parser.parse_args()
 
-    args.input, args.config, args.directory = map(Path, [args.input, args.config, args.directory])
+    args.input, args.directory = map(Path, [args.input, args.directory])
     
     args.directory.mkdir(parents=True, exist_ok=True)
     
@@ -65,21 +57,20 @@ def parse_args():
 def main():
     args = parse_args()
 
-    input_file = read_yaml(args.config)
-    input_data = input_file.data_conf
-
     model_dump = torch.load(args.input)
 
-    train_x, train_y = model_dump['training_data']['train_x'], model_dump['training_data']['train_y']
-    num_inputs = input_data.num_inputs
-    num_tasks = input_data.num_outputs
+    config = model_dump['config']
 
-    if input_file.transform_conf.transform_input.transform_data:
+    train_x, train_y = model_dump['training_data']['train_x'], model_dump['training_data']['train_y']
+    num_inputs = config.data_conf.num_inputs
+    num_tasks = config.data_conf.num_outputs
+
+    if config.transform_conf.transform_input.transform_data:
         input_transformer = model_dump['training_data']['input_transformer']
     else:
         input_transformer = None
 
-    model_path, likelihood = load_model(input_file, model_dump, train_x, train_y, num_tasks)
+    model_path, likelihood = load_model(config, model_dump, train_x, train_y, num_tasks)
 
     traced_model = trace_model(model_path, len(train_x), input_transformer, num_inputs)
 
@@ -98,9 +89,9 @@ class MeanVarModelWrapper(torch.nn.Module):
         return output_dist.mean, output_dist.variance
 
 
-def load_model(input_file, model_dump, train_x, train_y, num_tasks):
-    likelihood_class = get_likelihood(input_file.training_conf)
-    model_class = get_model(input_file.training_conf)
+def load_model(config, model_dump, train_x, train_y, num_tasks):
+    likelihood_class = get_likelihood(config.training_conf)
+    model_class = get_model(config.training_conf)
 
     if num_tasks > 1:
         likelihood = likelihood_class(num_tasks=num_tasks)
