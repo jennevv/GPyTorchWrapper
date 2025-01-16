@@ -103,7 +103,7 @@ def load_model(config, model_dump, train_x, train_y, num_tasks):
     model.double()
     likelihood.double()
 
-    model.load_state_dict(model_dump['model_state'])
+    model.load_state_dict(model_dump['state_dict'])
 
     return model, likelihood
 
