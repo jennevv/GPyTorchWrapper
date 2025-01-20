@@ -40,7 +40,9 @@ def input_output_split(data: pd.DataFrame, data_conf: DataConf) -> tuple[pd.Data
         raise RuntimeError("The number of inputs and outputs specified exceeds the number of columns in the data file.")
 
     if n_inputs + n_outputs < len(data.columns):
-        if isinstance(data_conf.output_index, int) or isinstance(data_conf.output_index, list):
+        if isinstance(data_conf.output_index, int) and n_outputs == 1:
+            output_idx = data_conf.output_index
+        elif isinstance(data_conf.output_index, list):
             output_idx = data_conf.output_index
         else:
             raise KeyError(
