@@ -141,7 +141,7 @@ def k_fold_split(
 
         # Evaluate the model on the training and test sets
         train_rmse, test_rmse, test_corr = evaluate_model(
-            model, likelihood, train_x, train_y, test_x, test_y
+            model, likelihood, output_transformer, train_x, train_y, test_x, test_y
         )
 
         train_rmse_arr[fold] = train_rmse[0]
