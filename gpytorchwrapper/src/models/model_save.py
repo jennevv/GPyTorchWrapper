@@ -4,7 +4,7 @@ import torch
 
 
 def save_model(
-    state_dict: object,
+    state_dict: dict,
     config: Config,
     training_data: dict,
     metrics: dict,

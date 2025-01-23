@@ -50,7 +50,7 @@ def input_output_split(
 
     if n_inputs + n_outputs < len(data.columns):
         if isinstance(data_conf.output_index, int) and n_outputs == 1:
-            output_idx = data_conf.output_index
+            output_idx = [data_conf.output_index]
         elif isinstance(data_conf.output_index, list):
             output_idx = data_conf.output_index
         else:
@@ -60,14 +60,11 @@ def input_output_split(
     else:
         output_idx = [i for i in range(n_outputs)]
 
-    if isinstance(output_idx, int):
-        output_idx = [output_idx]
-
     input_columns = data.columns[0:n_inputs]
     output_columns = []
 
     for idx in output_idx:
-        column_i = data.columns[n_inputs + (idx)]
+        column_i = data.columns[n_inputs + idx]
         output_columns.append(column_i)
 
     x = data[input_columns]
@@ -184,7 +181,7 @@ def write_kfold_results(kfold_results, out_dir):
 
 
 def stratified_shuffle_split(
-    x: pd.DataFrame, y: pd.DataFrame, n_bins: int = 5, test_size: float = 0.2
+    x: pd.DataFrame, y: pd.DataFrame, n_bins: int | None = 5, test_size: float = 0.2
 ):
     """
     Split the data into training and test sets using stratified shuffle split

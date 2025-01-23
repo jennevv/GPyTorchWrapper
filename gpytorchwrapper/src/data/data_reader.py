@@ -13,11 +13,11 @@ class DataReader:
     def __init__(self):
         pass
 
-    def _read_csv(self, file: str) -> pd.DataFrame:
+    def _read_csv(self, file: str | Path) -> pd.DataFrame | pd.Series:
         data = pd.read_csv(file)
         return data
 
-    def _read_pickle(self, file: str) -> pd.DataFrame:
+    def _read_pickle(self, file: str | Path) -> pd.DataFrame:
         pickle = joblib.load(file)
         data = pickle["processed_dataset"]
 
@@ -52,13 +52,13 @@ class DataReader:
         if file_type == "csv":
             try:
                 data = self._read_csv(file)
-            except:
-                raise ImportError(f"The file is not of the file type {file_type}.")
+            except Exception:
+                raise ImportError(f"The file is likely not of the file type {file_type}.")
         elif file_type == "pickle":
             try:
                 data = self._read_pickle(file)
-            except:
-                raise ImportError(f"The file is not of the file type {file_type}.")
+            except Exception:
+                raise ImportError(f"The file is likely not of the file type {file_type}.")
         else:
             raise NotImplementedError(
                 f"The file type {file_type} is not implemented. Choose either csv or pickle."

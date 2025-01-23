@@ -3,6 +3,9 @@ import logging
 import gpytorch
 import torch
 
+from gpytorch.models import ExactGP
+from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood
+
 logger = logging.getLogger(__name__)
 
 
@@ -11,7 +14,7 @@ class ModelEvaluator:
     Class for evaluating the rmse and correlation of the model predictions on the selected dataset
     """
 
-    def __init__(self, model: object, likelihood: object, output_transformer: object = None):
+    def __init__(self, model: ExactGP, likelihood: GaussianLikelihood | MultitaskGaussianLikelihood, output_transformer: object = None):
         self.model = model
         self.likelihood = likelihood
         self.output_transformer = output_transformer
@@ -30,7 +33,7 @@ class ModelEvaluator:
         if not torch.is_tensor(tensor):
             raise NotImplementedError("The input should be a PyTorch tensor.")
 
-    def _compare_mean_and_output_dimensions(self, output, mean) -> None:
+    def _compare_mean_and_output_dimensions(self, output: torch.Tensor, mean: torch.Tensor) -> None:
         if output.squeeze().dim() != mean.squeeze().dim():
             raise ValueError(
                 "The number of output dimensions does not match the number of prediction dimensions."
@@ -47,8 +50,8 @@ class ModelEvaluator:
         rmse = []
 
         if self.output_transformer is not None:
-            y = torch.as_tensor(self.output_transformer.inverse_transform(y.numpy().reshape(-1,1)))
-            mean = torch.as_tensor(self.output_transformer.inverse_transform(predictions.mean.numpy().reshape(-1,1)))
+            y = torch.as_tensor(self.output_transformer.inverse_transform(y.numpy().reshape(-1, 1)))
+            mean = torch.as_tensor(self.output_transformer.inverse_transform(predictions.mean.numpy().reshape(-1, 1)))
         else:
             mean = predictions.mean
 
@@ -83,22 +86,22 @@ class ModelEvaluator:
 
 
 def evaluate_model(
-    model: object,
-    likelihood: object,
-    output_transformer: object,
-    train_x: torch.Tensor,
-    train_y: torch.Tensor,
-    test_x: torch.Tensor,
-    test_y: torch.Tensor,
+        model: ExactGP,
+        likelihood: GaussianLikelihood | MultitaskGaussianLikelihood,
+        output_transformer: object,
+        train_x: torch.Tensor,
+        train_y: torch.Tensor,
+        test_x: torch.Tensor,
+        test_y: torch.Tensor,
 ) -> tuple[list[float], list[float], list[float]] | tuple[list[float], None, None]:
     """
     Evaluate the model on the training and test sets
 
     Parameters
     -----------
-    model : object
+    model : ExactGP
             The trained model
-    likelihood : object
+    likelihood : GaussianLikelihood | MultitaskGaussianLikelihood
                  The trained likelihood of the model
     train_x : torch.Tensor
               The input training data

@@ -4,6 +4,8 @@ import pkgutil
 
 import sklearn.preprocessing as transformer_module
 import gpytorch.likelihoods as likelihood_module
+from gpytorch.likelihoods import Likelihood
+from gpytorch.models import ExactGP
 
 import gpytorchwrapper.src.models.gp_models as model_module
 from .config_classes import TransformerConf, TrainingConf
@@ -38,7 +40,7 @@ def get_transformer(transformer_conf: TransformerConf) -> object:
     return selected_transformer_class
 
 
-def get_likelihood(training_conf: TrainingConf) -> object:
+def get_likelihood(training_conf: TrainingConf) -> Likelihood:
     """
     Get the likelihood class and options
 
@@ -56,7 +58,7 @@ def get_likelihood(training_conf: TrainingConf) -> object:
     return getattr(likelihood_module, selected_likelihood)
 
 
-def get_plugins(path: str = None):
+def get_plugins(path: str | None = None):
     if path is None:
         # Dynamically find the plugins directory relative to this script
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -76,7 +78,7 @@ def get_plugins(path: str = None):
     return discovered_plugins
 
 
-def get_model(training_conf: TrainingConf) -> object:
+def get_model(training_conf: TrainingConf) -> ExactGP:
     """
     Get the model class and options
 

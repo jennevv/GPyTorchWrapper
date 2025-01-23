@@ -5,13 +5,17 @@ import logging
 
 from botorch import fit_gpytorch_mll
 
+from gpytorch.models import ExactGP
+from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood
+from gpytorch.mlls import MarginalLogLikelihood
+
 from gpytorchwrapper.src.config.config_classes import TrainingConf
 from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
 
 logger = logging.getLogger(__name__)
 
 
-def define_optimizer(model: object, learning_rate: float) -> torch.optim.Optimizer:
+def define_optimizer(model: ExactGP, learning_rate: float) -> torch.optim.Optimizer:
     """
     Define the optimizer for the model
 
@@ -31,7 +35,7 @@ def define_optimizer(model: object, learning_rate: float) -> torch.optim.Optimiz
     return torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
-def set_noiseless(likelihood: object, num_tasks: int) -> object:
+def set_noiseless(likelihood: GaussianLikelihood | MultitaskGaussianLikelihood, num_tasks: int) -> object:
     """
     Set the likelihood noise to a small value to simulate noiseless data
     The noise is set to 1e-8 for performance reasons
@@ -83,8 +87,8 @@ def loss_figure(loss: list[float], iteration: list[int]) -> None:
 def training_loop(
     train_x: torch.Tensor,
     train_y: torch.Tensor,
-    model,
-    mll,
+    model: ExactGP,
+    mll: MarginalLogLikelihood,
     optimizer: torch.optim.Optimizer,
     learning_iterations: int,
     debug: bool,
@@ -100,7 +104,7 @@ def training_loop(
             The output training data
     model : object
             The model to be trained
-    mll : object
+    mll : MarginalLogLikelihood
         The marginal likelihood of the model
     optimizer : object
             The optimizer for the model
@@ -137,7 +141,7 @@ def training_loop(
     loss_figure(loss_hash["loss"], loss_hash["iteration"])
 
 
-def model_parameters(model: object) -> str:
+def model_parameters(model: ExactGP) -> str:
     parameters = []
 
     for param_name, param in model.named_parameters():
@@ -158,7 +162,7 @@ def train_model(
     train_y: torch.Tensor,
     training_conf: TrainingConf,
     num_tasks: int,
-) -> tuple[object, object]:
+) -> tuple[ExactGP, GaussianLikelihood | MultitaskGaussianLikelihood]:
     """
     Train the model using the training data
 
