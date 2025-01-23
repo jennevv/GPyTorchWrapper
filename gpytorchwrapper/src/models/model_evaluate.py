@@ -11,9 +11,10 @@ class ModelEvaluator:
     Class for evaluating the rmse and correlation of the model predictions on the selected dataset
     """
 
-    def __init__(self, model: object, likelihood: object):
+    def __init__(self, model: object, likelihood: object, output_transformer: object = None):
         self.model = model
         self.likelihood = likelihood
+        self.output_transformer = output_transformer
 
     def _predict(self, x: torch.Tensor) -> gpytorch.distributions.Distribution:
         self.model.eval()
@@ -45,11 +46,16 @@ class ModelEvaluator:
 
         rmse = []
 
+        if self.output_transformer is not None:
+            mean = torch.as_tensor(self.output_transformer.inverse_transform(predictions.mean.numpy()))
+        else:
+            mean = predictions.mean
+
         if y.dim() > 1:
             for i in range(y.shape[1]):
-                rmse.append(self._rmse(predictions.mean[:, i], y[:, i]))
+                rmse.append(self._rmse(mean[:, i], y[:, i]))
         else:
-            rmse.append(self._rmse(predictions.mean, y))
+            rmse.append(self._rmse(mean, y))
         return rmse
 
     def evaluate_correlation(self, x: torch.Tensor, y: torch.Tensor) -> list[float]:
@@ -78,6 +84,7 @@ class ModelEvaluator:
 def evaluate_model(
     model: object,
     likelihood: object,
+    output_transformer: object,
     train_x: torch.Tensor,
     train_y: torch.Tensor,
     test_x: torch.Tensor,
@@ -112,7 +119,7 @@ def evaluate_model(
     """
     logger.info("Evaluating the model.")
 
-    evaluator = ModelEvaluator(model, likelihood)
+    evaluator = ModelEvaluator(model, likelihood, output_transformer)
 
     train_rmse = evaluator.evaluate_rmse(train_x, train_y)
     logger.info(f"train_rmse: {train_rmse}")

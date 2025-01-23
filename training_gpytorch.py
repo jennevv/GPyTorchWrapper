@@ -109,7 +109,7 @@ def main():
 
     # Evaluate the model on the training and test sets
     train_rmse, test_rmse, test_corr = evaluate_model(
-        model, likelihood, train_x, train_y, test_x, test_y
+        model, likelihood, output_transformer, train_x, train_y, test_x, test_y
     )
 
     # Save metadata to dictionaries
