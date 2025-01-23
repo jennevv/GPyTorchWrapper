@@ -55,7 +55,10 @@ def test_read_yaml_valid_file(sample_yaml_file):
 
     assert config.transform_conf.transform_input.transform_data is True
     assert config.transform_conf.transform_input.transformer_class == "PowerTransformer"
-    assert config.transform_conf.transform_input.transformer_options == {'method': 'yeo-johnson', 'standardize': True}
+    assert config.transform_conf.transform_input.transformer_options == {
+        "method": "yeo-johnson",
+        "standardize": True,
+    }
     assert config.transform_conf.transform_input.columns is None
 
     assert config.transform_conf.transform_output.transform_data is False

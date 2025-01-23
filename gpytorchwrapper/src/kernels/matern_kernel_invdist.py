@@ -9,7 +9,8 @@ class MaternKernelInvDist(MaternKernel):
         super().__init__(**kwargs)
         if self.active_dims is not None:
             raise NotImplementedError(
-                'Active dimensions are not supported for MaternKernelInvDist. Please use select_dims instead.')
+                "Active dimensions are not supported for MaternKernelInvDist. Please use select_dims instead."
+            )
 
         self.select_dims = select_dims
 

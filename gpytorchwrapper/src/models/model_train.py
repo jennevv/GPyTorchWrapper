@@ -56,6 +56,7 @@ def set_noiseless(likelihood: object, num_tasks: int) -> object:
         likelihood.raw_noise.detach_()
     return likelihood
 
+
 def loss_figure(loss: list[float], iteration: list[int]) -> None:
     """
     Plot the change of loss during training
@@ -73,14 +74,21 @@ def loss_figure(loss: list[float], iteration: list[int]) -> None:
     None
     """
     plt.scatter(iteration, loss)
-    plt.title('Change of loss during training')
-    plt.xlabel('Iteration')
-    plt.ylabel('Loss')
+    plt.title("Change of loss during training")
+    plt.xlabel("Iteration")
+    plt.ylabel("Loss")
     plt.savefig("loss.png", dpi=300)
 
 
-
-def training_loop(train_x: torch.Tensor, train_y: torch.Tensor, model, mll, optimizer: torch.optim.Optimizer, learning_iterations: int, debug: bool) -> None:
+def training_loop(
+    train_x: torch.Tensor,
+    train_y: torch.Tensor,
+    model,
+    mll,
+    optimizer: torch.optim.Optimizer,
+    learning_iterations: int,
+    debug: bool,
+) -> None:
     """
     The training loop for the model
 
@@ -105,13 +113,13 @@ def training_loop(train_x: torch.Tensor, train_y: torch.Tensor, model, mll, opti
     --------
     None
     """
-    loss_hash = {'loss': [], 'iteration': []}
+    loss_hash = {"loss": [], "iteration": []}
 
     with gpytorch.settings.debug(debug):
         for iteration in range(learning_iterations):
             if (iteration + 1) % 10 == 0:
-                logger.info(f'Iteration {iteration + 1}/{learning_iterations}')
-                loss_figure(loss_hash['loss'], loss_hash['iteration'])
+                logger.info(f"Iteration {iteration + 1}/{learning_iterations}")
+                loss_figure(loss_hash["loss"], loss_hash["iteration"])
 
             optimizer.zero_grad()
 
@@ -119,28 +127,38 @@ def training_loop(train_x: torch.Tensor, train_y: torch.Tensor, model, mll, opti
 
             loss = -mll(output, train_y)
 
-            loss_hash['loss'].append(loss.item())
+            loss_hash["loss"].append(loss.item())
 
-            loss_hash['iteration'].append(iteration)
+            loss_hash["iteration"].append(iteration)
             loss.backward()
             optimizer.step()
 
     # Plot the loss one last time
-    loss_figure(loss_hash['loss'], loss_hash['iteration'])
+    loss_figure(loss_hash["loss"], loss_hash["iteration"])
+
 
 def model_parameters(model: object) -> str:
     parameters = []
 
     for param_name, param in model.named_parameters():
         if param.size() == 1:
-            parameters.append(f'Parameter name: {param_name:42} value = {param.item()}\n')
+            parameters.append(
+                f"Parameter name: {param_name:42} value = {param.item()}\n"
+            )
         else:
-            parameters.append(f'Parameter name: {param_name:42} value = {param.tolist()}\n')
+            parameters.append(
+                f"Parameter name: {param_name:42} value = {param.tolist()}\n"
+            )
 
-    return ''.join(parameters)
+    return "".join(parameters)
 
 
-def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: TrainingConf, num_tasks: int) -> tuple[object, object]:
+def train_model(
+    train_x: torch.Tensor,
+    train_y: torch.Tensor,
+    training_conf: TrainingConf,
+    num_tasks: int,
+) -> tuple[object, object]:
     """
     Train the model using the training data
 
@@ -162,7 +180,7 @@ def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: Tra
     likelihood : object
                  The likelihood of the trained model
     """
-    logger.info('Defining the model specifications.')
+    logger.info("Defining the model specifications.")
 
     # Load the training specifications
     learning_iterations = training_conf.learning_iterations
@@ -178,24 +196,30 @@ def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: Tra
     # Set noise constraint like sklearn WhiteKernel for comparison reasons
     if num_tasks > 1:
         if noiseless:
-            likelihood = likelihood_class(num_tasks=num_tasks,
-                                          noise_constraint=gpytorch.constraints.GreaterThan(1e-8))
+            likelihood = likelihood_class(
+                num_tasks=num_tasks,
+                noise_constraint=gpytorch.constraints.GreaterThan(1e-8),
+            )
             likelihood.raw_task_noises.requires_grad = False
         else:
-            likelihood = likelihood_class(num_tasks=num_tasks,
-                noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
+            likelihood = likelihood_class(
+                num_tasks=num_tasks,
+                noise_constraint=gpytorch.constraints.GreaterThan(1e-5),
+            )
     else:
         if noiseless:
             likelihood = likelihood_class(
-                noise_constraint=gpytorch.constraints.GreaterThan(1e-8))
+                noise_constraint=gpytorch.constraints.GreaterThan(1e-8)
+            )
             likelihood.raw_noise.requires_grad = False
         else:
             likelihood = likelihood_class(
-                noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
+                noise_constraint=gpytorch.constraints.GreaterThan(1e-5)
+            )
 
     model = model_class(train_x, train_y, likelihood)
 
-    logger.info(f'Parameters before training: \n{model_parameters(model)}')
+    logger.info(f"Parameters before training: \n{model_parameters(model)}")
 
     # Training in double precision
     model.double()
@@ -210,8 +234,10 @@ def train_model(train_x: torch.Tensor, train_y: torch.Tensor, training_conf: Tra
     else:
         # Optimize model hyperparameters
         optimizer = define_optimizer(model, learning_rate)
-        training_loop(train_x, train_y, model, mll, optimizer, learning_iterations, debug)
+        training_loop(
+            train_x, train_y, model, mll, optimizer, learning_iterations, debug
+        )
 
-    logger.info(f'Parameters after training: \n{model_parameters(model)}')
+    logger.info(f"Parameters after training: \n{model_parameters(model)}")
 
     return model, likelihood

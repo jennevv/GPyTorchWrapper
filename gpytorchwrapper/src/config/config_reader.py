@@ -2,6 +2,7 @@ import pathlib
 import yaml
 from .config_classes import create_config, Config
 
+
 def read_yaml(input_path: pathlib.Path | str) -> Config:
     """
     Read the input file and return a dictionary with the specifications.
@@ -29,7 +30,7 @@ def read_yaml(input_path: pathlib.Path | str) -> Config:
     if not input_path.exists():
         raise FileNotFoundError(f"The file {input_path} does not exist")
 
-    with input_path.open('r') as f:
+    with input_path.open("r") as f:
         input_dict = yaml.safe_load(f)
 
     try:
@@ -38,5 +39,3 @@ def read_yaml(input_path: pathlib.Path | str) -> Config:
         raise NotImplementedError("Incorrect YAML file structure.")
 
     return config
-
-

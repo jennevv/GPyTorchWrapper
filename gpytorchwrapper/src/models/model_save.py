@@ -2,7 +2,15 @@ from pathlib import Path
 from gpytorchwrapper.src.config.config_classes import Config
 import torch
 
-def save_model(state_dict: object, config: Config, training_data: dict, metrics: dict, output: str, directory: Path) -> None:
+
+def save_model(
+    state_dict: object,
+    config: Config,
+    training_data: dict,
+    metrics: dict,
+    output: str,
+    directory: Path,
+) -> None:
     """
     Save the model to a .pth file
 
@@ -29,9 +37,10 @@ def save_model(state_dict: object, config: Config, training_data: dict, metrics:
         directory = Path(directory)
 
     savestate = {
-        'state_dict': state_dict,
-        'config': config,
-        'training_data': training_data,
-        'metrics': metrics}
+        "state_dict": state_dict,
+        "config": config,
+        "training_data": training_data,
+        "metrics": metrics,
+    }
 
-    torch.save(savestate, directory / f'{output}.pth')
+    torch.save(savestate, directory / f"{output}.pth")

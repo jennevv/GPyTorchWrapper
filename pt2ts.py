@@ -9,13 +9,12 @@ import torch
 from gpytorchwrapper.src.config.config_reader import read_yaml
 from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
 
-warnings.filterwarnings("ignore") # Ignore warnings from the torch.jit.trace function
+warnings.filterwarnings("ignore")  # Ignore warnings from the torch.jit.trace function
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        prog="pt2ts",
-        description="Convert a PyTorch model to a TorchScript model"
+        prog="pt2ts", description="Convert a PyTorch model to a TorchScript model"
     )
 
     parser.add_argument(
@@ -41,17 +40,16 @@ def parse_args():
         type=str,
         required=False,
         default="./",
-        help="Directory where the TorchScript model is saved."
+        help="Directory where the TorchScript model is saved.",
     )
 
     args = parser.parse_args()
 
     args.input, args.directory = map(Path, [args.input, args.directory])
-    
-    args.directory.mkdir(parents=True, exist_ok=True)
-    
-    return args
 
+    args.directory.mkdir(parents=True, exist_ok=True)
+
+    return args
 
 
 def main():
@@ -59,14 +57,17 @@ def main():
 
     model_dump = torch.load(args.input)
 
-    config = model_dump['config']
+    config = model_dump["config"]
 
-    train_x, train_y = model_dump['training_data']['train_x'], model_dump['training_data']['train_y']
+    train_x, train_y = (
+        model_dump["training_data"]["train_x"],
+        model_dump["training_data"]["train_y"],
+    )
     num_inputs = config.data_conf.num_inputs
     num_tasks = config.data_conf.num_outputs
 
     if config.transform_conf.transform_input.transform_data:
-        input_transformer = model_dump['training_data']['input_transformer']
+        input_transformer = model_dump["training_data"]["input_transformer"]
     else:
         input_transformer = None
 
@@ -103,7 +104,7 @@ def load_model(config, model_dump, train_x, train_y, num_tasks):
     model.double()
     likelihood.double()
 
-    model.load_state_dict(model_dump['state_dict'])
+    model.load_state_dict(model_dump["state_dict"])
 
     return model, likelihood
 
@@ -116,8 +117,11 @@ def trace_model(model, len_training_data, transformer, num_inputs):
 
     test_x = torch.tensor(test_x, dtype=torch.float64, requires_grad=True)
 
-    with gpytorch.settings.fast_pred_var(), gpytorch.settings.trace_mode(), gpytorch.settings.max_eager_kernel_size(
-            len_training_data + len(test_x)):
+    with (
+        gpytorch.settings.fast_pred_var(),
+        gpytorch.settings.trace_mode(),
+        gpytorch.settings.max_eager_kernel_size(len_training_data + len(test_x)),
+    ):
         model.eval()
         pred = model(test_x)  # Do precomputation
         traced_model = torch.jit.trace(MeanVarModelWrapper(model), test_x)

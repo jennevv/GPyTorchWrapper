@@ -5,7 +5,12 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import StratifiedShuffleSplit, KFold, train_test_split
 
-from gpytorchwrapper.src.config.config_classes import DataConf, TestingConf, TrainingConf, TransformConf
+from gpytorchwrapper.src.config.config_classes import (
+    DataConf,
+    TestingConf,
+    TrainingConf,
+    TransformConf,
+)
 from gpytorchwrapper.src.data.data_transform import transform
 from gpytorchwrapper.src.models.model_evaluate import evaluate_model
 from gpytorchwrapper.src.models.model_train import train_model
@@ -14,7 +19,9 @@ from gpytorchwrapper.src.utils import dataframe_to_tensor
 logger = logging.getLogger(__name__)
 
 
-def input_output_split(data: pd.DataFrame, data_conf: DataConf) -> tuple[pd.DataFrame, pd.DataFrame]:
+def input_output_split(
+    data: pd.DataFrame, data_conf: DataConf
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Split the data into input and output
 
@@ -37,7 +44,9 @@ def input_output_split(data: pd.DataFrame, data_conf: DataConf) -> tuple[pd.Data
     n_outputs = data_conf.num_outputs
 
     if (n_inputs + n_outputs) > len(data.columns):
-        raise RuntimeError("The number of inputs and outputs specified exceeds the number of columns in the data file.")
+        raise RuntimeError(
+            "The number of inputs and outputs specified exceeds the number of columns in the data file."
+        )
 
     if n_inputs + n_outputs < len(data.columns):
         if isinstance(data_conf.output_index, int) and n_outputs == 1:
@@ -46,7 +55,8 @@ def input_output_split(data: pd.DataFrame, data_conf: DataConf) -> tuple[pd.Data
             output_idx = data_conf.output_index
         else:
             raise KeyError(
-                f"The output index is not specified or not properly specified. Expected int or list[int], got {type(data_conf.output_index)}")
+                f"The output index is not specified or not properly specified. Expected int or list[int], got {type(data_conf.output_index)}"
+            )
     else:
         output_idx = [i for i in range(n_outputs)]
 
@@ -65,8 +75,15 @@ def input_output_split(data: pd.DataFrame, data_conf: DataConf) -> tuple[pd.Data
     return x, y
 
 
-def k_fold_split(x: pd.DataFrame, y: pd.DataFrame, training_conf: TrainingConf, transform_conf: TransformConf,
-                 data_conf: DataConf, directory: Path, split_size: float = 0.2) -> None:
+def k_fold_split(
+    x: pd.DataFrame,
+    y: pd.DataFrame,
+    training_conf: TrainingConf,
+    transform_conf: TransformConf,
+    data_conf: DataConf,
+    directory: Path,
+    split_size: float = 0.2,
+) -> None:
     """
     Split the data using k-fold cross-validation
 
@@ -108,14 +125,24 @@ def k_fold_split(x: pd.DataFrame, y: pd.DataFrame, training_conf: TrainingConf, 
         test_x = x.iloc[test_index]
         test_y = y.iloc[test_index]
 
-        train_x, test_x, train_y, test_y, input_transformer, output_transformer = transform(train_x, train_y, test_x,
-                                                                                            test_y, transform_conf)
-        train_x, test_x, train_y, test_y = map(dataframe_to_tensor, [train_x, test_x, train_y, test_y])
+        train_x, test_x, train_y, test_y, input_transformer, output_transformer = (
+            transform(train_x, train_y, test_x, test_y, transform_conf)
+        )
+        train_x, test_x, train_y, test_y = map(
+            dataframe_to_tensor, [train_x, test_x, train_y, test_y]
+        )
 
-        model, likelihood = train_model(train_x, train_y, training_conf=training_conf, num_tasks=data_conf.num_outputs)
+        model, likelihood = train_model(
+            train_x,
+            train_y,
+            training_conf=training_conf,
+            num_tasks=data_conf.num_outputs,
+        )
 
         # Evaluate the model on the training and test sets
-        train_rmse, test_rmse, test_corr = evaluate_model(model, likelihood, train_x, train_y, test_x, test_y)
+        train_rmse, test_rmse, test_corr = evaluate_model(
+            model, likelihood, train_x, train_y, test_x, test_y
+        )
 
         train_rmse_arr[fold] = train_rmse[0]
         test_rmse_arr[fold] = test_rmse[0]
@@ -123,8 +150,10 @@ def k_fold_split(x: pd.DataFrame, y: pd.DataFrame, training_conf: TrainingConf, 
 
     kfold_data = np.stack([train_rmse_arr, test_rmse_arr, test_corr_arr], axis=1)
 
-    kfold_df = pd.DataFrame(kfold_data, columns=['TRAIN_RMSE', 'TEST_RMSE', 'TEST_CORR'])
-    kfold_df.to_csv(directory / Path('kfold_data.csv'), index=False)
+    kfold_df = pd.DataFrame(
+        kfold_data, columns=["TRAIN_RMSE", "TEST_RMSE", "TEST_CORR"]
+    )
+    kfold_df.to_csv(directory / Path("kfold_data.csv"), index=False)
 
     kfold_results = calculate_kfold_results(kfold_data)
 
@@ -137,9 +166,9 @@ def calculate_kfold_results(kfold_data):
     avg_test_corr = np.average(kfold_data[:, 2])
 
     kfold_results = {
-        'avg_train_rmse': avg_train_rmse,
-        'avg_test_rmse': avg_test_rmse,
-        'avg_test_corr': avg_test_corr
+        "avg_train_rmse": avg_train_rmse,
+        "avg_test_rmse": avg_test_rmse,
+        "avg_test_corr": avg_test_corr,
     }
 
     return kfold_results
@@ -148,13 +177,15 @@ def calculate_kfold_results(kfold_data):
 def write_kfold_results(kfold_results, out_dir):
     file_path = out_dir / Path("kfold_results.txt")
 
-    with file_path.open(mode='w') as f:
+    with file_path.open(mode="w") as f:
         f.write(f"Average Train RMSE: {kfold_results['avg_train_rmse']}")
         f.write(f"Average Test RMSE: {kfold_results['avg_test_rmse']}")
         f.write(f"Average Test R2: {kfold_results['avg_test_corr']}")
 
 
-def stratified_shuffle_split(x: pd.DataFrame, y: pd.DataFrame, n_bins: int = 5, test_size: float = 0.2):
+def stratified_shuffle_split(
+    x: pd.DataFrame, y: pd.DataFrame, n_bins: int = 5, test_size: float = 0.2
+):
     """
     Split the data into training and test sets using stratified shuffle split
 
@@ -180,7 +211,7 @@ def stratified_shuffle_split(x: pd.DataFrame, y: pd.DataFrame, n_bins: int = 5, 
     test_y : pd.DataFrame
              The output test set
     """
-    logging.info('Performing stratified shuffle split.')
+    logging.info("Performing stratified shuffle split.")
 
     if isinstance(x, np.ndarray):
         x = pd.DataFrame(x)
@@ -192,7 +223,7 @@ def stratified_shuffle_split(x: pd.DataFrame, y: pd.DataFrame, n_bins: int = 5, 
     data = x.join(y)
 
     # Add n bins along the selected column
-    data['CAT'] = pd.cut(data[y.columns[0]], bins=n_bins)  # Create category column
+    data["CAT"] = pd.cut(data[y.columns[0]], bins=n_bins)  # Create category column
 
     # Split data into test and training set using categories
     split = StratifiedShuffleSplit(n_splits=1, test_size=test_size, random_state=26)
@@ -218,13 +249,18 @@ def stratified_shuffle_split(x: pd.DataFrame, y: pd.DataFrame, n_bins: int = 5, 
     return train_x, test_x, train_y, test_y
 
 
-def split_data(x: pd.DataFrame, y: pd.DataFrame, data_conf: DataConf, transform_conf: TransformConf,
-               training_conf: TrainingConf, testing_conf: TestingConf, directory: Path) \
-        -> tuple[
-               pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame
-           ] | tuple[
-               pd.DataFrame, None, pd.DataFrame, None
-           ]:
+def split_data(
+    x: pd.DataFrame,
+    y: pd.DataFrame,
+    data_conf: DataConf,
+    transform_conf: TransformConf,
+    training_conf: TrainingConf,
+    testing_conf: TestingConf,
+    directory: Path,
+) -> (
+    tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]
+    | tuple[pd.DataFrame, None, pd.DataFrame, None]
+):
     """
     Split the data into training and test sets.
     If neither kFold nor stratified shuffle split is selected, perform a random split.
@@ -248,15 +284,25 @@ def split_data(x: pd.DataFrame, y: pd.DataFrame, data_conf: DataConf, transform_
     """
     if testing_conf.test:
         if testing_conf.kfold:
-            k_fold_split(x, y, training_conf=training_conf, transform_conf=transform_conf, data_conf=data_conf,
-                         directory=directory, split_size=testing_conf.test_size)
+            k_fold_split(
+                x,
+                y,
+                training_conf=training_conf,
+                transform_conf=transform_conf,
+                data_conf=data_conf,
+                directory=directory,
+                split_size=testing_conf.test_size,
+            )
             return x, None, y, None
         elif testing_conf.strat_shuffle_split:
-            train_x, test_x, train_y, test_y = stratified_shuffle_split(x, y, n_bins=testing_conf.kfold_bins,
-                                                                        test_size=testing_conf.test_size)
+            train_x, test_x, train_y, test_y = stratified_shuffle_split(
+                x, y, n_bins=testing_conf.kfold_bins, test_size=testing_conf.test_size
+            )
             return train_x, test_x, train_y, test_y
         else:
-            train_x, test_x, train_y, test_y = train_test_split(x, y, test_size=testing_conf.test_size)
+            train_x, test_x, train_y, test_y = train_test_split(
+                x, y, test_size=testing_conf.test_size
+            )
             return train_x, test_x, train_y, test_y
     else:
         return x, None, y, None

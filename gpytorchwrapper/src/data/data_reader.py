@@ -19,10 +19,12 @@ class DataReader:
 
     def _read_pickle(self, file: str) -> pd.DataFrame:
         pickle = joblib.load(file)
-        data = pickle['processed_dataset']
+        data = pickle["processed_dataset"]
 
         if not isinstance(data, pd.DataFrame) and not isinstance(data, pd.Series):
-            raise NotImplementedError(f'The processed dataset in the pickle file is not a pandas DataFrame. Instead got {type(data)}')
+            raise NotImplementedError(
+                f"The processed dataset in the pickle file is not a pandas DataFrame. Instead got {type(data)}"
+            )
 
         return data
 
@@ -47,17 +49,19 @@ class DataReader:
         NotImplementedError
             If the file type specified is not implemented or the processed dataset in the pickle file is not a pandas DataFrame.
         """
-        if file_type == 'csv':
+        if file_type == "csv":
             try:
                 data = self._read_csv(file)
             except:
-                raise ImportError(f'The file is not of the file type {file_type}.')
-        elif file_type == 'pickle':
+                raise ImportError(f"The file is not of the file type {file_type}.")
+        elif file_type == "pickle":
             try:
                 data = self._read_pickle(file)
             except:
-                raise ImportError(f'The file is not of the file type {file_type}.')
+                raise ImportError(f"The file is not of the file type {file_type}.")
         else:
-            raise NotImplementedError(f'The file type {file_type} is not implemented. Choose either csv or pickle.')
+            raise NotImplementedError(
+                f"The file type {file_type} is not implemented. Choose either csv or pickle."
+            )
 
         return data

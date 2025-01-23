@@ -12,6 +12,7 @@ import sys
 
 logger = logging.getLogger(__name__)
 
+
 def get_transformer(transformer_conf: TransformerConf) -> object:
     """
     Get the transformer class and options
@@ -54,11 +55,12 @@ def get_likelihood(training_conf: TrainingConf) -> object:
     selected_likelihood = training_conf.likelihood_class
     return getattr(likelihood_module, selected_likelihood)
 
+
 def get_plugins(path: str = None):
     if path is None:
         # Dynamically find the plugins directory relative to this script
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.abspath(os.path.join(current_dir, '../../plugins'))
+        path = os.path.abspath(os.path.join(current_dir, "../../plugins"))
 
     if not os.path.isdir(path):
         raise FileNotFoundError(f"Plugins directory not found at {path}")
@@ -67,9 +69,8 @@ def get_plugins(path: str = None):
 
     discovered_plugins = {
         name: importlib.import_module(name)
-        for finder, name, ispkg
-        in pkgutil.iter_modules()
-        if name.startswith('model_')
+        for finder, name, ispkg in pkgutil.iter_modules()
+        if name.startswith("model_")
     }
 
     return discovered_plugins
@@ -100,9 +101,10 @@ def get_model(training_conf: TrainingConf) -> object:
             if hasattr(module, selected_model):
                 logger.info(f"Loading model class {selected_model} from {module}.")
                 return getattr(module, selected_model)
-        raise NotImplementedError(f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder.")
+        raise NotImplementedError(
+            f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder."
+        )
     else:
-        raise NotImplementedError(f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder.")
-
-
-
+        raise NotImplementedError(
+            f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder."
+        )

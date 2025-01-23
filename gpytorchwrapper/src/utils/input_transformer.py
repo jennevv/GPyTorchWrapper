@@ -1,7 +1,9 @@
 import torch
 
 
-def xyz_to_invdist_torch(x: torch.Tensor, index: bool = False) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
+def xyz_to_invdist_torch(
+    x: torch.Tensor, index: bool = False
+) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
     """
     x is a tensor of shape (n, m) where m is the number of individual x, y, z coordinates
     and n is the number of data points.
@@ -37,7 +39,7 @@ def xyz_to_invdist_torch(x: torch.Tensor, index: bool = False) -> torch.Tensor |
 
     # Calculate pairwise distances
     diff = coords[:, :, None, :] - coords[:, None, :, :]
-    dist = torch.sqrt(torch.sum(diff ** 2, dim=-1) + 1e-8)
+    dist = torch.sqrt(torch.sum(diff**2, dim=-1) + 1e-8)
 
     # Create a mask to zero out the diagonal (self-distances)
     mask = torch.eye(num_atoms, dtype=torch.bool)

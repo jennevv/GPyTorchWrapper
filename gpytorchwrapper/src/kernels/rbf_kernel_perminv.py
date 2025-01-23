@@ -12,15 +12,23 @@ from gpytorchwrapper.src.utils.permutational_invariance import generate_permutat
 class RBFKernelPermInv(Kernel):
     has_lengthscale = True
 
-    def __init__(self, n_atoms: int, idx_equiv_atoms: list[list[int]], select_dims: Tensor = None, **kwargs):
+    def __init__(
+        self,
+        n_atoms: int,
+        idx_equiv_atoms: list[list[int]],
+        select_dims: Tensor = None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
 
         if self.ard_num_dims is not None:
             raise NotImplementedError(
-                'ARD is not supported for RBFKernelPermInv. This will lead to an ill-conditioned covariance matrix.')
+                "ARD is not supported for RBFKernelPermInv. This will lead to an ill-conditioned covariance matrix."
+            )
         if self.active_dims is not None:
             raise NotImplementedError(
-                'Active dimensions are not supported for RBFKernelPermInv. Please use select_dims instead.')
+                "Active dimensions are not supported for RBFKernelPermInv. Please use select_dims instead."
+            )
 
         self.idx_equiv_atoms = idx_equiv_atoms
         self.select_dims = select_dims
@@ -35,7 +43,9 @@ class RBFKernelPermInv(Kernel):
 
         for p in self.permutations:
             x2_perm = x2.clone()
-            x2_perm[:, self.dims[init_perm, :].flatten()] = x2[:, self.dims[p, :].flatten()]
+            x2_perm[:, self.dims[init_perm, :].flatten()] = x2[
+                :, self.dims[p, :].flatten()
+            ]
 
             # Transform xyz coordinates to internuclear distances
             x1_interdist = xyz_to_invdist_torch(x1)
@@ -46,23 +56,30 @@ class RBFKernelPermInv(Kernel):
                 x2_perm_interdist = x2_perm_interdist[:, self.select_dims].clone()
 
             if (
-                    x1.requires_grad
-                    or x2.requires_grad
-                    or (self.ard_num_dims is not None and self.ard_num_dims > 1)
-                    or diag
-                    or params.get("last_dim_is_batch", False)
-                    or trace_mode.on()
+                x1.requires_grad
+                or x2.requires_grad
+                or (self.ard_num_dims is not None and self.ard_num_dims > 1)
+                or diag
+                or params.get("last_dim_is_batch", False)
+                or trace_mode.on()
             ):
                 x1_ = x1_interdist.div(self.lengthscale)
                 x2_ = x2_perm_interdist.div(self.lengthscale)
-                k_sum += postprocess_rbf(self.covar_dist(x1_, x2_, square_dist=True, diag=diag, **params))
+                k_sum += postprocess_rbf(
+                    self.covar_dist(x1_, x2_, square_dist=True, diag=diag, **params)
+                )
             else:
                 k_sum += RBFCovariance.apply(
                     x1_interdist,
                     x2_perm_interdist,
                     self.lengthscale,
-                    lambda x1_interdist, x2_perm_interdist: self.covar_dist(x1_interdist, x2_perm_interdist,
-                                                                            square_dist=True, diag=False, **params),
+                    lambda x1_interdist, x2_perm_interdist: self.covar_dist(
+                        x1_interdist,
+                        x2_perm_interdist,
+                        square_dist=True,
+                        diag=False,
+                        **params,
+                    ),
                 )
 
         return 1 / num_perms * k_sum

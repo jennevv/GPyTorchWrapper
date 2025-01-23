@@ -15,31 +15,52 @@ from gpytorchwrapper.src.utils.permutational_invariance import generate_permutat
 class LinearxMaternKernelPermInv(Kernel):
     has_lengthscale = True
 
-    def __init__(self, n_atoms: int, idx_equiv_atoms: list[list[int]], select_dims: Tensor = None, nu: float = 2.5,
-                 variance_prior: Optional[Prior] = None, variance_constraint: Optional[Interval] = None,
-                 **kwargs):
+    def __init__(
+        self,
+        n_atoms: int,
+        idx_equiv_atoms: list[list[int]],
+        select_dims: Tensor = None,
+        nu: float = 2.5,
+        variance_prior: Optional[Prior] = None,
+        variance_constraint: Optional[Interval] = None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
 
         if nu not in {0.5, 1.5, 2.5}:
-            raise NotImplementedError('Please select one of the following nu values: {0.5, 1.5, 2.5}')
+            raise NotImplementedError(
+                "Please select one of the following nu values: {0.5, 1.5, 2.5}"
+            )
         if self.ard_num_dims is not None:
             raise NotImplementedError(
-                'ARD is not supported for LinearxMaternKernelPermInv. This will lead to an ill-conditioned covariance matrix.')
+                "ARD is not supported for LinearxMaternKernelPermInv. This will lead to an ill-conditioned covariance matrix."
+            )
         if self.active_dims is not None:
             raise NotImplementedError(
-                'Active dimensions are not supported for LinearxMaternKernelPermInv. Please use select_dims instead.')
+                "Active dimensions are not supported for LinearxMaternKernelPermInv. Please use select_dims instead."
+            )
 
         if variance_constraint is None:
             variance_constraint = Positive()
 
-        self.register_parameter(name="raw_variance", parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1, 1)))
+        self.register_parameter(
+            name="raw_variance",
+            parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1, 1)),
+        )
         if variance_prior is not None:
             if not isinstance(variance_prior, Prior):
-                raise TypeError("Expected gpytorch.priors.Prior but got " + type(variance_prior).__name__)
-            self.register_prior("variance_prior", variance_prior, lambda m: m.variance, lambda m, v: m._set_variance(v))
+                raise TypeError(
+                    "Expected gpytorch.priors.Prior but got "
+                    + type(variance_prior).__name__
+                )
+            self.register_prior(
+                "variance_prior",
+                variance_prior,
+                lambda m: m.variance,
+                lambda m, v: m._set_variance(v),
+            )
 
         self.register_constraint("raw_variance", variance_constraint)
-
 
         self.select_dims = select_dims
         self.nu = nu
@@ -60,7 +81,9 @@ class LinearxMaternKernelPermInv(Kernel):
     def _set_variance(self, value: Union[float, torch.Tensor]):
         if not torch.is_tensor(value):
             value = torch.as_tensor(value).to(self.raw_variance)
-        self.initialize(raw_variance=self.raw_variance_constraint.inverse_transform(value))
+        self.initialize(
+            raw_variance=self.raw_variance_constraint.inverse_transform(value)
+        )
 
     def matern_kernel(self, x1, x2, diag, **params):
         mean = x1.mean(dim=-2, keepdim=True)
@@ -77,9 +100,13 @@ class LinearxMaternKernelPermInv(Kernel):
         elif self.nu == 1.5:
             constant_component = (math.sqrt(3) * distance).add(1)
         elif self.nu == 2.5:
-            constant_component = (math.sqrt(5) * distance).add(1).add(5.0 / 3.0 * distance ** 2)
+            constant_component = (
+                (math.sqrt(5) * distance).add(1).add(5.0 / 3.0 * distance**2)
+            )
         else:
-            raise NotImplementedError('Please select one of the following nu values: {0.5, 1.5, 2.5}')
+            raise NotImplementedError(
+                "Please select one of the following nu values: {0.5, 1.5, 2.5}"
+            )
 
         return constant_component * exp_component
 
@@ -104,26 +131,38 @@ class LinearxMaternKernelPermInv(Kernel):
             return prod.diagonal(dim1=-1, dim2=-2)
         else:
             return prod
-    def forward(self, x1, x2, diag=False, last_dim_is_batch: Optional[bool] = False, **params):
+
+    def forward(
+        self, x1, x2, diag=False, last_dim_is_batch: Optional[bool] = False, **params
+    ):
         k_sum = 0
         num_perms = len(self.permutations)
         init_perm = self.permutations[0]
 
         for p in self.permutations:
             x2_perm = x2.clone()
-            x2_perm[:, self.dims[init_perm, :].flatten()] = x2[:, self.dims[p, :].flatten()]
+            x2_perm[:, self.dims[init_perm, :].flatten()] = x2[
+                :, self.dims[p, :].flatten()
+            ]
 
             # Transform xyz coordinates to internuclear distances
             x1_interdist = xyz_to_invdist_torch(x1)
             x2_perm_interdist = xyz_to_invdist_torch(x2_perm)
 
-
             if self.select_dims is not None:
-                x1_interdist = torch.index_select(x1_interdist, 1, torch.tensor(self.select_dims))
-                x2_perm_interdist = torch.index_select(x2_perm_interdist, 1, torch.tensor(self.select_dims))
+                x1_interdist = torch.index_select(
+                    x1_interdist, 1, torch.tensor(self.select_dims)
+                )
+                x2_perm_interdist = torch.index_select(
+                    x2_perm_interdist, 1, torch.tensor(self.select_dims)
+                )
 
-            k_linear = self.linear_kernel(x1_interdist, x2_perm_interdist, diag, last_dim_is_batch, **params)
-            k_matern = self.matern_kernel(x1_interdist, x2_perm_interdist, diag, **params)
+            k_linear = self.linear_kernel(
+                x1_interdist, x2_perm_interdist, diag, last_dim_is_batch, **params
+            )
+            k_matern = self.matern_kernel(
+                x1_interdist, x2_perm_interdist, diag, **params
+            )
 
             k_sum += k_linear * k_matern
         return 1 / num_perms * k_sum

@@ -7,6 +7,7 @@ def metadata_dict(**kwargs):
     """Save the metadata to a dictionary"""
     return kwargs
 
+
 def dataframe_to_tensor(df):
     if not isinstance(df, pd.DataFrame) and not isinstance(df, pd.Series):
         raise TypeError("Input must be a Pandas DataFrame or Series")

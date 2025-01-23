@@ -23,8 +23,12 @@ class MultiOutputMockModel(gpytorch.models.ExactGP):
 
         num_outputs = 2
 
-        self.mean_module = gpytorch.means.MultitaskMean(gpytorch.means.ConstantMean(), num_tasks=num_outputs)
-        self.covar_module = gpytorch.kernels.MultitaskKernel(gpytorch.kernels.RBFKernel(), num_tasks=num_outputs)
+        self.mean_module = gpytorch.means.MultitaskMean(
+            gpytorch.means.ConstantMean(), num_tasks=num_outputs
+        )
+        self.covar_module = gpytorch.kernels.MultitaskKernel(
+            gpytorch.kernels.RBFKernel(), num_tasks=num_outputs
+        )
 
     def forward(self, x):
         mean_x = self.mean_module(x)
@@ -37,6 +41,7 @@ def single_output_model_evaluator():
     likelihood = gpytorch.likelihoods.GaussianLikelihood()
     model = MockModel(likelihood)
     return ModelEvaluator(model, likelihood)
+
 
 @pytest.fixture
 def multi_output_model_evaluator():
@@ -62,7 +67,9 @@ def test_rmse(single_output_model_evaluator):
 
 def test_check_if_tensor(single_output_model_evaluator):
     tensor = torch.tensor([1.0, 2.0, 3.0])
-    single_output_model_evaluator._check_if_tensor(tensor)  # Should not raise an exception
+    single_output_model_evaluator._check_if_tensor(
+        tensor
+    )  # Should not raise an exception
 
     with pytest.raises(NotImplementedError):
         single_output_model_evaluator._check_if_tensor([1.0, 2.0, 3.0])
@@ -74,7 +81,9 @@ def test_compare_mean_and_output_dimensions(single_output_model_evaluator):
     single_output_model_evaluator._compare_mean_and_output_dimensions(output, mean)
 
     with pytest.raises(ValueError):
-        single_output_model_evaluator._compare_mean_and_output_dimensions(output, torch.randn(10,2))
+        single_output_model_evaluator._compare_mean_and_output_dimensions(
+            output, torch.randn(10, 2)
+        )
 
 
 def test_evaluate_rmse(single_output_model_evaluator):
@@ -103,6 +112,7 @@ def test_evaluate_correlation(single_output_model_evaluator):
     assert len(corr) == 1
     assert isinstance(corr[0], float)
 
+
 def test_evaluate_correlation_multidimensional(multi_output_model_evaluator):
     x = torch.randn(10, 2)
     y = torch.randn(10, 2)
@@ -110,6 +120,7 @@ def test_evaluate_correlation_multidimensional(multi_output_model_evaluator):
     assert isinstance(corr, list)
     assert len(corr) == 2
     assert all(isinstance(c, float) for c in corr)
+
 
 def test_input_validation(single_output_model_evaluator):
     x = torch.randn(10, 1)

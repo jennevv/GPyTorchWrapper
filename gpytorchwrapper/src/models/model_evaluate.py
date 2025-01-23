@@ -31,7 +31,9 @@ class ModelEvaluator:
 
     def _compare_mean_and_output_dimensions(self, output, mean) -> None:
         if output.squeeze().dim() != mean.squeeze().dim():
-            raise ValueError('The number of output dimensions does not match the number of prediction dimensions.')
+            raise ValueError(
+                "The number of output dimensions does not match the number of prediction dimensions."
+            )
 
     def evaluate_rmse(self, x: torch.Tensor, y: torch.Tensor) -> list[float]:
         self._check_if_tensor(x)
@@ -73,12 +75,14 @@ class ModelEvaluator:
         return corr
 
 
-def evaluate_model(model: object, likelihood: object, train_x: torch.Tensor, train_y: torch.Tensor,
-                   test_x: torch.Tensor, test_y: torch.Tensor) -> tuple[
-                                                                      list[float], list[float], list[float]
-                                                                  ] | tuple[
-                                                                      list[float], None, None
-                                                                  ]:
+def evaluate_model(
+    model: object,
+    likelihood: object,
+    train_x: torch.Tensor,
+    train_y: torch.Tensor,
+    test_x: torch.Tensor,
+    test_y: torch.Tensor,
+) -> tuple[list[float], list[float], list[float]] | tuple[list[float], None, None]:
     """
     Evaluate the model on the training and test sets
 
@@ -106,12 +110,12 @@ def evaluate_model(model: object, likelihood: object, train_x: torch.Tensor, tra
     test_corr : list or None
                 List containing the correlation values for the test set
     """
-    logger.info('Evaluating the model.')
+    logger.info("Evaluating the model.")
 
     evaluator = ModelEvaluator(model, likelihood)
 
     train_rmse = evaluator.evaluate_rmse(train_x, train_y)
-    logger.info(f'train_rmse: {train_rmse}')
+    logger.info(f"train_rmse: {train_rmse}")
 
     if test_x is not None:
         test_rmse = evaluator.evaluate_rmse(test_x, test_y)

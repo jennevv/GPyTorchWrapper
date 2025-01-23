@@ -11,19 +11,28 @@ from gpytorchwrapper.src.utils.permutational_invariance import generate_permutat
 class MaternKernelPermInv(Kernel):
     has_lengthscale = True
 
-    def __init__(self, n_atoms: int, idx_equiv_atoms: list[list[int]], select_dims: Tensor = None, nu: float = 2.5,
-                 **kwargs):
+    def __init__(
+        self,
+        n_atoms: int,
+        idx_equiv_atoms: list[list[int]],
+        select_dims: Tensor = None,
+        nu: float = 2.5,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
 
         if nu not in {0.5, 1.5, 2.5}:
-            raise NotImplementedError('Please select one of the following nu values: {0.5, 1.5, 2.5}')
+            raise NotImplementedError(
+                "Please select one of the following nu values: {0.5, 1.5, 2.5}"
+            )
         if self.ard_num_dims is not None:
             raise NotImplementedError(
-                'ARD is not supported for MaternKernelPermInv. This will lead to an ill-conditioned covariance matrix.')
+                "ARD is not supported for MaternKernelPermInv. This will lead to an ill-conditioned covariance matrix."
+            )
         if self.active_dims is not None:
             raise NotImplementedError(
-                'Active dimensions are not supported for MaternKernelPermInv. Please use select_dims instead.')
-
+                "Active dimensions are not supported for MaternKernelPermInv. Please use select_dims instead."
+            )
 
         self.select_dims = select_dims
         self.nu = nu
@@ -41,7 +50,9 @@ class MaternKernelPermInv(Kernel):
 
         for p in self.permutations:
             x2_perm = x2.clone()
-            x2_perm[:, self.dims[init_perm, :].flatten()] = x2[:, self.dims[p, :].flatten()]
+            x2_perm[:, self.dims[init_perm, :].flatten()] = x2[
+                :, self.dims[p, :].flatten()
+            ]
 
             # Transform xyz coordinates to internuclear distances
             x1_interdist = xyz_to_invdist_torch(x1)
@@ -65,10 +76,14 @@ class MaternKernelPermInv(Kernel):
             elif self.nu == 1.5:
                 constant_component = (math.sqrt(3) * distance).add(1)
             elif self.nu == 2.5:
-                constant_component = (math.sqrt(5) * distance).add(1).add(5.0 / 3.0 * distance ** 2)
+                constant_component = (
+                    (math.sqrt(5) * distance).add(1).add(5.0 / 3.0 * distance**2)
+                )
             else:
-                raise NotImplementedError('Please select one of the following nu values: {0.5, 1.5, 2.5}')
+                raise NotImplementedError(
+                    "Please select one of the following nu values: {0.5, 1.5, 2.5}"
+                )
 
-            k_sum += (constant_component * exp_component)
+            k_sum += constant_component * exp_component
 
         return 1 / num_perms * k_sum
