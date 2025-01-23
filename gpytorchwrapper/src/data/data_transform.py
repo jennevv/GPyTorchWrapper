@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def transform_data(
-    x: pd.DataFrame, transformer: object, columns: list | None = None
+    x: pd.DataFrame, transformer: object, columns: list[int] | None = None
 ) -> pd.DataFrame | tuple[pd.DataFrame, object]:
     """
     Transform the input data using the selected transformer

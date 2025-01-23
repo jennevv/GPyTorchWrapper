@@ -53,12 +53,16 @@ class DataReader:
             try:
                 data = self._read_csv(file)
             except Exception:
-                raise ImportError(f"The file is likely not of the file type {file_type}.")
+                raise ImportError(
+                    f"The file is likely not of the file type {file_type}."
+                )
         elif file_type == "pickle":
             try:
                 data = self._read_pickle(file)
             except Exception:
-                raise ImportError(f"The file is likely not of the file type {file_type}.")
+                raise ImportError(
+                    f"The file is likely not of the file type {file_type}."
+                )
         else:
             raise NotImplementedError(
                 f"The file type {file_type} is not implemented. Choose either csv or pickle."

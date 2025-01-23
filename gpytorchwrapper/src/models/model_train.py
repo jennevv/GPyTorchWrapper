@@ -35,7 +35,9 @@ def define_optimizer(model: ExactGP, learning_rate: float) -> torch.optim.Optimi
     return torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
-def set_noiseless(likelihood: GaussianLikelihood | MultitaskGaussianLikelihood, num_tasks: int) -> object:
+def set_noiseless(
+    likelihood: GaussianLikelihood | MultitaskGaussianLikelihood, num_tasks: int
+) -> object:
     """
     Set the likelihood noise to a small value to simulate noiseless data
     The noise is set to 1e-8 for performance reasons
