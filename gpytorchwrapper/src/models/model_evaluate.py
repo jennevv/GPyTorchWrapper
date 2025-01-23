@@ -47,7 +47,7 @@ class ModelEvaluator:
         rmse = []
 
         if self.output_transformer is not None:
-            mean = torch.as_tensor(self.output_transformer.inverse_transform(predictions.mean.numpy()))
+            mean = torch.as_tensor(self.output_transformer.inverse_transform(predictions.mean.numpy().reshape(-1,1)))
         else:
             mean = predictions.mean
 
