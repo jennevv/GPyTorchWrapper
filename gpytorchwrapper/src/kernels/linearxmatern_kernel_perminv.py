@@ -84,23 +84,26 @@ class LinearxMaternKernelPermInv(Kernel):
         return constant_component * exp_component
 
     def linear_kernel(self, x1, x2, diag, last_dim_is_batch, **params):
-        x1_ = x1
-        x2_ = x2
-
+        x1_ = x1 * self.variance.sqrt()
         if last_dim_is_batch:
-            x1_ = x1.transpose(-1, -2).unsqueeze(-1)
-            x2_ = x2.transpose(-1, -2).unsqueeze(-1)
+            x1_ = x1_.transpose(-1, -2).unsqueeze(-1)
 
         if x1.size() == x2.size() and torch.equal(x1, x2):
+            # Use RootLinearOperator when x1 == x2 for efficiency when composing
+            # with other kernels
             prod = RootLinearOperator(x1_)
+
         else:
+            x2_ = x2 * self.variance.sqrt()
+            if last_dim_is_batch:
+                x2_ = x2_.transpose(-1, -2).unsqueeze(-1)
+
             prod = MatmulLinearOperator(x1_, x2_.transpose(-2, -1))
 
         if diag:
             return prod.diagonal(dim1=-1, dim2=-2)
         else:
             return prod
-
     def forward(self, x1, x2, diag=False, last_dim_is_batch: Optional[bool] = False, **params):
         k_sum = 0
         num_perms = len(self.permutations)
