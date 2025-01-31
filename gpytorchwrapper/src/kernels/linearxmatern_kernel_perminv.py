@@ -9,7 +9,7 @@ from linear_operator.operators import MatmulLinearOperator, RootLinearOperator
 from torch import Tensor
 
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_invdist_torch
-from gpytorchwrapper.src.utils.permutational_invariance import generate_permutations
+from gpytorchwrapper.src.utils.permutational_invariance import generate_permutations, generate_unique_distances
 
 
 class LinearxMaternKernelPermInv(Kernel):
@@ -23,6 +23,9 @@ class LinearxMaternKernelPermInv(Kernel):
         nu: float = 2.5,
         variance_prior: Optional[Prior] = None,
         variance_constraint: Optional[Interval] = None,
+        ard: bool = False,
+        ard_lengthscale_prior: Optional[Prior] = None,
+        ard_lengthscale_constraint: Optional[Interval] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -33,11 +36,11 @@ class LinearxMaternKernelPermInv(Kernel):
             )
         if self.ard_num_dims is not None:
             raise NotImplementedError(
-                "ARD is not supported for LinearxMaternKernelPermInv. This will lead to an ill-conditioned covariance matrix."
+                "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead."
             )
         if self.active_dims is not None:
             raise NotImplementedError(
-                "Active dimensions are not supported for LinearxMaternKernelPermInv. Please use select_dims instead."
+                "active_dims is not supported for LinearxMaternKernelPermInv. Please use select_dims instead."
             )
 
         if variance_constraint is None:
@@ -61,11 +64,34 @@ class LinearxMaternKernelPermInv(Kernel):
             )
 
         self.register_constraint("raw_variance", variance_constraint)
+        if ard:
+            self.raw_lengthscale.requires_grad = False
+
+            if ard_lengthscale_constraint is None:
+                ard_lengthscale_constraint = Positive()
+            self.num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
+            self.register_parameter(
+                name="raw_ard_lengthscale",
+                parameter=torch.nn.Parameter(torch.zeros(self.num_unique_distances))
+            )
+
+            if ard_lengthscale_prior is not None:
+                if not isinstance(ard_lengthscale_prior, Prior):
+                    raise TypeError(
+                        "Expected gpytorch.priors.Prior but got "
+                        + type(ard_lengthscale_prior).__name__
+                    )
+                self.register_prior(
+                    "ard_lengthscale_prior",
+                    ard_lengthscale_prior,
+                    lambda m: m.ard_lengthscale,
+                    lambda m, v: m._set_ard_lengthscale(v),
+                )
+            self.register_constraint("raw_ard_lengthscale", ard_lengthscale_constraint)
 
         self.select_dims = select_dims
         self.nu = nu
         self.idx_equiv_atoms = idx_equiv_atoms
-
         dims = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
         self.dims = dims
         self.permutations = generate_permutations(idx_equiv_atoms)
@@ -85,11 +111,39 @@ class LinearxMaternKernelPermInv(Kernel):
             raw_variance=self.raw_variance_constraint.inverse_transform(value)
         )
 
-    def matern_kernel(self, x1, x2, diag, **params):
+    @property
+    def ard_lengthscale(self) -> torch.Tensor:
+        return self.raw_ard_lengtscale_constraint.transform(self.ard_lengthscale)
+
+    @ard_lengthscale.setter
+    def ard_lengthscale(self, value: torch.Tensor):
+        self._set_variance(value)
+
+    def _set_ard_lengthscale(self, value: Tensor):
+        # Used by the lengthscale_prior
+        if not self.has_lengthscale:
+            raise RuntimeError("Kernel has no lengthscale.")
+
+        if not torch.is_tensor(value):
+            value = torch.as_tensor(value).to(self.raw_ard_lengthscale)
+
+        self.initialize(raw_lengthscale=self.raw_ard_lengthscale_constraint.inverse_transform(value))
+
+    def expand_ard_lengthscales(self, ard_lengthscale, idx: torch.Tensor):
+
+
+
+    def matern_kernel(self, x1, x2, diag, idx, **params):
         mean = x1.mean(dim=-2, keepdim=True)
 
-        x1_ = (x1 - mean).div(self.lengthscale)
-        x2_ = (x2 - mean).div(self.lengthscale)
+        if self.ard_lengthscale is not None:
+            ard_lengthscale = self.expand_ard_lengthscales(self.ard_lengthscale, idx)
+
+            x1_ = (x1 - mean).div(self.ard_lengthscale)
+            x2_ = (x2 - mean).div(self.ard_lengthscale)
+        else:
+            x1_ = (x1 - mean).div(self.lengthscale)
+            x2_ = (x2 - mean).div(self.lengthscale)
 
         distance = self.covar_dist(x1_, x2_, diag=diag, **params)
 
@@ -146,7 +200,7 @@ class LinearxMaternKernelPermInv(Kernel):
             ]
 
             # Transform xyz coordinates to internuclear distances
-            x1_interdist = xyz_to_invdist_torch(x1)
+            x1_interdist, idx = xyz_to_invdist_torch(x1, index=True)
             x2_perm_interdist = xyz_to_invdist_torch(x2_perm)
 
             if self.select_dims is not None:
@@ -156,12 +210,13 @@ class LinearxMaternKernelPermInv(Kernel):
                 x2_perm_interdist = torch.index_select(
                     x2_perm_interdist, 1, torch.tensor(self.select_dims)
                 )
+                idx = idx[self.select_dims]
 
             k_linear = self.linear_kernel(
                 x1_interdist, x2_perm_interdist, diag, last_dim_is_batch, **params
             )
             k_matern = self.matern_kernel(
-                x1_interdist, x2_perm_interdist, diag, **params
+                x1_interdist, x2_perm_interdist, diag, idx=idx, **params
             )
 
             k_sum += k_linear * k_matern
