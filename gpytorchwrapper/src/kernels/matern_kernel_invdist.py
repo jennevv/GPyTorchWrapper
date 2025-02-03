@@ -15,11 +15,10 @@ class MaternKernelInvDist(MaternKernel):
         self.select_dims = select_dims
 
     def forward(self, x1, x2, diag=False, **params):
-        x1_transformed = xyz_to_invdist_torch(x1)
-        x2_transformed = xyz_to_invdist_torch(x2) if x2 is not None else x1_transformed
+        x1_interdist, x2_interdist = xyz_to_invdist_torch(x1), xyz_to_invdist_torch(x2)
 
         if self.select_dims is not None:
-            x1_transformed = x1_transformed.index_select(-1, self.select_dims)
-            x2_transformed = x2_transformed.index_select(-1, self.select_dims)
+            x1_interdist = x1_interdist.index_select(-1, self.select_dims)
+            x2_interdist = x2_interdist.index_select(-1, self.select_dims)
 
-        return super().forward(x1_transformed, x2_transformed, diag=diag, **params)
+        return super().forward(x1_interdist, x2_interdist, diag=diag, **params)

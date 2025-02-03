@@ -72,7 +72,7 @@ class LinearxMaternKernelPermInv(Kernel):
             self.num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
             self.register_parameter(
                 name="raw_ard_lengthscale",
-                parameter=torch.nn.Parameter(torch.zeros(self.num_unique_distances))
+                parameter=torch.nn.Parameter(torch.zeros(self.num_unique_distances, 1))
             )
 
             if ard_lengthscale_prior is not None:
