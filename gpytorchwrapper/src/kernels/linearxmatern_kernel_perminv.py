@@ -130,8 +130,7 @@ class LinearxMaternKernelPermInv(Kernel):
         self.initialize(raw_lengthscale=self.raw_ard_lengthscale_constraint.inverse_transform(value))
 
     def expand_ard_lengthscales(self, ard_lengthscale, idx: torch.Tensor):
-
-
+        pass
 
     def matern_kernel(self, x1, x2, diag, idx, **params):
         mean = x1.mean(dim=-2, keepdim=True)
