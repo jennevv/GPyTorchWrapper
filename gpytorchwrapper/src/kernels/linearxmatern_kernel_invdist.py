@@ -17,7 +17,6 @@ class LinearxMaternKernelInvDist(Kernel):
 
     def __init__(
         self,
-        n_atoms: int,
         select_dims: Tensor = None,
         nu: float = 2.5,
         variance_prior: Optional[Prior] = None,
