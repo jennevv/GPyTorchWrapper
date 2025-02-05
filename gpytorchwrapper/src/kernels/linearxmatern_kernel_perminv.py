@@ -93,6 +93,7 @@ class LinearxMaternKernelPermInv(Kernel):
         self.select_dims = select_dims
         self.nu = nu
         self.idx_equiv_atoms = idx_equiv_atoms
+        self.ard = ard
         self.ard_expansion = ard_expansion
 
         dims = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
@@ -130,12 +131,12 @@ class LinearxMaternKernelPermInv(Kernel):
         if not torch.is_tensor(value):
             value = torch.as_tensor(value).to(self.raw_ard_lengthscale)
 
-        self.initialize(raw_lengthscale=self.raw_ard_lengthscale_constraint.inverse_transform(value))
+        self.initialize(raw_ard_lengthscale=self.raw_ard_lengthscale_constraint.inverse_transform(value))
 
     def matern_kernel(self, x1, x2, diag, idx, **params):
         mean = x1.mean(dim=-2, keepdim=True)
 
-        if self.ard_lengthscale is not None:
+        if self.ard:
             ard_lengthscale = self.ard_lengthscale[self.ard_expansion]
 
             x1_ = (x1 - mean).div(ard_lengthscale)
