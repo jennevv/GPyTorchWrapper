@@ -24,6 +24,7 @@ class LinearxMaternKernelPermInv(Kernel):
         variance_prior: Optional[Prior] = None,
         variance_constraint: Optional[Interval] = None,
         ard: bool = False,
+        ard_expansion: list = None,
         ard_lengthscale_prior: Optional[Prior] = None,
         ard_lengthscale_constraint: Optional[Interval] = None,
         **kwargs,
@@ -92,6 +93,8 @@ class LinearxMaternKernelPermInv(Kernel):
         self.select_dims = select_dims
         self.nu = nu
         self.idx_equiv_atoms = idx_equiv_atoms
+        self.ard_expansion = ard_expansion
+
         dims = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
         self.dims = dims
         self.permutations = generate_permutations(idx_equiv_atoms)
@@ -129,17 +132,14 @@ class LinearxMaternKernelPermInv(Kernel):
 
         self.initialize(raw_lengthscale=self.raw_ard_lengthscale_constraint.inverse_transform(value))
 
-    def expand_ard_lengthscales(self, ard_lengthscale, idx: torch.Tensor):
-        pass
-
     def matern_kernel(self, x1, x2, diag, idx, **params):
         mean = x1.mean(dim=-2, keepdim=True)
 
         if self.ard_lengthscale is not None:
-            ard_lengthscale = self.expand_ard_lengthscales(self.ard_lengthscale, idx)
+            ard_lengthscale = self.ard_lengthscale[self.ard_expansion]
 
-            x1_ = (x1 - mean).div(self.ard_lengthscale)
-            x2_ = (x2 - mean).div(self.ard_lengthscale)
+            x1_ = (x1 - mean).div(ard_lengthscale)
+            x2_ = (x2 - mean).div(ard_lengthscale)
         else:
             x1_ = (x1 - mean).div(self.lengthscale)
             x2_ = (x2 - mean).div(self.lengthscale)
