@@ -25,8 +25,6 @@ class LinearxMaternKernelPermInv(Kernel):
         variance_constraint: Optional[Interval] = None,
         ard: bool = False,
         ard_expansion: list = None,
-        ard_lengthscale_prior: Optional[Prior] = None,
-        ard_lengthscale_constraint: Optional[Interval] = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -66,29 +64,12 @@ class LinearxMaternKernelPermInv(Kernel):
 
         self.register_constraint("raw_variance", variance_constraint)
         if ard:
-            self.raw_lengthscale.requires_grad = False
+            if ard_expansion is None:
+                raise NotImplementedError("Please specify the expansion list for the ard lengthscale tensor.")
 
-            if ard_lengthscale_constraint is None:
-                ard_lengthscale_constraint = Positive()
-            self.num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
-            self.register_parameter(
-                name="raw_ard_lengthscale",
-                parameter=torch.nn.Parameter(torch.zeros(self.num_unique_distances, 1))
-            )
+            num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
+            self.ard_num_dims = num_unique_distances
 
-            if ard_lengthscale_prior is not None:
-                if not isinstance(ard_lengthscale_prior, Prior):
-                    raise TypeError(
-                        "Expected gpytorch.priors.Prior but got "
-                        + type(ard_lengthscale_prior).__name__
-                    )
-                self.register_prior(
-                    "ard_lengthscale_prior",
-                    ard_lengthscale_prior,
-                    lambda m: m.ard_lengthscale,
-                    lambda m, v: m._set_ard_lengthscale(v),
-                )
-            self.register_constraint("raw_ard_lengthscale", ard_lengthscale_constraint)
 
         self.select_dims = select_dims
         self.nu = nu
@@ -121,7 +102,7 @@ class LinearxMaternKernelPermInv(Kernel):
 
     @ard_lengthscale.setter
     def ard_lengthscale(self, value: torch.Tensor):
-        self._set_variance(value)
+        self._set_ard_lengthscale(value)
 
     def _set_ard_lengthscale(self, value: Tensor):
         # Used by the lengthscale_prior
@@ -137,7 +118,7 @@ class LinearxMaternKernelPermInv(Kernel):
         mean = x1.mean(dim=-2, keepdim=True)
 
         if self.ard:
-            ard_lengthscale = self.ard_lengthscale[self.ard_expansion]
+            ard_lengthscale = self.lengthscale[self.ard_expansion]
 
             x1_ = (x1 - mean).div(ard_lengthscale)
             x2_ = (x2 - mean).div(ard_lengthscale)
