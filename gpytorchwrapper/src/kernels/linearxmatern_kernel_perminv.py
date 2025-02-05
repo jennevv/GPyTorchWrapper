@@ -27,15 +27,27 @@ class LinearxMaternKernelPermInv(Kernel):
         ard_expansion: list = None,
         **kwargs,
     ):
+        if not ard:
+            super().__init__(**kwargs)
+
+            if self.ard_num_dims is not None:
+                raise NotImplementedError(
+                    "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead."
+                )
+        else:
+            if ard_expansion is None:
+                raise NotImplementedError("Please specify the expansion list for the ard lengthscale tensor.")
+
+            num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
+            self.ard_num_dims = num_unique_distances
+
+            super().__init__(ard_num_dims=self.ard_num_dims, **kwargs)
 
         if nu not in {0.5, 1.5, 2.5}:
             raise NotImplementedError(
                 "Please select one of the following nu values: {0.5, 1.5, 2.5}"
             )
-        if self.ard_num_dims is not None:
-            raise NotImplementedError(
-                "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead."
-            )
+
         if self.active_dims is not None:
             raise NotImplementedError(
                 "active_dims is not supported for LinearxMaternKernelPermInv. Please use select_dims instead."
@@ -62,16 +74,8 @@ class LinearxMaternKernelPermInv(Kernel):
             )
 
         self.register_constraint("raw_variance", variance_constraint)
-        if ard:
-            if ard_expansion is None:
-                raise NotImplementedError("Please specify the expansion list for the ard lengthscale tensor.")
 
-            num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
-            self.ard_num_dims = num_unique_distances
 
-            super().__init__(ard_num_dims=self.ard_num_dims, **kwargs)
-        else:
-            super().__init__(**kwargs)
 
         self.select_dims = select_dims
         self.nu = nu
