@@ -125,8 +125,7 @@ class LinearxMaternKernelInvDist(Kernel):
         self, x1, x2, diag=False, last_dim_is_batch: Optional[bool] = False, **params
     ):
         # Transform xyz coordinates to internuclear distances
-        x1_interdist = xyz_to_invdist_torch(x1)
-        x2_interdist = xyz_to_invdist_torch(x2)
+        x1_interdist, x2_interdist = xyz_to_invdist_torch(x1), xyz_to_invdist_torch(x2)
 
         if self.select_dims is not None:
             x1_interdist = torch.index_select(
