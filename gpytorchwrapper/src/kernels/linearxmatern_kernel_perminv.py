@@ -99,24 +99,6 @@ class LinearxMaternKernelPermInv(Kernel):
             raw_variance=self.raw_variance_constraint.inverse_transform(value)
         )
 
-    @property
-    def ard_lengthscale(self) -> torch.Tensor:
-        return self.raw_ard_lengtscale_constraint.transform(self.ard_lengthscale)
-
-    @ard_lengthscale.setter
-    def ard_lengthscale(self, value: torch.Tensor):
-        self._set_ard_lengthscale(value)
-
-    def _set_ard_lengthscale(self, value: Tensor):
-        # Used by the lengthscale_prior
-        if not self.has_lengthscale:
-            raise RuntimeError("Kernel has no lengthscale.")
-
-        if not torch.is_tensor(value):
-            value = torch.as_tensor(value).to(self.raw_ard_lengthscale)
-
-        self.initialize(raw_ard_lengthscale=self.raw_ard_lengthscale_constraint.inverse_transform(value))
-
     def matern_kernel(self, x1, x2, diag, idx, **params):
         mean = x1.mean(dim=-2, keepdim=True)
 
