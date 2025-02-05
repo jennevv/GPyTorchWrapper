@@ -74,28 +74,20 @@ class SwitchingConstantMean(Mean):
 
     @staticmethod
     def sigmoid(x):
-        return x / (1 + torch.exp(-x))
+        return torch.exp(-x)
 
     def weighted_constant(self, dist):
-        num_channels = dist.shape[1]
-
         weights = self.sigmoid(dist)
 
         total_weight = torch.sum(weights, dim=1)
-        if total_weight > 0:
-            weights /= total_weight.reshape(-1,1)
-        else:
-            # Fallback: if all weights are zero (should not happen with sigmoid), assign equal weight.
-            weights = torch.ones(num_channels) / num_channels
+        weights /= total_weight.reshape(-1,1)
 
         # Compute the weighted mean using the channel_means
-        weighted_constant = torch.sum(self.constants * weights, dim=1)
+        weighted_constant = torch.sum(self.constant * weights, dim=1)
 
         return weighted_constant
 
     def forward(self, x):
         dist = xyz_to_dist_torch(x)
         w_constant = self.weighted_constant(dist)
-
-        constant = self.w_constant.unsqueeze(-1)  # *batch_shape x 1
-        return constant.expand(torch.broadcast_shapes(w_constant.shape, dist.shape[:-1]))
+        return w_constant
