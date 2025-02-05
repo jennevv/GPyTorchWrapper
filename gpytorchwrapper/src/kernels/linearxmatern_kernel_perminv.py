@@ -38,10 +38,9 @@ class LinearxMaternKernelPermInv(Kernel):
             if ard_expansion is None:
                 raise NotImplementedError("Please specify the expansion list for the ard lengthscale tensor.")
 
-            num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
-            self.ard_num_dims = num_unique_distances
+            #num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
 
-            super().__init__(ard_num_dims=self.ard_num_dims, **kwargs)
+            super().__init__(**kwargs)
 
         if nu not in {0.5, 1.5, 2.5}:
             raise NotImplementedError(
@@ -74,8 +73,6 @@ class LinearxMaternKernelPermInv(Kernel):
             )
 
         self.register_constraint("raw_variance", variance_constraint)
-
-
 
         self.select_dims = select_dims
         self.nu = nu
@@ -124,7 +121,7 @@ class LinearxMaternKernelPermInv(Kernel):
         mean = x1.mean(dim=-2, keepdim=True)
 
         if self.ard:
-            ard_lengthscale = self.lengthscale[self.ard_expansion]
+            ard_lengthscale = self.lengthscale[0][self.ard_expansion]
 
             x1_ = (x1 - mean).div(ard_lengthscale)
             x2_ = (x2 - mean).div(ard_lengthscale)
