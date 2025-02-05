@@ -32,7 +32,7 @@ class LinearxMaternKernelPermInv(Kernel):
 
             if self.ard_num_dims is not None:
                 raise NotImplementedError(
-                    "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead."
+                    "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead and specify ard_expansion."
                 )
         else:
             if ard_expansion is None:
