@@ -27,7 +27,6 @@ class LinearxMaternKernelPermInv(Kernel):
         ard_expansion: list = None,
         **kwargs,
     ):
-        super().__init__(**kwargs)
 
         if nu not in {0.5, 1.5, 2.5}:
             raise NotImplementedError(
@@ -70,6 +69,9 @@ class LinearxMaternKernelPermInv(Kernel):
             num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
             self.ard_num_dims = num_unique_distances
 
+            super().__init__(ard_num_dims=self.ard_num_dims, **kwargs)
+        else:
+            super().__init__(**kwargs)
 
         self.select_dims = select_dims
         self.nu = nu
