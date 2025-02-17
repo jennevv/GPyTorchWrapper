@@ -9,7 +9,10 @@ from linear_operator.operators import MatmulLinearOperator, RootLinearOperator
 from torch import Tensor
 
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_invdist_torch
-from gpytorchwrapper.src.utils.permutational_invariance import generate_permutations, generate_unique_distances
+from gpytorchwrapper.src.utils.permutational_invariance import (
+    generate_permutations,
+    generate_unique_distances,
+)
 
 
 class LinearxMaternKernelInvDist(Kernel):
@@ -138,7 +141,5 @@ class LinearxMaternKernelInvDist(Kernel):
         k_linear = self.linear_kernel(
             x1_interdist, x2_interdist, diag, last_dim_is_batch, **params
         )
-        k_matern = self.matern_kernel(
-            x1_interdist, x2_interdist, diag, **params
-        )
+        k_matern = self.matern_kernel(x1_interdist, x2_interdist, diag, **params)
         return k_linear * k_matern

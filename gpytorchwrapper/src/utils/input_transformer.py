@@ -56,6 +56,7 @@ def xyz_to_invdist_torch(
 
     return torch.pow(interdist, -1)
 
+
 def xyz_to_dist_torch(
     x: torch.Tensor, index: bool = False
 ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
@@ -110,4 +111,3 @@ def xyz_to_dist_torch(
         return interdist, torch.transpose(triu_indices, -1, -2)
 
     return interdist
-

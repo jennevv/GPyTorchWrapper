@@ -69,5 +69,3 @@ def generate_unique_distances(num_atoms: int, idx_equiv_atoms: list[list[int]]) 
     num_unique_dist = (num_groups * (num_groups - 1)) // 2 + num_perminv_groups
 
     return num_unique_dist
-
-

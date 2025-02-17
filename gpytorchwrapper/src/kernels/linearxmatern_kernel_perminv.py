@@ -9,7 +9,10 @@ from linear_operator.operators import MatmulLinearOperator, RootLinearOperator
 from torch import Tensor
 
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_invdist_torch
-from gpytorchwrapper.src.utils.permutational_invariance import generate_permutations, generate_unique_distances
+from gpytorchwrapper.src.utils.permutational_invariance import (
+    generate_permutations,
+    generate_unique_distances,
+)
 
 
 class LinearxMaternKernelPermInv(Kernel):
@@ -36,9 +39,11 @@ class LinearxMaternKernelPermInv(Kernel):
                 )
         else:
             if ard_expansion is None:
-                raise NotImplementedError("Please specify the expansion list for the ard lengthscale tensor.")
+                raise NotImplementedError(
+                    "Please specify the expansion list for the ard lengthscale tensor."
+                )
 
-            #num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
+            # num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
 
             super().__init__(**kwargs)
 
