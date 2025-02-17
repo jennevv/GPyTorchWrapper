@@ -39,7 +39,7 @@ def parse_args():
     )
     parser.add_argument(
         "-f",
-        "--file_type",
+        "--file-type",
         type=str,
         required=True,
         help="Format of the data file. Can be either csv or pickle.",
@@ -65,10 +65,21 @@ def parse_args():
         help="Output directory",
     )
 
+    parser.add_argument(
+        "-t",
+        "--test-set",
+        type=str,
+        required=False,
+        help="File containing the test data",
+    )
+
     args = parser.parse_args()
     args.input, args.config, args.directory = map(
         Path, [args.input, args.config, args.directory]
     )
+    if args.test_set:
+        args.test_set = Path(args.test_set)
+
     # Allow for the creation of the output directory if it does not exist
     args.directory.mkdir(parents=True, exist_ok=True)
 
@@ -92,12 +103,31 @@ def main():
 
     # Data processing
     x, y = input_output_split(data, data_conf)
-    train_x, test_x, train_y, test_y = split_data(
-        x, y, data_conf, transform_conf, training_conf, testing_conf, args.directory
-    )
-    train_x, test_x, train_y, test_y, input_transformer, output_transformer = transform(
-        train_x, train_y, test_x, test_y, transform_conf
-    )
+    if not args.test_set:
+        train_x, test_x, train_y, test_y = split_data(
+            x, y, data_conf, transform_conf, training_conf, testing_conf, args.directory
+        )
+        train_x, test_x, train_y, test_y, input_transformer, output_transformer = transform(
+            train_x, train_y, test_x, test_y, transform_conf
+        )
+    else:
+        train_x, _, train_y, _ = split_data(
+            x, y, data_conf, transform_conf, training_conf, testing_conf, args.directory
+        )
+        train_x, _, train_y, _, input_transformer, output_transformer = transform(
+            train_x, train_y, None, None, transform_conf
+        )
+
+        test_data = reader.read_data(file=args.test_set, file_type=args.file_type)
+        logger.info(f"Test data loaded from {args.test_set}.")
+
+        x, y = input_output_split(test_data, data_conf)
+        test_x, _, test_y, _ = split_data(
+            x, y, data_conf, transform_conf, training_conf, testing_conf, args.directory
+        )
+        test_x, _, test_y, _, input_transformer, output_transformer = transform(
+            test_x, test_y, None, None, transform_conf
+        )
 
     train_x, train_y = map(dataframe_to_tensor, [train_x, train_y])
     if test_x is not None:

@@ -73,17 +73,27 @@ def transform_data(
 def transform(
     train_x: pd.DataFrame,
     train_y: pd.DataFrame,
-    test_x: pd.DataFrame,
-    test_y: pd.DataFrame,
+    test_x: Optional[pd.DataFrame],
+    test_y: Optional[pd.DataFrame],
     transform_conf: TransformConf,
-) -> tuple[
-    pd.DataFrame,
-    pd.DataFrame,
-    pd.DataFrame,
-    pd.DataFrame,
-    Optional[object],
-    Optional[object],
-]:
+) -> (
+    tuple[
+        pd.DataFrame,
+        pd.DataFrame,
+        pd.DataFrame,
+        pd.DataFrame,
+        Optional[object],
+        Optional[object],
+    ]
+    | tuple[
+        pd.DataFrame,
+        pd.DataFrame,
+        None,
+        None,
+        object,
+        object,
+    ]
+):
     logging.info("Transforming data.")
 
     # Transform the input
@@ -114,9 +124,9 @@ def transform(
         if test_y is not None:
             test_y = transform_data(test_y, output_transformer, columns=None)
 
-        logging.info(f"Transforming output values using {output_transformer}.")
+        logging.info(f"Transforming output values using {output_transformer}.\n")
     else:
         output_transformer = None
-        logging.info("Using raw output values.")
+        logging.info("Using raw output values.\n")
 
     return train_x, test_x, train_y, test_y, input_transformer, output_transformer
