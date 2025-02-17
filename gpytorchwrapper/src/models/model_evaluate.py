@@ -71,9 +71,7 @@ class ModelEvaluator:
                     self.output_transformer.inverse_transform(y.numpy())
                 )
                 mean = torch.as_tensor(
-                    self.output_transformer.inverse_transform(
-                        predictions.mean.numpy()
-                    )
+                    self.output_transformer.inverse_transform(predictions.mean.numpy())
                 )
 
         else:
@@ -155,7 +153,9 @@ def evaluate_model(
     if test_x is not None:
         test_rmse = evaluator.evaluate_rmse(test_x, test_y)
         test_corr = evaluator.evaluate_correlation(test_x, test_y)
-        logger.info(f'test_rmse" {test_rmse}\ntest_corr: {test_corr}')
+        logger.info(f"test_rmse: {test_rmse}")
+        logger.info(f"test_corr: {test_corr}")
+        logger.info("Model evaluation complete.\n")
         return train_rmse, test_rmse, test_corr
 
     else:

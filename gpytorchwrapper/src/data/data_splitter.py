@@ -1,4 +1,5 @@
 import logging
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -13,7 +14,7 @@ from gpytorchwrapper.src.config.config_classes import (
 )
 from gpytorchwrapper.src.data.data_transform import transform
 from gpytorchwrapper.src.models.model_evaluate import evaluate_model
-from gpytorchwrapper.src.models.model_train import train_model
+from gpytorchwrapper.src.models.model_train import train_model, print_model_parameters
 from gpytorchwrapper.src.utils import dataframe_to_tensor
 
 logger = logging.getLogger(__name__)
@@ -114,6 +115,7 @@ def k_fold_split(
     train_rmse_arr = np.zeros(n_splits)
     test_rmse_arr = np.zeros(n_splits)
     test_corr_arr = np.zeros(n_splits)
+    fold_parameters = []
 
     for fold, (train_index, test_index) in enumerate(kf.split(x)):
         logger.info(f"Fold {fold}")
@@ -129,12 +131,14 @@ def k_fold_split(
             dataframe_to_tensor, [train_x, test_x, train_y, test_y]
         )
 
-        model, likelihood = train_model(
+        model, likelihood, fold_params = train_model(
             train_x,
             train_y,
             training_conf=training_conf,
             num_tasks=data_conf.num_outputs,
         )
+
+        fold_parameters.append(fold_params)
 
         # Evaluate the model on the training and test sets
         train_rmse, test_rmse, test_corr = evaluate_model(
@@ -144,6 +148,13 @@ def k_fold_split(
         train_rmse_arr[fold] = train_rmse[0]
         test_rmse_arr[fold] = test_rmse[0]
         test_corr_arr[fold] = test_corr[0]
+
+    best_fold = np.argmin(test_rmse_arr)
+
+    logger.info(f"Best fold: Fold {best_fold}")
+    logger.info(
+        f"Best model parameters: \n{print_model_parameters(fold_parameters[best_fold].keys(), fold_parameters[best_fold].values())}\n"
+    )
 
     kfold_data = np.stack([train_rmse_arr, test_rmse_arr, test_corr_arr], axis=1)
 
@@ -246,6 +257,10 @@ def stratified_shuffle_split(
     return train_x, test_x, train_y, test_y
 
 
+def exit_program():
+    sys.exit(0)
+
+
 def split_data(
     x: pd.DataFrame,
     y: pd.DataFrame,
@@ -290,7 +305,7 @@ def split_data(
                 directory=directory,
                 split_size=testing_conf.test_size,
             )
-            return x, None, y, None
+            exit_program()
         elif testing_conf.strat_shuffle_split:
             train_x, test_x, train_y, test_y = stratified_shuffle_split(
                 x, y, n_bins=testing_conf.kfold_bins, test_size=testing_conf.test_size

@@ -143,20 +143,43 @@ def training_loop(
     loss_figure(loss_hash["loss"], loss_hash["iteration"])
 
 
-def model_parameters(model: ExactGP) -> str:
-    parameters = []
+def model_parameters(
+    model: ExactGP, transformed: bool = True
+) -> tuple[list[str, list[float]]] | tuple[list[str], list[list[float]]]:
+    parameters, parameter_names = [], []
+    if transformed:
+        constraints = []
 
-    for param_name, param in model.named_parameters():
-        if param.size() == 1:
-            parameters.append(
-                f"Parameter name: {param_name:42} value = {param.item()}\n"
-            )
-        else:
-            parameters.append(
-                f"Parameter name: {param_name:42} value = {param.tolist()}\n"
-            )
+        for _, constraint in model.named_constraints():
+            constraints.append(constraint)
 
-    return "".join(parameters)
+        for constraint, (parameter_name, param) in zip(
+            constraints, model.named_parameters()
+        ):
+            parameter_names.append(parameter_name)
+            if param.size() == 1:
+                parameters.append(constraint.transform(param).item())
+            else:
+                parameters.append(constraint.transform(param).tolist())
+    else:
+        for parameter_name, param in model.named_parameters():
+            parameter_names.append(parameter_name)
+            if param.size() == 1:
+                parameters.append(param.item())
+            else:
+                parameters.append(param.tolist())
+
+    return parameter_names, parameters
+
+
+def print_model_parameters(parameter_names: list, parameters: list) -> str:
+    parameter_strings = []
+    for parameter_name, parameter in zip(parameter_names, parameters):
+        parameter_strings.append(
+            f"Transformed parameter name: {parameter_name:42} value = {parameter}\n"
+        )
+
+    return "".join(parameter_strings)
 
 
 def train_model(
@@ -164,7 +187,9 @@ def train_model(
     train_y: torch.Tensor,
     training_conf: TrainingConf,
     num_tasks: int,
-) -> tuple[ExactGP, GaussianLikelihood | MultitaskGaussianLikelihood]:
+) -> tuple[
+    ExactGP, GaussianLikelihood | MultitaskGaussianLikelihood, dict[str, list[float]]
+]:
     """
     Train the model using the training data
 
@@ -224,8 +249,10 @@ def train_model(
             )
 
     model = model_class(train_x, train_y, likelihood)
-
-    logger.info(f"Parameters before training: \n{model_parameters(model)}")
+    parameter_names, parameters = model_parameters(model)
+    logger.info(
+        f"Parameters before training: \n{print_model_parameters(parameter_names, parameters)}"
+    )
 
     # Training in double precision
     model.double()
@@ -244,6 +271,11 @@ def train_model(
             train_x, train_y, model, mll, optimizer, learning_iterations, debug
         )
 
-    logger.info(f"Parameters after training: \n{model_parameters(model)}")
+    parameter_names, parameters = model_parameters(model)
+    logger.info(
+        f"Parameters after training: \n{print_model_parameters(parameter_names, parameters)}"
+    )
 
-    return model, likelihood
+    parameter_dict = dict(zip(parameter_names, parameters))
+
+    return model, likelihood, parameter_dict
