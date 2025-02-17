@@ -1,6 +1,7 @@
 import argparse
 import logging
 import pathlib
+from dataclasses import asdict
 from pathlib import Path
 from sys import platform
 
@@ -128,7 +129,7 @@ def main():
     # Save the model to a .pth file
     save_model(
         model.state_dict(),
-        config,
+        asdict(config),
         training_metadata,
         metrics_metadata,
         args.output,
