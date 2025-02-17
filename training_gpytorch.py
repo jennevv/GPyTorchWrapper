@@ -16,7 +16,7 @@ from gpytorchwrapper.src.utils import metadata_dict, dataframe_to_tensor
 __author__ = "Jenne Van Veerdeghem"
 __version__ = "0.0.1"
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 # Needed for training on HPC cluster
@@ -103,7 +103,7 @@ def main():
         test_x, test_y = map(dataframe_to_tensor, [test_x, test_y])
 
     # Model training
-    model, likelihood = train_model(
+    model, likelihood, _ = train_model(
         train_x, train_y, training_conf, data_conf.num_outputs
     )
 
