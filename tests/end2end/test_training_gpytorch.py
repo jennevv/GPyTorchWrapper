@@ -40,6 +40,28 @@ def run_script_single_output():
         check=True,
     )
 
+def run_script_single_output_with_external_test():
+    subprocess.run(
+        [
+            "python",
+            "training_gpytorch.py",
+            "-i",
+            "./tests/end2end/data.csv",
+            "-f",
+            "csv",
+            "-c",
+            "./tests/end2end/single_output_config.yml",
+            "-o",
+            "test_model_single_output",
+            "-d",
+            "./test_single_model",
+            "-t",
+            "./tests/end2end/data.csv"
+        ],
+        check=True,
+    )
+
+
 
 @pytest.fixture(scope="module")
 def run_script_multi_output():
@@ -57,6 +79,27 @@ def run_script_multi_output():
             "test_model_multi_output",
             "-d",
             "./test_multi_model",
+        ],
+        check=True,
+    )
+
+def run_script_multi_output_with_external_test():
+    subprocess.run(
+        [
+            "python",
+            "training_gpytorch.py",
+            "-i",
+            "./tests/end2end/data.csv",
+            "-f",
+            "csv",
+            "-c",
+            "./tests/end2end/multi_output_config.yml",
+            "-o",
+            "test_model_multi_output",
+            "-d",
+            "./test_multi_model",
+            "-t",
+            "./tests/end2end/data.csv"
         ],
         check=True,
     )
