@@ -70,7 +70,7 @@ def parse_args():
         "--test-set",
         type=str,
         required=False,
-        help="File containing the test data",
+        help="File containing the test data. Not usable when cross-validation is selected in the config file.",
     )
 
     args = parser.parse_args()
