@@ -14,7 +14,10 @@ class DataReader:
         pass
 
     def _read_csv(self, file: str | Path) -> pd.DataFrame | pd.Series:
-        data = pd.read_csv(file)
+        if check_df_header(file):
+            data = pd.read_csv(file)
+        else:
+            data = pd.read_csv(file, header=None)
         return data
 
     def _read_pickle(self, file: str | Path) -> pd.DataFrame:
@@ -69,3 +72,11 @@ class DataReader:
             )
 
         return data
+
+def check_df_header(file: str | Path) -> bool:
+    """
+    Returns True if the file has a header and False if the file doesn't have one.
+    """
+    df = pd.read_csv(file, header=None, nrows=5)
+    df_header = pd.read_csv(file, nrows=5)
+    return tuple(df.dtypes) != tuple(df_header.dtypes)
