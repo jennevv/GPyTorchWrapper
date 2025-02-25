@@ -27,7 +27,7 @@ if platform == "linux":
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        prog="GPR Training for H2O-Kr",
+        prog="GPR Training",
         description="Train a Gaussian Process Regressor using GPytorch.",
     )
     parser.add_argument(
