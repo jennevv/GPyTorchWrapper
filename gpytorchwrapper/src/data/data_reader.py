@@ -1,8 +1,8 @@
 from pathlib import Path
 
 import joblib
+import numpy as np
 import pandas as pd
-
 
 class DataReader:
     """
@@ -15,9 +15,9 @@ class DataReader:
 
     def _read_csv(self, file: str | Path) -> pd.DataFrame | pd.Series:
         if check_df_header(file):
-            data = pd.read_csv(file)
+            data = pd.read_csv(file, dtype=np.float64)
         else:
-            data = pd.read_csv(file, header=None)
+            data = pd.read_csv(file, header=None,dtype=np.float64)
         return data
 
     def _read_pickle(self, file: str | Path) -> pd.DataFrame:

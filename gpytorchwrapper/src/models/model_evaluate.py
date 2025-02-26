@@ -8,6 +8,7 @@ from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood
 
 logger = logging.getLogger(__name__)
 
+torch.set_default_dtype(torch.float64)
 
 class ModelEvaluator:
     """
@@ -27,7 +28,7 @@ class ModelEvaluator:
     def _predict(self, x: torch.Tensor) -> gpytorch.distributions.Distribution:
         self.model.eval()
         self.likelihood.eval()
-        with torch.no_grad(), gpytorch.settings.fast_pred_var():
+        with torch.no_grad():
             predictions = self.likelihood(self.model(x))
         return predictions
 

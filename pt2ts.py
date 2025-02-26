@@ -11,6 +11,12 @@ from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
 
 warnings.filterwarnings("ignore")  # Ignore warnings from the torch.jit.trace function
 
+gpytorch.settings.fast_computations(
+    covar_root_decomposition=False, # False = Cholesky decomp., True = Lanczos
+    log_prob=False, # False = Cholesky decomp., True = modified conjugate gradients algorithm
+    solves=False # False = Cholesky decomp., True = preconditioned conjugate gradients
+)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -118,9 +124,10 @@ def trace_model(model, len_training_data, transformer, num_inputs):
     test_x = torch.tensor(test_x, dtype=torch.float64, requires_grad=True)
 
     with (
-        gpytorch.settings.fast_pred_var(),
-        gpytorch.settings.trace_mode(),
-        gpytorch.settings.max_eager_kernel_size(len_training_data + len(test_x)),
+        gpytorch.settings.fast_pred_var(), # LOVE method for predictive variance
+        gpytorch.settings.fast_pred_samples(), # LOVE method for predictive samples
+        gpytorch.settings.trace_mode(), # Required for tracing, turns off some exclusive GPyTorch features
+        gpytorch.settings.max_eager_kernel_size(len_training_data + len(test_x)), # Disables lazy evaluation
     ):
         model.eval()
         pred = model(test_x)  # Do precomputation
