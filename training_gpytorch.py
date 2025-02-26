@@ -4,7 +4,6 @@ import pathlib
 from dataclasses import asdict
 from pathlib import Path
 from sys import platform
-import gpytorch
 import torch
 
 from gpytorchwrapper.src.config.config_reader import read_yaml
@@ -24,17 +23,9 @@ logger = logging.getLogger(__name__)
 
 torch.set_default_dtype(torch.float64)
 
-gpytorch.settings.fast_computations(
-    covar_root_decomposition=True, # False = Cholesky decomp., True = Lanczos
-    log_prob=True, # False = Cholesky decomp., True = modified conjugate gradients algorithm
-    solves=True # False = Cholesky decomp., True = preconditioned conjugate gradients
-)
-
-
 # Needed for training on HPC cluster
 if platform == "linux":
     pathlib.WindowsPath = pathlib.PosixPath
-
 
 def parse_args():
     parser = argparse.ArgumentParser(

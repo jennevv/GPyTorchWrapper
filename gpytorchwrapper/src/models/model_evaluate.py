@@ -28,7 +28,11 @@ class ModelEvaluator:
     def _predict(self, x: torch.Tensor) -> gpytorch.distributions.Distribution:
         self.model.eval()
         self.likelihood.eval()
-        with torch.no_grad():
+        with torch.no_grad(), gpytorch.settings.fast_computations(
+    covar_root_decomposition=False,
+    log_prob=False,
+    solves=False
+):
             predictions = self.likelihood(self.model(x))
         return predictions
 

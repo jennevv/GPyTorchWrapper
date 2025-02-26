@@ -11,25 +11,24 @@ class DataConf:
 
 @dataclass
 class TransformerConf:
-    transform_data: bool
-    transformer_class: str
-    transformer_options: Optional[dict] = None
+    transform_data: bool = False
+    transformer_class: str = "DefaultTransformer"
+    transformer_options: Optional[dict] = field(default_factory=dict)
     columns: Optional[list[int]] = None
 
 
 @dataclass
 class TransformConf:
-    transform_input: TransformerConf
-    transform_output: TransformerConf
+    transform_input: TransformerConf = field(default_factory=TransformerConf)
+    transform_output: TransformerConf = field(default_factory=TransformerConf)
 
 
-# TODO: Remove MeanConf and relegate it to a ConstantKernel
 @dataclass
 class TrainingConf:
     model_class: str
     likelihood_class: str
-    learning_rate: float
-    learning_iterations: int
+    learning_rate: float = 0.5
+    learning_iterations: int = 100
     noiseless: Optional[bool] = False
     botorch: Optional[bool] = False
     debug: Optional[bool] = True
@@ -52,54 +51,54 @@ class Config:
     testing_conf: TestingConf
 
 
-# Function to create a Config object from a dictionary
+# Function to create a Config object from a dictionary with defaults
 def create_config(config_dict: dict) -> Config:
     return Config(
         data_conf=DataConf(
             num_inputs=config_dict["data_conf"]["num_inputs"],
             num_outputs=config_dict["data_conf"]["num_outputs"],
-            output_index=config_dict["data_conf"]["output_index"],
+            output_index=config_dict["data_conf"].get("output_index"),
         ),
         transform_conf=TransformConf(
             transform_input=TransformerConf(
-                transform_data=config_dict["transform_conf"]["transform_input"][
-                    "transform_data"
-                ],
-                transformer_class=config_dict["transform_conf"]["transform_input"][
-                    "transformer_class"
-                ],
-                transformer_options=config_dict["transform_conf"]["transform_input"][
-                    "transformer_options"
-                ],
-                columns=config_dict["transform_conf"]["transform_input"]["columns"],
+                transform_data=config_dict["transform_conf"]["transform_input"].get(
+                    "transform_data", False
+                ),
+                transformer_class=config_dict["transform_conf"]["transform_input"].get(
+                    "transformer_class", "DefaultTransformer"
+                ),
+                transformer_options=config_dict["transform_conf"]["transform_input"].get(
+                    "transformer_options", {}
+                ),
+                columns=config_dict["transform_conf"]["transform_input"].get("columns"),
             ),
             transform_output=TransformerConf(
-                transform_data=config_dict["transform_conf"]["transform_output"][
-                    "transform_data"
-                ],
-                transformer_class=config_dict["transform_conf"]["transform_output"][
-                    "transformer_class"
-                ],
-                transformer_options=config_dict["transform_conf"]["transform_output"][
-                    "transformer_options"
-                ],
-                columns=config_dict["transform_conf"]["transform_output"]["columns"],
+                transform_data=config_dict["transform_conf"]["transform_output"].get(
+                    "transform_data", False
+                ),
+                transformer_class=config_dict["transform_conf"]["transform_output"].get(
+                    "transformer_class", "DefaultTransformer"
+                ),
+                transformer_options=config_dict["transform_conf"]["transform_output"].get(
+                    "transformer_options", {}
+                ),
+                columns=config_dict["transform_conf"]["transform_output"].get("columns", []),
             ),
         ),
         training_conf=TrainingConf(
-            model_class=config_dict["training_conf"]["model_class"],
-            likelihood_class=config_dict["training_conf"]["likelihood_class"],
-            learning_rate=config_dict["training_conf"]["learning_rate"],
-            learning_iterations=config_dict["training_conf"]["learning_iterations"],
-            noiseless=config_dict["training_conf"]["noiseless"],
-            botorch=config_dict["training_conf"]["botorch"],
-            debug=config_dict["training_conf"]["debug"],
+            model_class=config_dict["training_conf"].get("model_class"),
+            likelihood_class=config_dict["training_conf"].get("likelihood_class"),
+            learning_rate=config_dict["training_conf"].get("learning_rate", 0.5),
+            learning_iterations=config_dict["training_conf"].get("learning_iterations", 100),
+            noiseless=config_dict["training_conf"].get("noiseless", False),
+            botorch=config_dict["training_conf"].get("botorch", False),
+            debug=config_dict["training_conf"].get("debug", True),
         ),
         testing_conf=TestingConf(
-            test=config_dict["testing_conf"]["test"],
-            test_size=config_dict["testing_conf"]["test_size"],
-            strat_shuffle_split=config_dict["testing_conf"]["strat_shuffle_split"],
-            kfold=config_dict["testing_conf"]["kfold"],
-            kfold_bins=config_dict["testing_conf"]["kfold_bins"],
+            test=config_dict["testing_conf"].get("test", False),
+            test_size=config_dict["testing_conf"].get("test_size", 0.2),
+            strat_shuffle_split=config_dict["testing_conf"].get("strat_shuffle_split", False),
+            kfold=config_dict["testing_conf"].get("kfold", False),
+            kfold_bins=config_dict["testing_conf"].get("kfold_bins", None),
         ),
     )

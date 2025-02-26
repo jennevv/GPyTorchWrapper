@@ -262,14 +262,19 @@ def train_model(
     mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 
     logger.info("Start training the model.")
-    if botorch:
-        fit_gpytorch_mll(mll)
-    else:
-        # Optimize model hyperparameters
-        optimizer = define_optimizer(model, learning_rate)
-        training_loop(
-            train_x, train_y, model, mll, optimizer, learning_iterations, debug
-        )
+    with gpytorch.settings.debug(debug), gpytorch.settings.fast_computations(
+    covar_root_decomposition=False,
+    log_prob=False,
+    solves=False
+):
+        if botorch:
+            fit_gpytorch_mll(mll)
+        else:
+            # Optimize model hyperparameters
+            optimizer = define_optimizer(model, learning_rate)
+            training_loop(
+                train_x, train_y, model, mll, optimizer, learning_iterations, debug
+            )
 
     parameter_names, parameters = model_parameters(model)
     logger.info(
