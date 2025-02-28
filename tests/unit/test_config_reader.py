@@ -29,11 +29,13 @@ def sample_yaml_file() -> pathlib.Path:
     training_conf:
       model_class: SingleGPRBF
       likelihood_class: GaussianLikelihood
-      learning_rate: 0.5
       learning_iterations: 100
-      noiseless: false
       botorch: false
       debug: True
+      optimizer:
+        optimizer_class: Adam
+        optimizer_options:
+          lr: 0.1
 
     testing_conf:
       test: false
@@ -68,10 +70,11 @@ def test_read_yaml_valid_file(sample_yaml_file):
 
     assert config.training_conf.model_class == "SingleGPRBF"
     assert config.training_conf.likelihood_class == "GaussianLikelihood"
-    assert config.training_conf.learning_rate == 0.5
     assert config.training_conf.learning_iterations == 100
-    assert config.training_conf.noiseless is False
     assert config.training_conf.botorch is False
+    assert config.training_conf.debug is True
+    assert config.training_conf.optimizer.optimizer_class == "Adam"
+    assert config.training_conf.optimizer.optimizer_options == {"lr": 0.1}
 
     assert config.testing_conf.test is False
     assert config.testing_conf.test_size == 0.2

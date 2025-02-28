@@ -6,16 +6,16 @@ import logging
 from botorch import fit_gpytorch_mll
 
 from gpytorch.models import ExactGP
-from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood
+from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood, Likelihood
 from gpytorch.mlls import MarginalLogLikelihood
 
-from gpytorchwrapper.src.config.config_classes import TrainingConf
-from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
+from gpytorchwrapper.src.config.config_classes import TrainingConf, OptimizerConf
+from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model, get_optimizer
 
 logger = logging.getLogger(__name__)
 
 
-def define_optimizer(model: ExactGP, learning_rate: float) -> torch.optim.Optimizer:
+def define_optimizer(model: ExactGP, optimizer_conf: OptimizerConf) -> torch.optim.Optimizer:
     """
     Define the optimizer for the model
 
@@ -31,8 +31,9 @@ def define_optimizer(model: ExactGP, learning_rate: float) -> torch.optim.Optimi
     optimizer : object
             The optimizer for the model
     """
-
-    return torch.optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer_class = get_optimizer(optimizer_conf)
+    optimizer = optimizer_class(model.parameters(), **optimizer_conf.optimizer_options)
+    return optimizer
 
 
 def set_noiseless(
@@ -181,6 +182,27 @@ def print_model_parameters(parameter_names: list, parameters: list) -> str:
 
     return "".join(parameter_strings)
 
+def define_likelihood(likelihood_class: Likelihood, num_tasks: int) -> Likelihood:
+    """
+    Define the likelihood for the model
+
+    Parameters
+    -----------
+    likelihood_class : object
+                       The likelihood class
+    num_tasks : int
+                The number of tasks the model is expected to train on
+
+    Returns
+    --------
+    likelihood : object
+                 The likelihood object
+    """
+    if num_tasks > 1:
+        return likelihood_class(num_tasks=num_tasks, noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
+    else:
+        return likelihood_class(noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
+
 
 def train_model(
     train_x: torch.Tensor,
@@ -215,40 +237,18 @@ def train_model(
 
     # Load the training specifications
     learning_iterations = training_conf.learning_iterations
-    learning_rate = training_conf.learning_rate
     botorch = training_conf.botorch
-    noiseless = training_conf.noiseless
     debug = training_conf.debug
+    optimizer_conf = training_conf.optimizer
 
     # Define likelihood and model
     likelihood_class = get_likelihood(training_conf)
     model_class = get_model(training_conf)
 
     # Set noise constraint like sklearn WhiteKernel for comparison reasons
-    if num_tasks > 1:
-        if noiseless:
-            likelihood = likelihood_class(
-                num_tasks=num_tasks,
-                noise_constraint=gpytorch.constraints.GreaterThan(1e-8),
-            )
-            likelihood.raw_task_noises.requires_grad = False
-        else:
-            likelihood = likelihood_class(
-                num_tasks=num_tasks,
-                noise_constraint=gpytorch.constraints.GreaterThan(1e-5),
-            )
-    else:
-        if noiseless:
-            likelihood = likelihood_class(
-                noise_constraint=gpytorch.constraints.GreaterThan(1e-8)
-            )
-            likelihood.raw_noise.requires_grad = False
-        else:
-            likelihood = likelihood_class(
-                noise_constraint=gpytorch.constraints.GreaterThan(1e-5)
-            )
-
+    likelihood = define_likelihood(likelihood_class, num_tasks)
     model = model_class(train_x, train_y, likelihood)
+
     parameter_names, parameters = model_parameters(model)
     logger.info(
         f"Parameters before training: \n{print_model_parameters(parameter_names, parameters)}"
@@ -272,7 +272,7 @@ def train_model(
             fit_gpytorch_mll(mll)
         else:
             # Optimize model hyperparameters
-            optimizer = define_optimizer(model, learning_rate)
+            optimizer = define_optimizer(model, optimizer_conf)
             training_loop(
                 train_x, train_y, model, mll, optimizer, learning_iterations, debug
             )

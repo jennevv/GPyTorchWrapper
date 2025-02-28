@@ -1,13 +1,14 @@
 import gpytorch
 import pytest
 import sklearn
+import torch
 
 import gpytorchwrapper.src.models.gp_models as model_module
-from gpytorchwrapper.src.config.config_classes import TransformerConf, TrainingConf
+from gpytorchwrapper.src.config.config_classes import TransformerConf, TrainingConf, OptimizerConf
 from gpytorchwrapper.src.config.model_factory import (
     get_transformer,
     get_likelihood,
-    get_model,
+    get_model, get_optimizer,
 )
 
 
@@ -47,7 +48,6 @@ def test_get_likelihood():
     training_conf = TrainingConf(
         model_class="TestModel",
         likelihood_class="GaussianLikelihood",
-        learning_rate=0.1,
         learning_iterations=100,
     )
     likelihood = get_likelihood(training_conf)
@@ -57,7 +57,6 @@ def test_get_likelihood():
     training_conf = TrainingConf(
         model_class="TestModel",
         likelihood_class="MultitaskGaussianLikelihood",
-        learning_rate=0.1,
         learning_iterations=100,
     )
     likelihood = get_likelihood(training_conf)
@@ -67,7 +66,6 @@ def test_get_likelihood():
     training_conf = TrainingConf(
         model_class="TestModel",
         likelihood_class="NonExistentLikelihood",
-        learning_rate=0.1,
         learning_iterations=100,
     )
     with pytest.raises(AttributeError):
@@ -78,7 +76,6 @@ def test_get_model():
     training_conf = TrainingConf(
         model_class="TestModel",
         likelihood_class="GaussianLikelihood",
-        learning_rate=0.1,
         learning_iterations=100,
     )
     model_class = get_model(training_conf)
@@ -88,9 +85,34 @@ def test_get_model():
     training_conf = TrainingConf(
         model_class="NonExistentModel",
         likelihood_class="GaussianLikelihood",
-        learning_rate=0.1,
         learning_iterations=100,
     )
 
     with pytest.raises(NotImplementedError):
         get_model(training_conf)
+
+def test_get_optimizer():
+    training_conf = TrainingConf(
+        model_class="TestModel",
+        likelihood_class="GaussianLikelihood",
+        learning_iterations=100,
+        optimizer=OptimizerConf(
+            optimizer_class="Adam",
+            optimizer_options={"lr": 0.1},
+        ),
+    )
+    optimizer = get_optimizer(training_conf.optimizer)
+    assert optimizer is torch.optim.Adam
+
+    # Test with non-existent optimizer
+    training_conf = TrainingConf(
+        model_class="TestModel",
+        likelihood_class="GaussianLikelihood",
+        learning_iterations=100,
+        optimizer=OptimizerConf(
+            optimizer_class="NonExistentOptimizer",
+            optimizer_options={"lr": 0.1},
+        ),
+    )
+    with pytest.raises(AttributeError):
+        get_optimizer(training_conf.optimizer)

@@ -22,9 +22,12 @@ training_conf:
   likelihood_class: GaussianLikelihood
   learning_rate: 0.5
   learning_iterations: 5
-  noiseless: false
   botorch: false
   debug: True
+  optimizer:
+    optimizer_class: Adam
+    optimizer_options:
+      lr: 0.1
 
 testing_conf:
   test: false

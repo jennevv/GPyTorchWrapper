@@ -6,9 +6,11 @@ import sklearn.preprocessing as transformer_module
 import gpytorch.likelihoods as likelihood_module
 from gpytorch.likelihoods import Likelihood
 from gpytorch.models import ExactGP
+from torch.optim import Optimizer
 
 import gpytorchwrapper.src.models.gp_models as model_module
-from .config_classes import TransformerConf, TrainingConf
+import torch.optim as optimizer_module
+from .config_classes import TransformerConf, TrainingConf, OptimizerConf
 import logging
 import sys
 
@@ -110,3 +112,20 @@ def get_model(training_conf: TrainingConf) -> ExactGP:
         raise NotImplementedError(
             f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder."
         )
+
+def get_optimizer(optimizer_conf: OptimizerConf) -> Optimizer:
+    """
+    Get the optimizer class and options
+
+    Parameters
+    -----------
+    optimizer_conf : OptimizerConf
+                    dataclass containing the optimizer specifications
+
+    Returns
+    --------
+    selected_optimizer_class : object
+                                The selected optimizer class
+    """
+    selected_optimizer = optimizer_conf.optimizer_class
+    return getattr(optimizer_module, selected_optimizer)

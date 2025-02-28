@@ -22,16 +22,19 @@ class TransformConf:
     transform_input: TransformerConf = field(default_factory=TransformerConf)
     transform_output: TransformerConf = field(default_factory=TransformerConf)
 
+@dataclass
+class OptimizerConf:
+    optimizer_class: str = "Adam"
+    optimizer_options: Optional[dict] = field(default_factory= lambda: {"lr": 0.1})
 
 @dataclass
 class TrainingConf:
     model_class: str
     likelihood_class: str
-    learning_rate: float = 0.5
     learning_iterations: int = 100
-    noiseless: Optional[bool] = False
     botorch: Optional[bool] = False
     debug: Optional[bool] = True
+    optimizer: OptimizerConf = field(default_factory=OptimizerConf)
 
 
 @dataclass
@@ -90,13 +93,19 @@ def create_config(config_dict: dict) -> Config:
         training_conf=TrainingConf(
             model_class=config_dict["training_conf"].get("model_class"),
             likelihood_class=config_dict["training_conf"].get("likelihood_class"),
-            learning_rate=config_dict["training_conf"].get("learning_rate", 0.5),
             learning_iterations=config_dict["training_conf"].get(
                 "learning_iterations", 100
             ),
-            noiseless=config_dict["training_conf"].get("noiseless", False),
             botorch=config_dict["training_conf"].get("botorch", False),
             debug=config_dict["training_conf"].get("debug", True),
+            optimizer=OptimizerConf(
+                optimizer_class=config_dict["training_conf"]["optimizer"].get(
+                    "optimizer_class", "Adam"
+                ),
+                optimizer_options=config_dict["training_conf"]["optimizer"].get(
+                    "optimizer_options", {"lr": 0.1}
+                ),
+            ),
         ),
         testing_conf=TestingConf(
             test=config_dict["testing_conf"].get("test", False),
