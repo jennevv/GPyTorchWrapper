@@ -12,6 +12,8 @@ from gpytorchwrapper.src.utils.input_transformer import xyz_to_invdist_torch
 from gpytorchwrapper.src.utils.permutational_invariance import (
     generate_permutations,
     generate_unique_distances,
+    generate_ard_expansion,
+    generate_interatomic_distance_indices
 )
 
 
@@ -24,10 +26,9 @@ class LinearxMaternKernelPermInv(Kernel):
         idx_equiv_atoms: list[list[int]],
         select_dims: Tensor = None,
         nu: float = 2.5,
+        ard: bool = False,
         variance_prior: Optional[Prior] = None,
         variance_constraint: Optional[Interval] = None,
-        ard: bool = False,
-        ard_expansion: list = None,
         **kwargs,
     ):
         if not ard:
@@ -38,14 +39,22 @@ class LinearxMaternKernelPermInv(Kernel):
                     "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead and specify ard_expansion."
                 )
         else:
-            if ard_expansion is None:
-                raise NotImplementedError(
-                    "Please specify the expansion list for the ard lengthscale tensor."
-                )
+            num_dist = n_atoms * (n_atoms - 1) // 2 # Number of interatomic distances
+            ard_num_dims = num_dist
+            num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms) # permutationally unique!
+            distance_idx = generate_interatomic_distance_indices(n_atoms)
+            ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
 
-            # num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms)
-
-            super().__init__(**kwargs)
+            if num_unique_distances != len(set(ard_expansion)):
+                raise ValueError(
+                    "The permutationally invariant ARD expansion failed."
+                    f"Expected number of unique distances {num_unique_distances} != {len(set(ard_expansion))}"
+                    f"ARD expansion: {ard_expansion}"
+                                 )
+            super().__init__(ard_num_dims=ard_num_dims, **kwargs)
+            self.ard = ard
+            self.ard_expansion = ard_expansion
+            self.idx_equiv_atoms = idx_equiv_atoms
 
         if nu not in {0.5, 1.5, 2.5}:
             raise NotImplementedError(
@@ -54,7 +63,7 @@ class LinearxMaternKernelPermInv(Kernel):
 
         if self.active_dims is not None:
             raise NotImplementedError(
-                "active_dims is not supported for LinearxMaternKernelPermInv. Please use select_dims instead."
+                "Keyword active_dims is not supported for LinearxMaternKernelPermInv. Please use select_dims instead."
             )
 
         if variance_constraint is None:
@@ -81,9 +90,6 @@ class LinearxMaternKernelPermInv(Kernel):
 
         self.select_dims = select_dims
         self.nu = nu
-        self.idx_equiv_atoms = idx_equiv_atoms
-        self.ard = ard
-        self.ard_expansion = ard_expansion
 
         dims = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
         self.dims = dims
@@ -104,14 +110,13 @@ class LinearxMaternKernelPermInv(Kernel):
             raw_variance=self.raw_variance_constraint.inverse_transform(value)
         )
 
-    def matern_kernel(self, x1, x2, diag, idx, **params):
+    def matern_kernel(self, x1, x2, diag, **params):
         mean = x1.mean(dim=-2, keepdim=True)
 
         if self.ard:
-            ard_lengthscale = self.lengthscale[0][self.ard_expansion]
-
-            x1_ = (x1 - mean).div(ard_lengthscale)
-            x2_ = (x2 - mean).div(ard_lengthscale)
+            perminv_ard_lengthscale = self.lengthscale.clone()[0][self.ard_expansion].unsqueeze(0)
+            x1_ = (x1 - mean).div(perminv_ard_lengthscale)
+            x2_ = (x2 - mean).div(perminv_ard_lengthscale)
         else:
             x1_ = (x1 - mean).div(self.lengthscale)
             x2_ = (x2 - mean).div(self.lengthscale)
@@ -171,7 +176,7 @@ class LinearxMaternKernelPermInv(Kernel):
             ]
 
             # Transform xyz coordinates to internuclear distances
-            x1_interdist, idx = xyz_to_invdist_torch(x1, index=True)
+            x1_interdist = xyz_to_invdist_torch(x1)
             x2_perm_interdist = xyz_to_invdist_torch(x2_perm)
 
             if self.select_dims is not None:
@@ -181,13 +186,12 @@ class LinearxMaternKernelPermInv(Kernel):
                 x2_perm_interdist = torch.index_select(
                     x2_perm_interdist, 1, torch.tensor(self.select_dims)
                 )
-                idx = idx[self.select_dims]
 
             k_linear = self.linear_kernel(
                 x1_interdist, x2_perm_interdist, diag, last_dim_is_batch, **params
             )
             k_matern = self.matern_kernel(
-                x1_interdist, x2_perm_interdist, diag, idx=idx, **params
+                x1_interdist, x2_perm_interdist, diag, **params
             )
 
             k_sum += k_linear * k_matern
