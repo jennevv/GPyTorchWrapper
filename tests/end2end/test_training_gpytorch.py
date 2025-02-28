@@ -40,6 +40,7 @@ def run_script_single_output():
         check=True,
     )
 
+
 @pytest.fixture(scope="module")
 def run_script_single_output_with_external_test():
     subprocess.run(
@@ -57,11 +58,10 @@ def run_script_single_output_with_external_test():
             "-d",
             "./test_single_model",
             "-t",
-            "./tests/end2end/data.csv"
+            "./tests/end2end/data.csv",
         ],
         check=True,
     )
-
 
 
 @pytest.fixture(scope="module")
@@ -84,6 +84,7 @@ def run_script_multi_output():
         check=True,
     )
 
+
 @pytest.fixture(scope="module")
 def run_script_multi_output_with_external_test():
     subprocess.run(
@@ -101,7 +102,7 @@ def run_script_multi_output_with_external_test():
             "-d",
             "./test_multi_model",
             "-t",
-            "./tests/end2end/data.csv"
+            "./tests/end2end/data.csv",
         ],
         check=True,
     )
@@ -146,7 +147,10 @@ def test_multi_output_model_exists(run_script_multi_output):
         raise FileNotFoundError("No model file found.")
     shutil.rmtree("./test_multi_model")
 
-def test_single_output_model_exists_with_external_test(run_script_single_output_with_external_test):
+
+def test_single_output_model_exists_with_external_test(
+    run_script_single_output_with_external_test,
+):
     for file in os.listdir("./test_single_model"):
         file = pathlib.Path(file)
         match = fnmatch.fnmatch(file.name, "test_model_single_output.pth")
@@ -156,7 +160,10 @@ def test_single_output_model_exists_with_external_test(run_script_single_output_
         raise FileNotFoundError("No model file found.")
     shutil.rmtree("./test_single_model")
 
-def test_multi_output_model_exists_with_external_test(run_script_multi_output_with_external_test):
+
+def test_multi_output_model_exists_with_external_test(
+    run_script_multi_output_with_external_test,
+):
     for file in os.listdir("./test_multi_model"):
         file = pathlib.Path(file)
         match = fnmatch.fnmatch(file.name, "test_model_multi_output.pth")

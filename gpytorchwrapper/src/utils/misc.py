@@ -1,8 +1,7 @@
-import subprocess
-
 import numpy as np
 import torch
 import pandas as pd
+
 
 def metadata_dict(**kwargs):
     """Save the metadata to a dictionary"""

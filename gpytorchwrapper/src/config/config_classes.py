@@ -67,9 +67,9 @@ def create_config(config_dict: dict) -> Config:
                 transformer_class=config_dict["transform_conf"]["transform_input"].get(
                     "transformer_class", "DefaultTransformer"
                 ),
-                transformer_options=config_dict["transform_conf"]["transform_input"].get(
-                    "transformer_options", {}
-                ),
+                transformer_options=config_dict["transform_conf"][
+                    "transform_input"
+                ].get("transformer_options", {}),
                 columns=config_dict["transform_conf"]["transform_input"].get("columns"),
             ),
             transform_output=TransformerConf(
@@ -79,17 +79,21 @@ def create_config(config_dict: dict) -> Config:
                 transformer_class=config_dict["transform_conf"]["transform_output"].get(
                     "transformer_class", "DefaultTransformer"
                 ),
-                transformer_options=config_dict["transform_conf"]["transform_output"].get(
-                    "transformer_options", {}
+                transformer_options=config_dict["transform_conf"][
+                    "transform_output"
+                ].get("transformer_options", {}),
+                columns=config_dict["transform_conf"]["transform_output"].get(
+                    "columns", []
                 ),
-                columns=config_dict["transform_conf"]["transform_output"].get("columns", []),
             ),
         ),
         training_conf=TrainingConf(
             model_class=config_dict["training_conf"].get("model_class"),
             likelihood_class=config_dict["training_conf"].get("likelihood_class"),
             learning_rate=config_dict["training_conf"].get("learning_rate", 0.5),
-            learning_iterations=config_dict["training_conf"].get("learning_iterations", 100),
+            learning_iterations=config_dict["training_conf"].get(
+                "learning_iterations", 100
+            ),
             noiseless=config_dict["training_conf"].get("noiseless", False),
             botorch=config_dict["training_conf"].get("botorch", False),
             debug=config_dict["training_conf"].get("debug", True),
@@ -97,7 +101,9 @@ def create_config(config_dict: dict) -> Config:
         testing_conf=TestingConf(
             test=config_dict["testing_conf"].get("test", False),
             test_size=config_dict["testing_conf"].get("test_size", 0.2),
-            strat_shuffle_split=config_dict["testing_conf"].get("strat_shuffle_split", False),
+            strat_shuffle_split=config_dict["testing_conf"].get(
+                "strat_shuffle_split", False
+            ),
             kfold=config_dict["testing_conf"].get("kfold", False),
             kfold_bins=config_dict["testing_conf"].get("kfold_bins", None),
         ),

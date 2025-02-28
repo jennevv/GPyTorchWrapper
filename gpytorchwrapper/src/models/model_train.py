@@ -262,11 +262,12 @@ def train_model(
     mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 
     logger.info("Start training the model.")
-    with gpytorch.settings.debug(debug), gpytorch.settings.fast_computations(
-    covar_root_decomposition=False,
-    log_prob=False,
-    solves=False
-):
+    with (
+        gpytorch.settings.debug(debug),
+        gpytorch.settings.fast_computations(
+            covar_root_decomposition=False, log_prob=False, solves=False
+        ),
+    ):
         if botorch:
             fit_gpytorch_mll(mll)
         else:

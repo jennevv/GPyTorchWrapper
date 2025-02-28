@@ -1,5 +1,4 @@
 from gpytorch import kernels, means, models, distributions
-import torch
 
 
 ##### SINGLE OUTPUT MODELS #####

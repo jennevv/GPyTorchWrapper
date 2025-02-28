@@ -1,5 +1,4 @@
 from pathlib import Path
-from gpytorchwrapper.src.config.config_classes import Config
 import torch
 
 

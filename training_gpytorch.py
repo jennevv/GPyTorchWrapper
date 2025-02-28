@@ -27,6 +27,7 @@ torch.set_default_dtype(torch.float64)
 if platform == "linux":
     pathlib.WindowsPath = pathlib.PosixPath
 
+
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="GPR Training",
@@ -109,8 +110,8 @@ def main():
         train_x, test_x, train_y, test_y = split_data(
             x, y, data_conf, transform_conf, training_conf, testing_conf, args.directory
         )
-        train_x, test_x, train_y, test_y, input_transformer, output_transformer = transform(
-            train_x, train_y, test_x, test_y, transform_conf
+        train_x, test_x, train_y, test_y, input_transformer, output_transformer = (
+            transform(train_x, train_y, test_x, test_y, transform_conf)
         )
     else:
         train_x, _, train_y, _ = split_data(

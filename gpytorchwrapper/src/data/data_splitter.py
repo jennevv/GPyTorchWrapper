@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from pandas import DataFrame
 from sklearn.model_selection import StratifiedShuffleSplit, KFold, train_test_split
 
 from gpytorchwrapper.src.config.config_classes import (
@@ -193,7 +194,7 @@ def write_kfold_results(kfold_results, out_dir):
 
 def stratified_shuffle_split(
     x: pd.DataFrame, y: pd.DataFrame, n_bins: int | None = 5, test_size: float = 0.2
-):
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Split the data into training and test sets using stratified shuffle split
 
@@ -248,11 +249,11 @@ def stratified_shuffle_split(
         set_.drop("CAT", axis=1, inplace=True)
 
     # Transform the input data
-    train_x = strat_train_set[x.columns]
-    test_x = strat_test_set[x.columns]
+    train_x: pd.DataFrame = strat_train_set[x.columns]
+    test_x: pd.DataFrame = strat_test_set[x.columns]
 
-    train_y = strat_train_set[output_columns]
-    test_y = strat_test_set[output_columns]
+    train_y: pd.DataFrame = strat_train_set[output_columns]
+    test_y: pd.DataFrame = strat_test_set[output_columns]
 
     return train_x, test_x, train_y, test_y
 
@@ -270,8 +271,9 @@ def split_data(
     testing_conf: TestingConf,
     directory: Path,
 ) -> (
-    tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]
-    | tuple[pd.DataFrame, None, pd.DataFrame, None]
+    None
+    | tuple[DataFrame, DataFrame, DataFrame, DataFrame]
+    | tuple[DataFrame, None, DataFrame, None]
 ):
     """
     Split the data into training and test sets.

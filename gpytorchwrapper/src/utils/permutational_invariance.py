@@ -70,23 +70,27 @@ def generate_unique_distances(num_atoms: int, idx_equiv_atoms: list[list[int]]) 
 
     return num_unique_dist
 
+
 def generate_interatomic_distance_indices(num_atoms: int):
     distance_indices: list[list[int]] = []
 
     for atom1 in range(num_atoms):
         for atom2 in range(num_atoms):
             if atom1 != atom2:
-                distance_idx = sorted([atom1,atom2])
+                distance_idx = sorted([atom1, atom2])
                 if distance_idx not in distance_indices:
                     distance_indices.append(distance_idx)
 
     return distance_indices
 
-def generate_ard_expansion(distance_idx: list[list[int]], idx_inv_atoms: list[list[int]]):
+
+def generate_ard_expansion(
+    distance_idx: list[list[int]], idx_inv_atoms: list[list[int]]
+):
     group_labels = {}
 
     # Flatten list to loop over
-    flat_distance_idx = [x for xs in distance_idx for x in xs]
+    flat_distance_idx = [atom for dist in distance_idx for atom in dist]
 
     for idx, atom in enumerate(flat_distance_idx):
         for inv_group in idx_inv_atoms:
@@ -94,8 +98,10 @@ def generate_ard_expansion(distance_idx: list[list[int]], idx_inv_atoms: list[li
                 flat_distance_idx[idx] = min(inv_group)
 
     # Reshape list to 2D for setting as dictionary keys
-    mapped_distance_idx = [flat_distance_idx[i:i + 2] for i in range(0, len(flat_distance_idx), 2)]
-    # Lists are not hashable
+    mapped_distance_idx = [
+        flat_distance_idx[i : i + 2] for i in range(0, len(flat_distance_idx), 2)
+    ]
+    # Lists are not hashable so turn into tuples and sort for unique representation
     mapped_distance_idx = [tuple(sorted(dist)) for dist in mapped_distance_idx]
 
     for dist in mapped_distance_idx:

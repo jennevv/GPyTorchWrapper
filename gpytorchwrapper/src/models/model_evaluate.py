@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 torch.set_default_dtype(torch.float64)
 
+
 class ModelEvaluator:
     """
     Class for evaluating the rmse and correlation of the model predictions on the selected dataset
@@ -28,11 +29,12 @@ class ModelEvaluator:
     def _predict(self, x: torch.Tensor) -> gpytorch.distributions.Distribution:
         self.model.eval()
         self.likelihood.eval()
-        with torch.no_grad(), gpytorch.settings.fast_computations(
-    covar_root_decomposition=False,
-    log_prob=False,
-    solves=False
-):
+        with (
+            torch.no_grad(),
+            gpytorch.settings.fast_computations(
+                covar_root_decomposition=False, log_prob=False, solves=False
+            ),
+        ):
             predictions = self.likelihood(self.model(x))
         return predictions
 

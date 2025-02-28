@@ -13,7 +13,7 @@ from gpytorchwrapper.src.utils.permutational_invariance import (
     generate_permutations,
     generate_unique_distances,
     generate_ard_expansion,
-    generate_interatomic_distance_indices
+    generate_interatomic_distance_indices,
 )
 
 
@@ -39,9 +39,11 @@ class LinearxMaternKernelPermInv(Kernel):
                     "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead and specify ard_expansion."
                 )
         else:
-            num_dist = n_atoms * (n_atoms - 1) // 2 # Number of interatomic distances
+            num_dist = n_atoms * (n_atoms - 1) // 2  # Number of interatomic distances
             ard_num_dims = num_dist
-            num_unique_distances = generate_unique_distances(n_atoms, idx_equiv_atoms) # permutationally unique!
+            num_unique_distances = generate_unique_distances(
+                n_atoms, idx_equiv_atoms
+            )  # permutationally unique!
             distance_idx = generate_interatomic_distance_indices(n_atoms)
             ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
 
@@ -50,7 +52,7 @@ class LinearxMaternKernelPermInv(Kernel):
                     "The permutationally invariant ARD expansion failed."
                     f"Expected number of unique distances {num_unique_distances} != {len(set(ard_expansion))}"
                     f"ARD expansion: {ard_expansion}"
-                                 )
+                )
             super().__init__(ard_num_dims=ard_num_dims, **kwargs)
             self.ard = ard
             self.ard_expansion = ard_expansion
@@ -114,7 +116,9 @@ class LinearxMaternKernelPermInv(Kernel):
         mean = x1.mean(dim=-2, keepdim=True)
 
         if self.ard:
-            perminv_ard_lengthscale = self.lengthscale.clone()[0][self.ard_expansion].unsqueeze(0)
+            perminv_ard_lengthscale = self.lengthscale.clone()[0][
+                self.ard_expansion
+            ].unsqueeze(0)
             x1_ = (x1 - mean).div(perminv_ard_lengthscale)
             x2_ = (x2 - mean).div(perminv_ard_lengthscale)
         else:
