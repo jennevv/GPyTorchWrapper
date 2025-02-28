@@ -57,7 +57,7 @@ def create_config(config_dict: dict) -> Config:
         data_conf=DataConf(
             num_inputs=config_dict["data_conf"]["num_inputs"],
             num_outputs=config_dict["data_conf"]["num_outputs"],
-            output_index=config_dict["data_conf"].get("output_index"),
+            output_index=config_dict["data_conf"]["output_index"],
         ),
         transform_conf=TransformConf(
             transform_input=TransformerConf(
