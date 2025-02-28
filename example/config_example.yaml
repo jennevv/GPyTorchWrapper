@@ -20,11 +20,13 @@ transform_conf:
 training_conf:
   model_class: SingleGPRBF
   likelihood_class: GaussianLikelihood
-  learning_rate: 0.5
   learning_iterations: 100
-  noiseless: false
   botorch: false
   debug: True
+  optimizer:
+    optimizer_class: Adam
+    optimizer_options:
+      lr: 0.1
 
 testing_conf:
   test: false
