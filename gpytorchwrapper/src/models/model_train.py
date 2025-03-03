@@ -40,8 +40,11 @@ def define_optimizer(model: ExactGP, optimizer_conf: OptimizerConf) -> torch.opt
 
 def define_likelihood(likelihood_conf: LikelihoodConf, likelihood_class: Likelihood, train_x: Tensor):
     if likelihood_class is FixedNoiseGaussianLikelihood:
+        print(likelihood_conf.likelihood_options)
         if "noise" not in likelihood_conf.likelihood_options.keys():
             raise KeyError("The noise parameter is not specified in the likelihood options.")
+        elif type(likelihood_conf.likelihood_options["noise"]) == str:
+            likelihood_conf.likelihood_options["noise"] = eval(likelihood_conf.likelihood_options["noise"])
         likelihood_conf.likelihood_options["noise"] = torch.tensor([likelihood_conf.likelihood_options["noise"]] * train_x.shape[0])
 
     if likelihood_conf.likelihood_options:
