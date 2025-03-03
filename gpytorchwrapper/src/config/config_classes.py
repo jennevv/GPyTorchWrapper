@@ -28,9 +28,19 @@ class OptimizerConf:
     optimizer_options: Optional[dict] = field(default_factory= lambda: {"lr": 0.1})
 
 @dataclass
-class TrainingConf:
+class LikelihoodConf:
+    likelihood_class: str = "GaussianLikelihood"
+    likelihood_options: Optional[dict] = field(default_factory= dict)
+
+@dataclass
+class ModelConf:
     model_class: str
-    likelihood_class: str
+    model_options: Optional[dict] = field(default_factory= dict)
+
+@dataclass
+class TrainingConf:
+    model: ModelConf = field(default_factory=ModelConf)
+    likelihood: LikelihoodConf = field(default_factory=LikelihoodConf)
     learning_iterations: int = 100
     botorch: Optional[bool] = False
     debug: Optional[bool] = True
@@ -91,8 +101,22 @@ def create_config(config_dict: dict) -> Config:
             ),
         ),
         training_conf=TrainingConf(
-            model_class=config_dict["training_conf"].get("model_class"),
-            likelihood_class=config_dict["training_conf"].get("likelihood_class"),
+            model=ModelConf(
+                model_class=config_dict["training_conf"]["model"].get(
+                    "model_class", "SingleGPRBF"
+                ),
+                model_options=config_dict["training_conf"]["model"].get(
+                    "model_options", {}
+                ),
+            ),
+            likelihood=LikelihoodConf(
+                likelihood_class=config_dict["training_conf"]["likelihood"].get(
+                    "likelihood_class", "GaussianLikelihood"
+                ),
+                likelihood_options=config_dict["training_conf"]["likelihood"].get(
+                    "likelihood_options", {}
+                ),
+            ),
             learning_iterations=config_dict["training_conf"].get(
                 "learning_iterations", 100
             ),

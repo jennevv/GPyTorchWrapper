@@ -10,7 +10,7 @@ from torch.optim import Optimizer
 
 import gpytorchwrapper.src.models.gp_models as model_module
 import torch.optim as optimizer_module
-from .config_classes import TransformerConf, TrainingConf, OptimizerConf
+from .config_classes import TransformerConf, TrainingConf, OptimizerConf, LikelihoodConf, ModelConf
 import logging
 import sys
 
@@ -42,7 +42,7 @@ def get_transformer(transformer_conf: TransformerConf) -> object:
     return selected_transformer_class
 
 
-def get_likelihood(training_conf: TrainingConf) -> Likelihood:
+def get_likelihood(likelihood_conf: LikelihoodConf) -> Likelihood:
     """
     Get the likelihood class and options
 
@@ -56,7 +56,7 @@ def get_likelihood(training_conf: TrainingConf) -> Likelihood:
     selected_likelihood_class : object
                                 The selected likelihood class
     """
-    selected_likelihood = training_conf.likelihood_class
+    selected_likelihood = likelihood_conf.likelihood_class
     return getattr(likelihood_module, selected_likelihood)
 
 
@@ -80,7 +80,7 @@ def get_plugins(path: str | None = None):
     return discovered_plugins
 
 
-def get_model(training_conf: TrainingConf) -> ExactGP:
+def get_model(model_conf: ModelConf) -> ExactGP:
     """
     Get the model class and options
 
@@ -94,7 +94,7 @@ def get_model(training_conf: TrainingConf) -> ExactGP:
     selected_model_class : object
                            The selected model class
     """
-    selected_model = training_conf.model_class
+    selected_model = model_conf.model_class
 
     plugin_modules = get_plugins()
     if hasattr(model_module, selected_model):

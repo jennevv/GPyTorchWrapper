@@ -18,8 +18,13 @@ transform_conf:
     columns: null
 
 training_conf:
-  model_class: TestMultitaskGPModel
-  likelihood_class: MultitaskGaussianLikelihood
+  model:
+    model_class: TestMultitaskGPModel
+    model_options: null
+  likelihood:
+    likelihood_class: MultitaskGaussianLikelihood
+    likelihood_options:
+        num_tasks: 2
   learning_rate: 0.5
   learning_iterations: 5
   botorch: false

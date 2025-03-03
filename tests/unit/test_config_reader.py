@@ -27,8 +27,10 @@ def sample_yaml_file() -> pathlib.Path:
         columns: null
 
     training_conf:
-      model_class: SingleGPRBF
-      likelihood_class: GaussianLikelihood
+      model:
+        model_class: SingleGPRBF
+      likelihood:
+        likelihood_class: GaussianLikelihood
       learning_iterations: 100
       botorch: false
       debug: True
@@ -68,8 +70,8 @@ def test_read_yaml_valid_file(sample_yaml_file):
     assert config.transform_conf.transform_output.transformer_options is None
     assert config.transform_conf.transform_output.columns is None
 
-    assert config.training_conf.model_class == "SingleGPRBF"
-    assert config.training_conf.likelihood_class == "GaussianLikelihood"
+    assert config.training_conf.model.model_class == "SingleGPRBF"
+    assert config.training_conf.likelihood.likelihood_class == "GaussianLikelihood"
     assert config.training_conf.learning_iterations == 100
     assert config.training_conf.botorch is False
     assert config.training_conf.debug is True

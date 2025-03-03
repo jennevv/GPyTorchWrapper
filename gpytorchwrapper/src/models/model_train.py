@@ -3,13 +3,16 @@ import gpytorch
 import matplotlib.pyplot as plt
 import logging
 
+from PIL.Image import FIXED
 from botorch import fit_gpytorch_mll
 
 from gpytorch.models import ExactGP
-from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood, Likelihood
+from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood, Likelihood, \
+    FixedNoiseGaussianLikelihood
 from gpytorch.mlls import MarginalLogLikelihood
+from torch import Tensor
 
-from gpytorchwrapper.src.config.config_classes import TrainingConf, OptimizerConf
+from gpytorchwrapper.src.config.config_classes import TrainingConf, OptimizerConf, LikelihoodConf
 from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model, get_optimizer
 
 logger = logging.getLogger(__name__)
@@ -35,33 +38,25 @@ def define_optimizer(model: ExactGP, optimizer_conf: OptimizerConf) -> torch.opt
     optimizer = optimizer_class(model.parameters(), **optimizer_conf.optimizer_options)
     return optimizer
 
+def define_likelihood(likelihood_conf: LikelihoodConf, likelihood_class: Likelihood, train_x: Tensor):
+    if likelihood_class is FixedNoiseGaussianLikelihood:
+        if "noise" not in likelihood_conf.likelihood_options.keys():
+            raise KeyError("The noise parameter is not specified in the likelihood options.")
+        likelihood_conf.likelihood_options["noise"] = torch.tensor([likelihood_conf.likelihood_options["noise"]] * train_x.shape[0])
 
-def set_noiseless(
-    likelihood: GaussianLikelihood | MultitaskGaussianLikelihood, num_tasks: int
-) -> object:
-    """
-    Set the likelihood noise to a small value to simulate noiseless data
-    The noise is set to 1e-8 for performance reasons
-
-    Parameters
-    -----------
-    likelihood : object
-                 The likelihood object
-    num_tasks : int
-                The number of tasks the model is expected to train on
-
-    Returns
-    --------
-    likelihood : object
-                 The likelihood object with the noise set to a small value
-    """
-    if num_tasks > 1:
-        likelihood.task_noises = torch.tensor([1e-8] * num_tasks)
-        likelihood.raw_task_noises.detach_()
+    if likelihood_conf.likelihood_options:
+        likelihood = likelihood_class(**likelihood_conf.likelihood_options)
     else:
-        likelihood.noise = 1e-8
-        likelihood.raw_noise.detach_()
+        likelihood = likelihood_class()
+
     return likelihood
+
+def define_model(model_conf, model_class, train_x, train_y, likelihood):
+    if model_conf.model_options:
+        model = model_class(train_x, train_y, likelihood, **model_conf.model_options)
+    else:
+        model = model_class(train_x, train_y, likelihood)
+    return model
 
 
 def loss_figure(loss: list[float], iteration: list[int]) -> None:
@@ -182,28 +177,6 @@ def print_model_parameters(parameter_names: list, parameters: list) -> str:
 
     return "".join(parameter_strings)
 
-def define_likelihood(likelihood_class: Likelihood, num_tasks: int) -> Likelihood:
-    """
-    Define the likelihood for the model
-
-    Parameters
-    -----------
-    likelihood_class : object
-                       The likelihood class
-    num_tasks : int
-                The number of tasks the model is expected to train on
-
-    Returns
-    --------
-    likelihood : object
-                 The likelihood object
-    """
-    if num_tasks > 1:
-        return likelihood_class(num_tasks=num_tasks, noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
-    else:
-        return likelihood_class(noise_constraint=gpytorch.constraints.GreaterThan(1e-5))
-
-
 def train_model(
     train_x: torch.Tensor,
     train_y: torch.Tensor,
@@ -242,12 +215,11 @@ def train_model(
     optimizer_conf = training_conf.optimizer
 
     # Define likelihood and model
-    likelihood_class = get_likelihood(training_conf)
-    model_class = get_model(training_conf)
+    likelihood_class = get_likelihood(training_conf.likelihood)
+    model_class = get_model(training_conf.model)
 
-    # Set noise constraint like sklearn WhiteKernel for comparison reasons
-    likelihood = define_likelihood(likelihood_class, num_tasks)
-    model = model_class(train_x, train_y, likelihood)
+    likelihood = define_likelihood(training_conf.likelihood, likelihood_class, train_x)
+    model = define_model(training_conf.model, model_class, train_x, train_y, likelihood)
 
     parameter_names, parameters = model_parameters(model)
     logger.info(
