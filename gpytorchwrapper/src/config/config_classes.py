@@ -84,7 +84,7 @@ def create_config(config_dict: dict) -> Config:
                     "transform_input"
                 ].get("transformer_options", {}),
                 columns=config_dict["transform_conf"]["transform_input"].get("columns"),
-            ),
+            ) if config_dict["transform_conf"]["transform_input"] else TransformerConf(),
             transform_output=TransformerConf(
                 transform_data=config_dict["transform_conf"]["transform_output"].get(
                     "transform_data", False
@@ -98,7 +98,7 @@ def create_config(config_dict: dict) -> Config:
                 columns=config_dict["transform_conf"]["transform_output"].get(
                     "columns", []
                 ),
-            ),
+            ) if config_dict["transform_conf"]["transform_output"] else TransformerConf()
         ),
         training_conf=TrainingConf(
             model=ModelConf(
@@ -107,7 +107,7 @@ def create_config(config_dict: dict) -> Config:
                 ),
                 model_options=config_dict["training_conf"]["model"].get(
                     "model_options", {}
-                ),
+                )
             ),
             likelihood=LikelihoodConf(
                 likelihood_class=config_dict["training_conf"]["likelihood"].get(
@@ -115,7 +115,7 @@ def create_config(config_dict: dict) -> Config:
                 ),
                 likelihood_options=config_dict["training_conf"]["likelihood"].get(
                     "likelihood_options", {}
-                ),
+                ) if config_dict["training_conf"]["likelihood"] else LikelihoodConf()
             ),
             learning_iterations=config_dict["training_conf"].get(
                 "learning_iterations", 100
@@ -128,8 +128,8 @@ def create_config(config_dict: dict) -> Config:
                 ),
                 optimizer_options=config_dict["training_conf"]["optimizer"].get(
                     "optimizer_options", {"lr": 0.1}
-                ),
-            ),
+                )
+            ) if config_dict["training_conf"]["optimizer"] else OptimizerConf()
         ),
         testing_conf=TestingConf(
             test=config_dict["testing_conf"].get("test", False),
