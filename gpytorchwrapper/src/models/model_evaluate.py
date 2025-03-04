@@ -4,7 +4,7 @@ import gpytorch
 import torch
 
 from gpytorch.models import ExactGP
-from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood
+from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood, FixedNoiseGaussianLikelihood
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,10 @@ class ModelEvaluator:
                 covar_root_decomposition=False, log_prob=False, solves=False
             ),
         ):
-            predictions = self.likelihood(self.model(x))
+            if isinstance(self.likelihood, FixedNoiseGaussianLikelihood):
+                predictions = self.likelihood(self.model(x), noise=torch.tensor([self.likelihood.noise[0,0].item()] * x.shape[0]))
+            else:
+                predictions = self.likelihood(self.model(x))
         return predictions
 
     def _rmse(self, a: torch.Tensor, b: torch.Tensor) -> float:
