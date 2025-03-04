@@ -44,8 +44,15 @@ def define_likelihood(likelihood_conf: LikelihoodConf, likelihood_class: Likelih
             raise KeyError("The noise parameter is not specified in the likelihood options.")
         elif type(likelihood_conf.likelihood_options["noise"]) == str:
             likelihood_conf.likelihood_options["noise"] = eval(likelihood_conf.likelihood_options["noise"])
-        likelihood_conf.likelihood_options["noise"] = torch.tensor([likelihood_conf.likelihood_options["noise"]] * train_x.shape[0])
-
+            likelihood_conf.likelihood_options["noise"] = torch.tensor([likelihood_conf.likelihood_options["noise"]] * train_x.shape[0])
+        elif isinstance(likelihood_conf.likelihood_options["noise"], list):
+            likelihood_conf.likelihood_options["noise"] = torch.tensor(likelihood_conf.likelihood_options["noise"])
+        elif isinstance(likelihood_conf.likelihood_options["noise"], float):
+            likelihood_conf.likelihood_options["noise"] = torch.tensor([likelihood_conf.likelihood_options["noise"]] * train_x.shape[0])
+        elif isinstance(likelihood_conf.likelihood_options["noise"], Tensor):
+            likelihood_conf.likelihood_options["noise"] = likelihood_conf.likelihood_options["noise"]
+        else:
+            raise ValueError("The noise parameter should be a float, list, or tensor.")
     if likelihood_conf.likelihood_options:
         likelihood = likelihood_class(**likelihood_conf.likelihood_options)
     else:
