@@ -33,14 +33,13 @@ class LinearxMaternKernelPermInv(Kernel):
     ):
         if not ard:
             super().__init__(**kwargs)
-
             if self.ard_num_dims is not None:
                 raise NotImplementedError(
                     "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead and specify ard_expansion."
                 )
         else:
             num_dist = n_atoms * (n_atoms - 1) // 2  # Number of interatomic distances
-            ard_num_dims = num_dist
+            ard_num_dims = num_dist if not select_dims else len(select_dims)
             num_unique_distances = generate_unique_distances(
                 n_atoms, idx_equiv_atoms
             )  # permutationally unique!
@@ -54,7 +53,6 @@ class LinearxMaternKernelPermInv(Kernel):
                     f"ARD expansion: {ard_expansion}"
                 )
             super().__init__(ard_num_dims=ard_num_dims, **kwargs)
-            self.ard = ard
             self.ard_expansion = ard_expansion
             self.idx_equiv_atoms = idx_equiv_atoms
 
@@ -92,6 +90,7 @@ class LinearxMaternKernelPermInv(Kernel):
 
         self.select_dims = select_dims
         self.nu = nu
+        self.ard = ard
 
         dims = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
         self.dims = dims
@@ -119,8 +118,12 @@ class LinearxMaternKernelPermInv(Kernel):
             perminv_ard_lengthscale = self.lengthscale.clone()[0][
                 self.ard_expansion
             ].unsqueeze(0)
-            x1_ = (x1 - mean).div(perminv_ard_lengthscale)
-            x2_ = (x2 - mean).div(perminv_ard_lengthscale)
+            if self.select_dims:
+                x1_ = (x1 - mean).div(perminv_ard_lengthscale[self.select_dims])
+                x2_ = (x2 - mean).div(perminv_ard_lengthscale[self.select_dims])
+            else:
+                x1_ = (x1 - mean).div(perminv_ard_lengthscale)
+                x2_ = (x2 - mean).div(perminv_ard_lengthscale)
         else:
             x1_ = (x1 - mean).div(self.lengthscale)
             x2_ = (x2 - mean).div(self.lengthscale)

@@ -36,7 +36,7 @@ class ModelEvaluator:
             ),
         ):
             if isinstance(self.likelihood, FixedNoiseGaussianLikelihood):
-                predictions = self.likelihood(self.model(x), noise=torch.tensor([self.likelihood.noise[0,0].item()] * x.shape[0]))
+                predictions = self.likelihood(self.model(x), noise=torch.tensor([self.likelihood.noise[0].item()] * x.shape[0]))
             else:
                 predictions = self.likelihood(self.model(x))
         return predictions
