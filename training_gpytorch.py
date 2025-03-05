@@ -15,6 +15,7 @@ from gpytorchwrapper.src.models.model_evaluate import evaluate_model
 from gpytorchwrapper.src.models.model_save import save_model
 from gpytorchwrapper.src.utils import metadata_dict, dataframe_to_tensor
 
+from dataclasses import dataclass
 __author__ = "Jenne Van Veerdeghem"
 __version__ = "0.0.1"
 
@@ -26,6 +27,23 @@ torch.set_default_dtype(torch.float64)
 # Needed for training on HPC cluster
 if platform == "linux":
     pathlib.WindowsPath = pathlib.PosixPath
+
+@dataclass
+class Arguments:
+    input: str
+    file_type: str
+    config: str
+    output: str
+    directory: str
+    test_set: str
+
+    def __post_init__(self):
+        self.input = Path(self.input)
+        self.config = Path(self.config)
+        self.directory = Path(self.directory)
+        if self.test_set:
+            self.test_set = Path(self.test_set)
+        self.directory.mkdir(parents=True, exist_ok=True)
 
 
 def parse_args():
@@ -89,8 +107,11 @@ def parse_args():
     return args
 
 
-def main():
-    args = parse_args()
+def main(args=None):
+    if args is None:
+        args = parse_args()
+    else:
+        args = Arguments(**args)
 
     reader = DataReader()
     data = reader.read_data(file=args.input, file_type=args.file_type)

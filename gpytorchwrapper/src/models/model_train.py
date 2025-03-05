@@ -53,7 +53,6 @@ def define_likelihood(likelihood_conf: LikelihoodConf, likelihood_class: Likelih
 
     if likelihood_conf.likelihood_options:
         likelihood = likelihood_class(**likelihood_conf.likelihood_options)
-        print(likelihood.noise)
     else:
         likelihood = likelihood_class()
 
