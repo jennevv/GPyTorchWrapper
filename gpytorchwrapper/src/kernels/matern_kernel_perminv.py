@@ -41,14 +41,17 @@ class MaternKernelPermInv(Kernel):
                 n_atoms, idx_equiv_atoms
             )  # permutationally unique!
             distance_idx = generate_interatomic_distance_indices(n_atoms)
-            ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
-
-            if num_unique_distances != len(set(ard_expansion)):
-                raise ValueError(
-                    "The permutationally invariant ARD expansion failed."
-                    f"Expected number of unique distances {num_unique_distances} != {len(set(ard_expansion))}"
-                    f"ARD expansion: {ard_expansion}"
-                )
+            if select_dims:
+                distance_idx = [distance_idx[i] for i in select_dims]
+                ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
+            else:
+                ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
+                if num_unique_distances != len(set(ard_expansion)):
+                    raise ValueError(
+                        "The permutationally invariant ARD expansion failed."
+                        f"Expected number of unique distances {num_unique_distances} != {len(set(ard_expansion))}"
+                        f"ARD expansion: {ard_expansion}"
+                    )
             super().__init__(ard_num_dims=ard_num_dims, **kwargs)
             self.ard_expansion = ard_expansion
             self.idx_equiv_atoms = idx_equiv_atoms
@@ -104,10 +107,10 @@ class MaternKernelPermInv(Kernel):
                 ].unsqueeze(0)
                 if self.select_dims:
                     x1_ = (x1_interdist - mean).div(
-                        perminv_ard_lengthscale[self.select_dims]
+                        perminv_ard_lengthscale
                     )
                     x2_ = (x2_perm_interdist - mean).div(
-                        perminv_ard_lengthscale[self.select_dims]
+                        perminv_ard_lengthscale
                     )
                 else:
                     x1_ = (x1_interdist - mean).div(perminv_ard_lengthscale)

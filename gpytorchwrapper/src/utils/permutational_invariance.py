@@ -71,7 +71,7 @@ def generate_unique_distances(num_atoms: int, idx_equiv_atoms: list[list[int]]) 
     return num_unique_dist
 
 
-def generate_interatomic_distance_indices(num_atoms: int):
+def generate_interatomic_distance_indices(num_atoms: int) -> list[list[int]]:
     distance_indices: list[list[int]] = []
 
     for atom1 in range(num_atoms):

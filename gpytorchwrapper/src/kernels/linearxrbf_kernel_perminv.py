@@ -43,8 +43,17 @@ class LinearxRBFKernelPermInv(Kernel):
                 n_atoms, idx_equiv_atoms
             )  # permutationally unique!
             distance_idx = generate_interatomic_distance_indices(n_atoms)
-            ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
-
+            if select_dims:
+                distance_idx = [distance_idx[i] for i in select_dims]
+                ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
+            else:
+                ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
+                if num_unique_distances != len(set(ard_expansion)):
+                    raise ValueError(
+                        "The permutationally invariant ARD expansion failed."
+                        f"Expected number of unique distances {num_unique_distances} != {len(set(ard_expansion))}"
+                        f"ARD expansion: {ard_expansion}"
+                    )
             if num_unique_distances != len(set(ard_expansion)):
                 raise ValueError(
                     "The permutationally invariant ARD expansion failed."
@@ -112,8 +121,8 @@ class LinearxRBFKernelPermInv(Kernel):
                 self.ard_expansion
             ].unsqueeze(0)
             if self.select_dims:
-                x1_ = (x1 - mean).div(perminv_ard_lengthscale[self.select_dims])
-                x2_ = (x2 - mean).div(perminv_ard_lengthscale[self.select_dims])
+                x1_ = (x1 - mean).div(perminv_ard_lengthscale)
+                x2_ = (x2 - mean).div(perminv_ard_lengthscale)
             else:
                 x1_ = (x1 - mean).div(perminv_ard_lengthscale)
                 x2_ = (x2 - mean).div(perminv_ard_lengthscale)
@@ -164,11 +173,12 @@ class LinearxRBFKernelPermInv(Kernel):
             x2_perm_interdist = xyz_to_invdist_torch(x2_perm)
 
             if self.select_dims is not None:
+                select_dims_tensor = torch.tensor(self.select_dims)
                 x1_interdist = torch.index_select(
-                    x1_interdist, 1, torch.tensor(self.select_dims)
+                    x1_interdist, 1, select_dims_tensor
                 )
                 x2_perm_interdist = torch.index_select(
-                    x2_perm_interdist, 1, torch.tensor(self.select_dims)
+                    x2_perm_interdist, 1, select_dims_tensor
                 )
 
             k_linear = self.linear_kernel(
