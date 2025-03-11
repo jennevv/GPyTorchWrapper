@@ -34,7 +34,7 @@ class LinearxRBFKernelPermInv(Kernel):
             super().__init__(**kwargs)
             if self.ard_num_dims is not None:
                 raise NotImplementedError(
-                    "Regular ARD is not supported for LinearxRBFKernelPermInv. Set 'ard=True' instead and specify ard_expansion."
+                    "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead and specify ard_expansion."
                 )
         else:
             num_dist = n_atoms * (n_atoms - 1) // 2  # Number of interatomic distances
@@ -54,12 +54,7 @@ class LinearxRBFKernelPermInv(Kernel):
                         f"Expected number of unique distances {num_unique_distances} != {len(set(ard_expansion))}"
                         f"ARD expansion: {ard_expansion}"
                     )
-            if num_unique_distances != len(set(ard_expansion)):
-                raise ValueError(
-                    "The permutationally invariant ARD expansion failed."
-                    f"Expected number of unique distances {num_unique_distances} != {len(set(ard_expansion))}"
-                    f"ARD expansion: {ard_expansion}"
-                )
+
             super().__init__(ard_num_dims=ard_num_dims, **kwargs)
             self.ard_expansion = ard_expansion
             self.idx_equiv_atoms = idx_equiv_atoms
