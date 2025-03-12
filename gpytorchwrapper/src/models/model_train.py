@@ -134,7 +134,7 @@ def training_loop(
         for iteration in range(learning_iterations):
             if (iteration + 1) % 10 == 0:
                 logger.info(f"Iteration {iteration + 1}/{learning_iterations}")
-                loss_figure(loss_hash["loss"], loss_hash["iteration"])
+                loss_figure(loss_hash["train_loss"], loss_hash["iteration"], loss_hash["val_loss"])
 
             optimizer.zero_grad()
 
@@ -142,7 +142,7 @@ def training_loop(
 
             loss = -mll(output, train_y)
 
-            loss_hash["loss"].append(loss.item())
+            loss_hash["train_loss"].append(loss.item())
 
             loss_hash["iteration"].append(iteration)
             loss.backward()
@@ -158,7 +158,7 @@ def training_loop(
                 model.train()  # Switch back to training mode
 
     # Plot the loss one last time
-    loss_figure(loss_hash["loss"], loss_hash["iteration"])
+    loss_figure(loss_hash["train_loss"], loss_hash["iteration"], loss_hash["val_loss"])
 
 
 def model_parameters(
