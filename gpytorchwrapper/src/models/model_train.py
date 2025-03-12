@@ -130,6 +130,8 @@ def training_loop(
     """
     loss_hash = {"train_loss": [], "val_loss": [], "train_iteration": []}
 
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50)
+
     with gpytorch.settings.debug(debug):
         for iteration in range(learning_iterations):
             if (iteration + 1) % 10 == 0:
@@ -147,6 +149,7 @@ def training_loop(
             loss_hash["iteration"].append(iteration)
             loss.backward()
             optimizer.step()
+            scheduler.step()
 
             if test_x is not None:
                 model.eval()  # Set model to evaluation mode
@@ -253,7 +256,8 @@ def train_model(
     likelihood.double()
 
     # Define the marginal likelihood
-    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+    if isinstance(model, gpytorch.models.ExactGP):
+        mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 
     logger.info("Start training the model.")
     with (
@@ -270,6 +274,7 @@ def train_model(
             training_loop(
                 train_x, train_y, model, mll, optimizer, learning_iterations, debug, test_x, test_y
             )
+            fit_gpytorch_mll(mll)
 
     parameter_names, parameters = model_parameters(model)
     logger.info(
