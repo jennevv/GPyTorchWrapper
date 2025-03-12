@@ -135,8 +135,9 @@ def k_fold_split(
         model, likelihood, fold_params = train_model(
             train_x,
             train_y,
-            training_conf=training_conf,
-            num_tasks=data_conf.num_outputs,
+            training_conf,
+            test_x,
+            test_y
         )
 
         fold_parameters.append(fold_params)
