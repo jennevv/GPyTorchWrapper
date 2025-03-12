@@ -159,7 +159,7 @@ def main(args=None):
 
     # Model training
     model, likelihood, _ = train_model(
-        train_x, train_y, training_conf, data_conf.num_outputs
+        train_x, train_y, training_conf, test_x, test_y
     )
 
     # Evaluate the model on the training and test sets

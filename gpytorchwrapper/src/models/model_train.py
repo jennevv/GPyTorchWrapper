@@ -66,7 +66,7 @@ def define_model(model_conf, model_class, train_x, train_y, likelihood):
     return model
 
 
-def loss_figure(loss: list[float], iteration: list[int]) -> None:
+def loss_figure(train_loss: list[float], iteration: list[int], val_loss: list[float] = None) -> None:
     """
     Plot the change of loss during training
 
@@ -82,10 +82,13 @@ def loss_figure(loss: list[float], iteration: list[int]) -> None:
     --------
     None
     """
-    plt.scatter(iteration, loss)
+    plt.scatter(iteration, train_loss, label="Train loss")
+    if val_loss is not None:
+        plt.scatter(iteration, val_loss, label="Validation loss")
     plt.title("Change of loss during training")
     plt.xlabel("Iteration")
     plt.ylabel("Loss")
+    plt.legend()
     plt.savefig("loss.png", dpi=300)
 
 
@@ -97,6 +100,8 @@ def training_loop(
     optimizer: torch.optim.Optimizer,
     learning_iterations: int,
     debug: bool,
+    test_x: torch.Tensor = None,
+    test_y: torch.Tensor = None
 ) -> None:
     """
     The training loop for the model
@@ -117,12 +122,13 @@ def training_loop(
                         The number of iterations to train the model
     debug : bool
             Whether to use the debug mode in GPyTorch. Turn off if unwanted debug exceptions interfere with training.
-
+    test_x
+    test_y
     Returns
     --------
     None
     """
-    loss_hash = {"loss": [], "iteration": []}
+    loss_hash = {"train_loss": [], "val_loss": [], "train_iteration": []}
 
     with gpytorch.settings.debug(debug):
         for iteration in range(learning_iterations):
@@ -141,6 +147,15 @@ def training_loop(
             loss_hash["iteration"].append(iteration)
             loss.backward()
             optimizer.step()
+
+            if test_x is not None:
+                model.eval()  # Set model to evaluation mode
+                with torch.no_grad():
+                    val_output = model(test_x)
+                    val_loss = -mll(val_output, test_y)
+                    loss_hash["val_loss"].append(val_loss.item())
+
+                model.train()  # Switch back to training mode
 
     # Plot the loss one last time
     loss_figure(loss_hash["loss"], loss_hash["iteration"])
@@ -188,7 +203,8 @@ def train_model(
     train_x: torch.Tensor,
     train_y: torch.Tensor,
     training_conf: TrainingConf,
-    num_tasks: int,
+    test_x: torch.Tensor = None,
+    test_y: torch.Tensor = None
 ) -> tuple[
     ExactGP, GaussianLikelihood | MultitaskGaussianLikelihood, dict[str, list[float]]
 ]:
@@ -203,8 +219,6 @@ def train_model(
               The output training data
     training_conf : TrainingConf
                     Dictionary containing the training specifications
-    num_tasks : int
-                The number of tasks the model is expected to train on
 
     Returns
     --------
@@ -212,6 +226,7 @@ def train_model(
             The trained model
     likelihood : object
                  The likelihood of the trained model
+    parameter_dict : dict
     """
     logger.info("Defining the model specifications.")
 
@@ -253,7 +268,7 @@ def train_model(
             # Optimize model hyperparameters
             optimizer = define_optimizer(model, optimizer_conf)
             training_loop(
-                train_x, train_y, model, mll, optimizer, learning_iterations, debug
+                train_x, train_y, model, mll, optimizer, learning_iterations, debug, test_x, test_y
             )
 
     parameter_names, parameters = model_parameters(model)
