@@ -266,15 +266,21 @@ def train_model(
             covar_root_decomposition=False, log_prob=False, solves=False
         ),
     ):
-        if botorch:
+        if botorch and optimizer_conf.optimizer_class is None:
             fit_gpytorch_mll(mll)
-        else:
+        elif botorch and optimizer_conf.optimizer_class is not None:
             # Optimize model hyperparameters
             optimizer = define_optimizer(model, optimizer_conf)
             training_loop(
                 train_x, train_y, model, mll, optimizer, learning_iterations, debug, test_x, test_y
             )
             fit_gpytorch_mll(mll)
+        else:
+            optimizer = define_optimizer(model, optimizer_conf)
+            training_loop(
+                train_x, train_y, model, mll, optimizer, learning_iterations, debug, test_x, test_y
+            )
+
 
     parameter_names, parameters = model_parameters(model)
     logger.info(
