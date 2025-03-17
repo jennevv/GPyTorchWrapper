@@ -83,13 +83,14 @@ def loss_figure(train_loss: list[float], iteration: list[int], val_loss: list[fl
     None
     """
     plt.scatter(iteration, train_loss, label="Train loss")
-    if val_loss is not None:
+    if len(val_loss) != 0:
         plt.scatter(iteration, val_loss, label="Validation loss")
     plt.title("Change of loss during training")
     plt.xlabel("Iteration")
     plt.ylabel("Loss")
     plt.legend()
     plt.savefig("loss.png", dpi=300)
+    plt.close()
 
 
 def training_loop(
@@ -128,7 +129,7 @@ def training_loop(
     --------
     None
     """
-    loss_hash = {"train_loss": [], "val_loss": [], "train_iteration": []}
+    loss_hash = {"train_loss": [], "val_loss": [], "iteration": []}
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50)
 

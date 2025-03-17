@@ -54,7 +54,7 @@ def xyz_to_invdist_torch(
     if index:
         return torch.pow(interdist, -1), torch.transpose(triu_indices, -1, -2)
 
-    return torch.pow(interdist, -1)
+    return torch.exp(-interdist) 
 
 
 def xyz_to_dist_torch(
