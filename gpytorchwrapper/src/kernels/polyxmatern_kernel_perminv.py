@@ -1,23 +1,16 @@
 import math
-from typing import Optional, Union
+from typing import Optional
 
 import torch
 from gpytorch.constraints import Interval, Positive
-from gpytorch.kernels import Kernel
 from gpytorch.priors import Prior
-from linear_operator.operators import MatmulLinearOperator, RootLinearOperator
 from torch import Tensor
 
-from gpytorchwrapper.src.utils.input_transformer import xyz_to_invdist_torch
-from gpytorchwrapper.src.utils.permutational_invariance import (
-    generate_permutations,
-    generate_unique_distances,
-    generate_ard_expansion,
-    generate_interatomic_distance_indices,
-)
+from gpytorchwrapper.src.kernels.perminv_kernel import PermInvKernel
+from gpytorchwrapper.src.utils.input_transformer import xyz_to_dist_torch
 
 
-class PolyxMaternKernelPermInv(Kernel):
+class PolyxMaternKernelPermInv(PermInvKernel):
     has_lengthscale = True
 
     def __init__(
@@ -28,38 +21,18 @@ class PolyxMaternKernelPermInv(Kernel):
         select_dims: Tensor = None,
         nu: float = 2.5,
         ard: bool = False,
+        representation: str = "invdist",
         offset_prior: Optional[Prior] = None,
         offset_constraint: Optional[Interval] = None,
         **kwargs,
     ):
-        if not ard:
-            super().__init__(**kwargs)
-            if self.ard_num_dims is not None:
-                raise NotImplementedError(
-                    "Regular ARD is not supported for LinearxMaternKernelPermInv. Set 'ard=True' instead and specify ard_expansion."
-                )
-        else:
-            num_dist = n_atoms * (n_atoms - 1) // 2  # Number of interatomic distances
-            ard_num_dims = num_dist if not select_dims else len(select_dims)
-            num_unique_distances = generate_unique_distances(
-                n_atoms, idx_equiv_atoms
-            )  # permutationally unique!
-            distance_idx = generate_interatomic_distance_indices(n_atoms)
-            if select_dims:
-                distance_idx = [distance_idx[i] for i in select_dims]
-                ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
-            else:
-                ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
-                if num_unique_distances != len(set(ard_expansion)):
-                    raise ValueError(
-                        "The permutationally invariant ARD expansion failed."
-                        f"Expected number of unique distances {num_unique_distances} != {len(set(ard_expansion))}"
-                        f"ARD expansion: {ard_expansion}"
-                    )
-
-            super().__init__(ard_num_dims=ard_num_dims, **kwargs)
-            self.ard_expansion = ard_expansion
-            self.idx_equiv_atoms = idx_equiv_atoms
+        super().__init__(
+            n_atoms=n_atoms,
+            idx_equiv_atoms=idx_equiv_atoms,
+            select_dims=select_dims,
+            ard=ard,
+            **kwargs,
+        )
 
         if nu not in {0.5, 1.5, 2.5}:
             raise NotImplementedError(
@@ -74,12 +47,17 @@ class PolyxMaternKernelPermInv(Kernel):
         if offset_constraint is None:
             offset_constraint = Positive()
 
-        self.register_parameter(name="raw_offset", parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1)))
+        self.register_parameter(
+            name="raw_offset",
+            parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1)),
+        )
 
         # We want the power to be a float so we dont have to worry about its device / dtype.
         if torch.is_tensor(power):
             if power.numel() > 1:
-                raise RuntimeError("Cant create a Polynomial kernel with more than one power")
+                raise RuntimeError(
+                    "Cant create a Polynomial kernel with more than one power"
+                )
             else:
                 power = power.item()
 
@@ -87,19 +65,21 @@ class PolyxMaternKernelPermInv(Kernel):
 
         if offset_prior is not None:
             if not isinstance(offset_prior, Prior):
-                raise TypeError("Expected gpytorch.priors.Prior but got " + type(offset_prior).__name__)
-            self.register_prior("offset_prior", offset_prior, lambda m: m.offset, lambda m, v: m._set_offset(v))
+                raise TypeError(
+                    "Expected gpytorch.priors.Prior but got "
+                    + type(offset_prior).__name__
+                )
+            self.register_prior(
+                "offset_prior",
+                offset_prior,
+                lambda m: m.offset,
+                lambda m, v: m._set_offset(v),
+            )
 
         self.register_constraint("raw_offset", offset_constraint)
 
-
-        self.select_dims = select_dims
         self.nu = nu
-        self.ard = ard
-
-        dims = torch.arange(0, n_atoms * 3).reshape(n_atoms, 3)
-        self.dims = dims
-        self.permutations = generate_permutations(idx_equiv_atoms)
+        self.representation = representation
 
     @property
     def offset(self) -> torch.Tensor:
@@ -121,12 +101,8 @@ class PolyxMaternKernelPermInv(Kernel):
             perminv_ard_lengthscale = self.lengthscale.clone()[0][
                 self.ard_expansion
             ].unsqueeze(0)
-            if self.select_dims:
-                x1_ = (x1 - mean).div(perminv_ard_lengthscale)
-                x2_ = (x2 - mean).div(perminv_ard_lengthscale)
-            else:
-                x1_ = (x1 - mean).div(perminv_ard_lengthscale)
-                x2_ = (x2 - mean).div(perminv_ard_lengthscale)
+            x1_ = (x1 - mean).div(perminv_ard_lengthscale)
+            x2_ = (x2 - mean).div(perminv_ard_lengthscale)
         else:
             x1_ = (x1 - mean).div(self.lengthscale)
             x2_ = (x2 - mean).div(self.lengthscale)
@@ -172,31 +148,26 @@ class PolyxMaternKernelPermInv(Kernel):
         num_perms = len(self.permutations)
         init_perm = self.permutations[0]
 
-        for p in self.permutations:
-            x2_perm = x2.clone()
-            x2_perm[:, self.dims[init_perm, :].flatten()] = x2[
-                :, self.dims[p, :].flatten()
-            ]
+        x1_dist = xyz_to_dist_torch(x1, representation=self.representation)
+        x2_dist = (
+            xyz_to_dist_torch(x2, representation=self.representation)
+            if not torch.equal(x1, x2)
+            else x1_dist
+        )
 
-            # Transform xyz coordinates to internuclear distances
-            x1_interdist = xyz_to_invdist_torch(x1)
-            x2_perm_interdist = xyz_to_invdist_torch(x2_perm)
+        for perm in self.permutations:
+            x2_dist_perm = x2_dist.clone()
+            x2_dist_perm[:, init_perm] = x2_dist[:, perm]
 
             if self.select_dims is not None:
                 select_dims_tensor = torch.tensor(self.select_dims)
-                x1_interdist = torch.index_select(
-                    x1_interdist, 1, select_dims_tensor
-                )
-                x2_perm_interdist = torch.index_select(
-                    x2_perm_interdist, 1, select_dims_tensor
-                )
+                x1_dist = torch.index_select(x1_dist, 1, select_dims_tensor)
+                x2_dist_perm = torch.index_select(x2_dist_perm, 1, select_dims_tensor)
 
             k_poly = self.polynomial_kernel(
-                x1_interdist, x2_perm_interdist, diag, last_dim_is_batch, **params
+                x1_dist, x2_dist_perm, diag, last_dim_is_batch, **params
             )
-            k_matern = self.matern_kernel(
-                x1_interdist, x2_perm_interdist, diag, **params
-            )
+            k_matern = self.matern_kernel(x1_dist, x2_dist_perm, diag, **params)
 
             k_sum += k_poly * k_matern
         return 1 / num_perms * k_sum

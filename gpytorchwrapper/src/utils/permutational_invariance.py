@@ -21,7 +21,7 @@ def generate_permutations(idx_equiv_atoms: list[list[int]]) -> torch.Tensor:
     For the reaction between N2 and H3+, the nitrogen atoms have indices 0 and 1,
     while the hydrogen atoms have indices 2, 3, and 4.
 
-    The `idx_equiv_atoms` list should look like [[0,1],[2,3,4]].
+    The `idx_equiv_atoms` list should look like [[0,1],[2,3,4]] or [[1,2]].
     """
     all_perms = []
     for group in idx_equiv_atoms:
@@ -113,3 +113,35 @@ def generate_ard_expansion(
     expansion = [group_labels[dist] for dist in mapped_distance_idx]
 
     return expansion
+
+
+def generate_dist_permutations(
+    distance_idx: list[list[int]], idx_inv_atoms: list[list[int]]
+):
+    group_labels = {}
+
+    # Flatten list to loop over
+    flat_distance_idx = [atom for dist in distance_idx for atom in dist]
+
+    for idx, atom in enumerate(flat_distance_idx):
+        for inv_group in idx_inv_atoms:
+            if atom in inv_group:
+                flat_distance_idx[idx] = min(inv_group)
+
+    mapped_distance_idx = [
+        flat_distance_idx[i : i + 2] for i in range(0, len(flat_distance_idx), 2)
+    ]
+
+    mapped_distance_idx = [tuple(sorted(dist)) for dist in mapped_distance_idx]
+
+    for i, dist in enumerate(mapped_distance_idx):
+        if dist in group_labels.keys():
+            group_labels[dist].append(i)
+        else:
+            group_labels[dist] = [i]
+
+    grouped_distance_idx = [x for x in group_labels.values() if len(x) > 1]
+
+    dist_permutations = generate_permutations(grouped_distance_idx)
+
+    return dist_permutations
