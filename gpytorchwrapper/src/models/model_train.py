@@ -128,7 +128,7 @@ def training_loop(
     --------
     None
     """
-    loss_hash = {"train_loss": [], "val_loss": [], "train_iteration": []}
+    loss_hash = {"train_loss": [], "val_loss": [], "iteration": []}
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.1)
 
     with gpytorch.settings.debug(debug):
