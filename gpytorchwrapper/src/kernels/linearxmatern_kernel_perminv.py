@@ -49,7 +49,7 @@ class LinearxMaternKernelPermInv(PermInvKernel):
 
         self.register_parameter(
             name="raw_variance",
-            parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1, 1)),
+            parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1, 1 if self.ard_num_dims is None else self.ard_num_dims)),
         )
         if variance_prior is not None:
             if not isinstance(variance_prior, Prior):
