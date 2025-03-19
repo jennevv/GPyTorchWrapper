@@ -129,6 +129,7 @@ def training_loop(
     None
     """
     loss_hash = {"train_loss": [], "val_loss": [], "train_iteration": []}
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.1)
 
     with gpytorch.settings.debug(debug):
         for iteration in range(learning_iterations):
@@ -155,7 +156,10 @@ def training_loop(
                     val_loss = -mll(val_output, test_y)
                     loss_hash["val_loss"].append(val_loss.item())
 
+                scheduler.step(val_loss)
                 model.train()  # Switch back to training mode
+            else:
+                scheduler.step(loss)
 
     # Plot the loss one last time
     loss_figure(loss_hash["train_loss"], loss_hash["iteration"], loss_hash["val_loss"])
