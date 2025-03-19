@@ -15,7 +15,7 @@ class RBFKernelPermInv(PermInvKernel):
         self,
         n_atoms: int,
         idx_equiv_atoms: list[list[int]],
-        select_dims: Tensor = None,
+        select_dims: list[int] = None,
         ard: bool = False,
         representation: str = "invdist",
         **kwargs,

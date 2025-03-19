@@ -18,7 +18,7 @@ class LinearxRBFKernelPermInv(PermInvKernel):
         self,
         n_atoms: int,
         idx_equiv_atoms: list[list[int]],
-        select_dims: Tensor = None,
+        select_dims: list[int] = None,
         ard: bool = False,
         representation: str = "invdist",
         variance_prior: Optional[Prior] = None,
@@ -30,6 +30,7 @@ class LinearxRBFKernelPermInv(PermInvKernel):
             idx_equiv_atoms=idx_equiv_atoms,
             select_dims=select_dims,
             ard=ard,
+            **kwargs
         )
 
         if self.active_dims is not None:

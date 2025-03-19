@@ -18,7 +18,7 @@ class PolyxMaternKernelPermInv(PermInvKernel):
         n_atoms: int,
         idx_equiv_atoms: list[list[int]],
         power: int,
-        select_dims: Tensor = None,
+        select_dims: list[int] = None,
         nu: float = 2.5,
         ard: bool = False,
         representation: str = "invdist",
