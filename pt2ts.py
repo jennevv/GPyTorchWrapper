@@ -5,8 +5,13 @@ from pathlib import Path
 import gpytorch
 import numpy as np
 import torch
+from gpytorch.likelihoods import Likelihood
+from gpytorch.models import GP
+from torch import Tensor
 
+from gpytorchwrapper.src.config.config_classes import Config
 from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
+from gpytorchwrapper.src.models.model_train import define_likelihood, define_model
 
 warnings.filterwarnings("ignore")  # Ignore warnings from the torch.jit.trace function
 
@@ -69,18 +74,17 @@ def main():
         model_dump["training_data"]["train_y"],
     )
     num_inputs = config.data_conf.num_inputs
-    num_tasks = config.data_conf.num_outputs
 
     if config.transform_conf.transform_input.transform_data:
         input_transformer = model_dump["training_data"]["input_transformer"]
     else:
         input_transformer = None
 
-    model_path, likelihood = load_model(config, model_dump, train_x, train_y, num_tasks)
+    model, likelihood = load_model(config, model_dump, train_x, train_y)
 
-    traced_model = trace_model(model_path, len(train_x), input_transformer, num_inputs)
+    traced_model = trace_model(model, len(train_x), input_transformer, num_inputs)
 
-    test_traced_model(model_path, traced_model, input_transformer, num_inputs)
+    test_traced_model(model, traced_model, input_transformer, num_inputs)
 
     traced_model.save(f"{args.directory / args.output}")
 
@@ -95,16 +99,21 @@ class MeanVarModelWrapper(torch.nn.Module):
         return output_dist.mean, output_dist.variance
 
 
-def load_model(config, model_dump, train_x, train_y, num_tasks):
-    likelihood_class = get_likelihood(config.training_conf)
-    model_class = get_model(config.training_conf)
+def load_model(
+    config: Config,
+    model_dump: dict,
+    train_x: Tensor,
+    train_y: Tensor,
+) -> tuple[GP, Likelihood]:
+    likelihood_class = get_likelihood(config.training_conf.likelihood)
+    model_class = get_model(config.training_conf.model)
 
-    if num_tasks > 1:
-        likelihood = likelihood_class(num_tasks=num_tasks)
-    else:
-        likelihood = likelihood_class()
-
-    model = model_class(train_x, train_y, likelihood)
+    likelihood = define_likelihood(
+        config.training_conf.likelihood, likelihood_class, train_x
+    )
+    model = define_model(
+        config.training_conf.model, model_class, train_x, train_y, likelihood
+    )
 
     model.double()
     likelihood.double()
