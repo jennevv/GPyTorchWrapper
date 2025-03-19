@@ -90,6 +90,7 @@ def loss_figure(train_loss: list[float], iteration: list[int], val_loss: list[fl
     plt.ylabel("Loss")
     plt.legend()
     plt.savefig("loss.png", dpi=300)
+    plt.close()
 
 
 def training_loop(
