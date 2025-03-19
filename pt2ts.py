@@ -8,12 +8,15 @@ import torch
 from gpytorch.likelihoods import Likelihood
 from gpytorch.models import GP
 from torch import Tensor
-
+import logging
 from gpytorchwrapper.src.config.config_classes import Config, create_config
 from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
 from gpytorchwrapper.src.models.model_train import define_likelihood, define_model
 
 warnings.filterwarnings("ignore")  # Ignore warnings from the torch.jit.trace function
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -73,12 +76,18 @@ def main():
     else:
         input_transformer = None
 
+    logger.info("Loading model definition.")
     model, likelihood = load_model(config, model_dump, train_x, train_y)
 
+    logger.info("Start tracing model.")
     traced_model = trace_model(model, len(train_x), input_transformer, num_inputs)
+    logger.info("Finished tracing model.")
 
+    logger.info("Test integrity traced model.")
     test_traced_model(model, traced_model, input_transformer, num_inputs)
+    logger.info("Model integrity is good.")
 
+    logger.info(f"Saving traced model to {args.directory / args.output}.")
     traced_model.save(f"{args.directory / args.output}")
 
 
