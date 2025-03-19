@@ -24,6 +24,8 @@ class PolyxMaternKernelPermInv(PermInvKernel):
         representation: str = "invdist",
         offset_prior: Optional[Prior] = None,
         offset_constraint: Optional[Interval] = None,
+        variance_prior: Optional[Prior] = None,
+        variance_constraint: Optional[Interval] = None,
         **kwargs,
     ):
         super().__init__(
@@ -78,6 +80,28 @@ class PolyxMaternKernelPermInv(PermInvKernel):
 
         self.register_constraint("raw_offset", offset_constraint)
 
+        if variance_constraint is None:
+            variance_constraint = Positive()
+
+        self.register_parameter(
+            name="raw_variance",
+            parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1, 1 if self.ard_num_dims is None else self.ard_num_dims)),
+        )
+        if variance_prior is not None:
+            if not isinstance(variance_prior, Prior):
+                raise TypeError(
+                    "Expected gpytorch.priors.Prior but got "
+                    + type(variance_prior).__name__
+                )
+            self.register_prior(
+                "variance_prior",
+                variance_prior,
+                lambda m: m.variance,
+                lambda m, v: m._set_variance(v),
+            )
+
+        self.register_constraint("raw_variance", variance_constraint)
+
         self.nu = nu
         self.representation = representation
 
@@ -93,6 +117,21 @@ class PolyxMaternKernelPermInv(PermInvKernel):
         if not torch.is_tensor(value):
             value = torch.as_tensor(value).to(self.raw_offset)
         self.initialize(raw_offset=self.raw_offset_constraint.inverse_transform(value))
+
+    @property
+    def variance(self) -> torch.Tensor:
+        return self.raw_variance_constraint.transform(self.raw_variance)
+
+    @variance.setter
+    def variance(self, value: float | torch.Tensor):
+        self._set_variance(value)
+
+    def _set_variance(self, value: float | torch.Tensor):
+        if not torch.is_tensor(value):
+            value = torch.as_tensor(value).to(self.raw_variance)
+        self.initialize(
+            raw_variance=self.raw_variance_constraint.inverse_transform(value)
+        )
 
     def matern_kernel(self, x1, x2, diag, **params):
         mean = x1.mean(dim=-2, keepdim=True)
@@ -129,17 +168,27 @@ class PolyxMaternKernelPermInv(PermInvKernel):
     def polynomial_kernel(self, x1, x2, diag, last_dim_is_batch, **params):
         offset = self.offset.view(*self.batch_shape, 1, 1)
 
+        if self.ard:
+            perminv_ard_variance = self.variance.clone()[0][
+                self.ard_expansion
+            ].unsqueeze(0)
+            x1_ = x1 * perminv_ard_variance.sqrt()
+            x2_ = x2 * perminv_ard_variance.sqrt()
+        else:
+            x1_ = x1 * self.variance.sqrt()
+            x2_ = x2 * self.variance.sqrt()
+
         if last_dim_is_batch:
-            x1 = x1.transpose(-1, -2).unsqueeze(-1)
-            x2 = x2.transpose(-1, -2).unsqueeze(-1)
+            x1_ = x1_.transpose(-1, -2).unsqueeze(-1)
+            x2_ = x2_.transpose(-1, -2).unsqueeze(-1)
 
         if diag:
-            return ((x1 * x2).sum(dim=-1) + self.offset).pow(self.power)
+            return ((x1_ * x2_).sum(dim=-1) + self.offset).pow(self.power)
 
-        if (x1.dim() == 2 and x2.dim() == 2) and offset.dim() == 2:
-            return torch.addmm(offset, x1, x2.transpose(-2, -1)).pow(self.power)
+        if (x1_.dim() == 2 and x2_.dim() == 2) and offset.dim() == 2:
+            return torch.addmm(offset, x1_, x2_.transpose(-2, -1)).pow(self.power)
         else:
-            return (torch.matmul(x1, x2.transpose(-2, -1)) + offset).pow(self.power)
+            return (torch.matmul(x1_, x2_.transpose(-2, -1)) + offset).pow(self.power)
 
     def forward(
         self, x1, x2, diag=False, last_dim_is_batch: Optional[bool] = False, **params
