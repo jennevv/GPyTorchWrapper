@@ -126,16 +126,17 @@ class LinearxRBFKernelPermInv(PermInvKernel):
         x2_dist = (
             xyz_to_dist_torch(x2, representation=self.representation)
             if not torch.equal(x1, x2)
-            else x1_dist
+            else x1_dist.clone()
         )
+        if self.select_dims is not None:
+            select_dims_tensor = torch.tensor(self.select_dims)
+            x1_dist = torch.index_select(x1_dist, 1, select_dims_tensor)
 
         for perm in self.permutations:
             x2_dist_perm = x2_dist.clone()
             x2_dist_perm[:, init_perm] = x2_dist[:, perm]
 
             if self.select_dims is not None:
-                select_dims_tensor = torch.tensor(self.select_dims)
-                x1_dist = torch.index_select(x1_dist, 1, select_dims_tensor)
                 x2_dist_perm = torch.index_select(x2_dist_perm, 1, select_dims_tensor)
 
             k_linear = self.linear_kernel(

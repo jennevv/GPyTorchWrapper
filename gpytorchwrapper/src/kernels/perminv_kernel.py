@@ -77,11 +77,11 @@ class PermInvKernel(Kernel):
                     )
 
             super().__init__(ard_num_dims=ard_num_dims, **kwargs)
-
-            permutations = generate_dist_permutations(distance_idx, idx_equiv_atoms)
-
-            self.select_dims = select_dims
-            self.idx_equiv_atoms = idx_equiv_atoms
-            self.ard = ard
             self.ard_expansion = ard_expansion
-            self.permutations = permutations
+
+        permutations = generate_dist_permutations(distance_idx, idx_equiv_atoms)
+
+        self.select_dims = select_dims
+        self.idx_equiv_atoms = idx_equiv_atoms
+        self.ard = ard
+        self.permutations = permutations
