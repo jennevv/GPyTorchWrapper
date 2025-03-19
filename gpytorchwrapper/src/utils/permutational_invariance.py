@@ -146,11 +146,3 @@ def generate_dist_permutations(
 
     return dist_permutations
 
-print(generate_permutations([[1,2]]))
-print(generate_ard_expansion(generate_interatomic_distance_indices(4), [[1,2]]))
-print(generate_dist_permutations(generate_interatomic_distance_indices(4), [[1,2]]))
-
-dims = [2,4,5]
-dist_idx = generate_interatomic_distance_indices(4)
-dist_idx = [dist_idx[i] for i in dims]
-print(generate_ard_expansion(dist_idx, [[1,2]]))
