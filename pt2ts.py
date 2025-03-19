@@ -9,18 +9,11 @@ from gpytorch.likelihoods import Likelihood
 from gpytorch.models import GP
 from torch import Tensor
 
-from gpytorchwrapper.src.config.config_classes import Config
+from gpytorchwrapper.src.config.config_classes import Config, create_config
 from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
 from gpytorchwrapper.src.models.model_train import define_likelihood, define_model
 
 warnings.filterwarnings("ignore")  # Ignore warnings from the torch.jit.trace function
-
-gpytorch.settings.fast_computations(
-    covar_root_decomposition=False,  # False = Cholesky decomp., True = Lanczos
-    log_prob=False,  # False = Cholesky decomp., True = modified conjugate gradients algorithm
-    solves=False,  # False = Cholesky decomp., True = preconditioned conjugate gradients
-)
-
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -67,7 +60,7 @@ def main():
 
     model_dump = torch.load(args.input)
 
-    config = model_dump["config"]
+    config = create_config(model_dump["config"])
 
     train_x, train_y = (
         model_dump["training_data"]["train_x"],
