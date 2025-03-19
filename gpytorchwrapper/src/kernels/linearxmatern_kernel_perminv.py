@@ -116,7 +116,14 @@ class LinearxMaternKernelPermInv(PermInvKernel):
         return constant_component * exp_component
 
     def linear_kernel(self, x1, x2, diag, last_dim_is_batch, **params):
-        x1_ = x1 * self.variance.sqrt()
+        if self.ard:
+            perminv_ard_variance = self.variance.clone()[0][
+                self.ard_expansion
+            ].unsqueeze(0)
+            x1_ = x1 * perminv_ard_variance.sqrt()
+        else:
+            x1_ = x1 * self.variance.sqrt()
+
         if last_dim_is_batch:
             x1_ = x1_.transpose(-1, -2).unsqueeze(-1)
 
@@ -126,7 +133,10 @@ class LinearxMaternKernelPermInv(PermInvKernel):
             prod = RootLinearOperator(x1_)
 
         else:
-            x2_ = x2 * self.variance.sqrt()
+            if self.ard:
+                x2_ = x2 * perminv_ard_variance.sqrt()
+            else:
+                x2_ = x2 * self.variance.sqrt()
             if last_dim_is_batch:
                 x2_ = x2_.transpose(-1, -2).unsqueeze(-1)
 
