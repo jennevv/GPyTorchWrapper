@@ -83,7 +83,7 @@ def loss_figure(train_loss: list[float], iteration: list[int], val_loss: list[fl
     None
     """
     plt.scatter(iteration, train_loss, label="Train loss")
-    if val_loss is not None:
+    if len(val_loss) > 0:
         plt.scatter(iteration, val_loss, label="Validation loss")
     plt.title("Change of loss during training")
     plt.xlabel("Iteration")
