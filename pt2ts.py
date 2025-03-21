@@ -11,6 +11,7 @@ from torch import Tensor
 import logging
 from gpytorchwrapper.src.config.config_classes import Config, create_config
 from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
+from gpytorchwrapper.src.models.model_load import load_model
 from gpytorchwrapper.src.models.model_train import define_likelihood, define_model
 
 warnings.filterwarnings("ignore")  # Ignore warnings from the torch.jit.trace function
@@ -99,31 +100,6 @@ class MeanVarModelWrapper(torch.nn.Module):
     def forward(self, x):
         output_dist = self.gp(x)
         return output_dist.mean, output_dist.variance
-
-
-def load_model(
-    config: Config,
-    model_dump: dict,
-    train_x: Tensor,
-    train_y: Tensor,
-) -> tuple[GP, Likelihood]:
-    likelihood_class = get_likelihood(config.training_conf.likelihood)
-    model_class = get_model(config.training_conf.model)
-
-    likelihood = define_likelihood(
-        config.training_conf.likelihood, likelihood_class, train_x
-    )
-    model = define_model(
-        config.training_conf.model, model_class, train_x, train_y, likelihood
-    )
-
-    model.double()
-    likelihood.double()
-
-    model.load_state_dict(model_dump["state_dict"])
-
-    return model, likelihood
-
 
 def trace_model(model, len_training_data, transformer, num_inputs):
     test_x = create_test_data(num_inputs)
