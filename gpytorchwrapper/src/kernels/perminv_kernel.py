@@ -1,3 +1,4 @@
+import torch
 from gpytorch.kernels import Kernel
 from torch import Tensor
 
@@ -50,8 +51,6 @@ class PermInvKernel(Kernel):
         **kwargs,
     ):
         n_dist = n_atoms * (n_atoms - 1) // 2
-        distance_idx = generate_interatomic_distance_indices(n_atoms)
-
         if not ard:
             super().__init__(**kwargs)
             if self.ard_num_dims is not None:
@@ -67,7 +66,12 @@ class PermInvKernel(Kernel):
             if select_dims:
                 distance_idx = [distance_idx[i] for i in select_dims]
                 ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
+                self.register_buffer(
+                    "select_dims", torch.tensor(select_dims, dtype=torch.int)
+                )
             else:
+                self.select_dims = None
+                distance_idx = generate_interatomic_distance_indices(n_atoms)
                 ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
                 if num_unique_distances != len(set(ard_expansion)):
                     raise ValueError(
@@ -77,11 +81,8 @@ class PermInvKernel(Kernel):
                     )
 
             super().__init__(ard_num_dims=ard_num_dims, **kwargs)
-            self.ard_expansion = ard_expansion
+            self.register_buffer("ard_expansion", torch.tensor(ard_expansion))
 
         permutations = generate_dist_permutations(distance_idx, idx_equiv_atoms)
-
-        self.select_dims = select_dims
-        self.idx_equiv_atoms = idx_equiv_atoms
+        self.register_buffer("permutations", permutations)
         self.ard = ard
-        self.permutations = permutations

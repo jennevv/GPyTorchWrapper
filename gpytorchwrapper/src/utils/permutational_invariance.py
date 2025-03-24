@@ -86,7 +86,7 @@ def generate_interatomic_distance_indices(num_atoms: int) -> list[list[int]]:
 
 def generate_ard_expansion(
     distance_idx: list[list[int]], idx_inv_atoms: list[list[int]]
-):
+) -> list:
     group_labels = {}
 
     # Flatten list to loop over
@@ -117,7 +117,7 @@ def generate_ard_expansion(
 
 def generate_dist_permutations(
     distance_idx: list[list[int]], idx_inv_atoms: list[list[int]]
-):
+) -> torch.Tensor:
     group_labels = {}
 
     # Flatten list to loop over

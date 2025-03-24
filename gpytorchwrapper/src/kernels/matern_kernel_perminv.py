@@ -1,6 +1,7 @@
 import math
 from typing import Optional
 
+import gpytorch.settings
 import torch
 from torch import Tensor
 
@@ -101,3 +102,15 @@ class MaternKernelPermInv(PermInvKernel):
             k_sum += self.matern_kernel(x1_dist, x2_dist_perm, diag, **params)
 
         return 1 / num_perms * k_sum
+
+
+class Model(gpytorch.models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood):
+        super().__init__(train_x, train_y, likelihood)
+        self.mean_module = gpytorch.means.ZeroMean()
+        self.covar_module = gpytorch.kernels.ScaleKernel(MaternKernelPermInv(n_atoms=3, idx_equiv_atoms=[[0,1]], ard=True))
+    def forward(self, x):
+       mean_x = self.mean_module(x)
+       covar_x = self.covar_module(x)
+
+       return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
