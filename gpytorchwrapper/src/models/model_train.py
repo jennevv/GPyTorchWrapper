@@ -165,32 +165,42 @@ def training_loop(
     # Plot the loss one last time
     loss_figure(loss_hash["train_loss"], loss_hash["iteration"], loss_hash["val_loss"])
 
-
-def model_parameters(
-    model: ExactGP, transformed: bool = True
-) -> tuple[list[str, list[float]]] | tuple[list[str], list[list[float]]]:
+def model_parameters(model, transformed: bool = True):
     parameters, parameter_names = [], []
-    if transformed:
-        constraints = []
 
-        for _, constraint in model.named_constraints():
-            constraints.append(constraint)
+    for full_param_name, param in model.named_parameters():
+        parameter_names.append(full_param_name)
 
-        for constraint, (parameter_name, param) in zip(
-            constraints, model.named_parameters()
-        ):
-            parameter_names.append(parameter_name)
-            if param.size() == 1:
-                parameters.append(constraint.transform(param).item())
+        if transformed:
+            # Split the full parameter name to get the module and parameter name.
+            module_path, param_name = full_param_name.rsplit(".", 1)
+            module = model
+            for attr in module_path.split("."):
+                module = getattr(module, attr)
+
+            # If the parameter is a "raw" parameter and the module defines a property, use that.
+            if param_name.startswith("raw_"):
+                prop_name = param_name.replace("raw_", "")
+                if hasattr(module, prop_name):
+                    t_value = getattr(module, prop_name)
+                else:
+                    # Fall back to manually applying the registered constraint (if any)
+                    constraint = module._constraints.get(param_name, None)
+                    if constraint is not None:
+                        t_value = constraint.transform(param)
+                    else:
+                        t_value = param
             else:
-                parameters.append(constraint.transform(param).tolist())
-    else:
-        for parameter_name, param in model.named_parameters():
-            parameter_names.append(parameter_name)
-            if param.size() == 1:
-                parameters.append(param.item())
+                t_value = param
+
+            # Convert the value to a Python float or list, as appropriate.
+            if t_value.numel() == 1:
+                parameters.append(t_value.item())
             else:
-                parameters.append(param.tolist())
+                parameters.append(t_value.tolist())
+        else:
+            # If not transforming, just use the raw parameter.
+            parameters.append(param.tolist() if param.numel() > 1 else param.item())
 
     return parameter_names, parameters
 
