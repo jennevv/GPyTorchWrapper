@@ -43,11 +43,16 @@ transform_conf:
     columns: list | null
 
 training_conf:
-  model_class: str
-  likelihood_class: str
-  learning_rate: float
+  model:
+    model_class: str
+  likelihood:
+    likelihood_class: str
+    likelihood_options:
+      option1: str | float
+  optimizer:
+    optimizer_class: str
+    learning_rate: float
   learning_iterations: int
-  noiseless: bool
   botorch: bool
   debug: bool
 
