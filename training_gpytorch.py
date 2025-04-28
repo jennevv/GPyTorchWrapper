@@ -5,6 +5,7 @@ from dataclasses import asdict
 from pathlib import Path
 from sys import platform
 import torch
+import time
 
 from gpytorchwrapper.src.config.config_reader import read_yaml
 from gpytorchwrapper.src.data.data_reader import DataReader
@@ -106,8 +107,30 @@ def parse_args():
 
     return args
 
+class Timer:
+    def __init__(self):
+        self.t1 = (0., 0.)
+        self.t2 = (0., 0.)
+    @staticmethod
+    def _time() -> tuple[float, float]:
+        return time.perf_counter(), time.process_time()
+    def set_init_time(self):
+        self.t1 = self._time()
+    def set_final_time(self):
+        self.t2 = self._time()
+    def real_time(self):
+        return self.t2[0] - self.t1[0]
+    def cpu_time(self):
+        return self.t2[1] - self.t1[1]
+    def log_timings(self, step_name: str):
+        logger.info(f"------------------------------------------\nTIMINGS FOR {step_name.upper()}")
+        logger.info(f"Real time: {self.real_time():.2f} seconds")
+        logger.info(f"CPU time: {self.cpu_time():.2f} seconds")
+        logger.info("------------------------------------------\n")
 
 def main(args=None):
+    timer = Timer()
+
     if args is None:
         args = parse_args()
     else:
@@ -157,10 +180,13 @@ def main(args=None):
     if test_x is not None:
         test_x, test_y = map(dataframe_to_tensor, [test_x, test_y])
 
+    timer.set_init_time()
     # Model training
     model, likelihood, _ = train_model(
         train_x, train_y, training_conf, test_x, test_y
     )
+    timer.set_final_time()
+    timer.log_timings(step_name="training")
 
     # Evaluate the model on the training and test sets
     train_rmse, test_rmse, test_corr = evaluate_model(
