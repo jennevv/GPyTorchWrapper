@@ -119,7 +119,6 @@ def test_loss_figure_exists(run_script_single_output):
     assert loss_fig.exists(), FileNotFoundError
     loss_fig.unlink()
 
-
 def test_loss_figure_exists_multiple(run_script_multi_output):
     loss_fig = pathlib.Path("loss.png")
     assert loss_fig.exists(), FileNotFoundError
@@ -148,6 +147,8 @@ def test_multi_output_model_exists(run_script_multi_output):
     shutil.rmtree("./test_multi_model")
 
 
+
+
 def test_single_output_model_exists_with_external_test(
     run_script_single_output_with_external_test,
 ):
@@ -160,10 +161,15 @@ def test_single_output_model_exists_with_external_test(
         raise FileNotFoundError("No model file found.")
     shutil.rmtree("./test_single_model")
 
+def test_loss_figure_exists_single_external(run_script_single_output_with_external_test):
+    loss_fig = pathlib.Path("loss.png")
+    assert loss_fig.exists(), FileNotFoundError
+    loss_fig.unlink()
 
 def test_multi_output_model_exists_with_external_test(
-    run_script_multi_output_with_external_test,
+    run_script_multi_output_with_external_test
 ):
+    print(os.listdir("."))
     for file in os.listdir("./test_multi_model"):
         file = pathlib.Path(file)
         match = fnmatch.fnmatch(file.name, "test_model_multi_output.pth")
@@ -172,3 +178,8 @@ def test_multi_output_model_exists_with_external_test(
     else:
         raise FileNotFoundError("No model file found.")
     shutil.rmtree("./test_multi_model")
+
+def test_loss_figure_exists_multi_external(run_script_multi_output_with_external_test):
+    loss_fig = pathlib.Path("loss.png")
+    assert loss_fig.exists(), FileNotFoundError
+    loss_fig.unlink()
