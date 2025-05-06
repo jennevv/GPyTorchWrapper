@@ -1,6 +1,8 @@
+import torch
 from gpytorch import kernels, means, models, distributions, constraints, priors
 
 from gpytorchwrapper.src.kernels.polyxmatern_kernel_perminv import PolyxMaternKernelPermInv
+from gpytorchwrapper.src.kernels import LinearxMaternKernelPermInv
 
 from botorch.models.gpytorch import GPyTorchModel
 

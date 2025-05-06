@@ -10,7 +10,7 @@ from torch.optim import Optimizer
 
 import gpytorchwrapper.src.models.gp_models as model_module
 import torch.optim as optimizer_module
-from .config_classes import TransformerConf, OptimizerConf, LikelihoodConf, ModelConf
+from .config_classes import TransformerConf, TrainingConf, OptimizerConf, LikelihoodConf, ModelConf
 import logging
 import sys
 

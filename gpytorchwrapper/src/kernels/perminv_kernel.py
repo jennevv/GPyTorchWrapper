@@ -1,5 +1,6 @@
 import torch
 from gpytorch.kernels import Kernel
+from torch import Tensor
 
 from gpytorchwrapper.src.utils.permutational_invariance import (
     generate_interatomic_distance_indices,
@@ -63,7 +64,6 @@ class PermInvKernel(Kernel):
             )  # permutationally unique!
 
             if select_dims:
-                distance_idx = generate_interatomic_distance_indices(n_atoms)
                 distance_idx = [distance_idx[i] for i in select_dims]
                 ard_expansion = generate_ard_expansion(distance_idx, idx_equiv_atoms)
                 self.register_buffer(

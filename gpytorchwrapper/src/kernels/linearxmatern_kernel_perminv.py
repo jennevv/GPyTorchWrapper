@@ -5,6 +5,7 @@ import torch
 from gpytorch.constraints import Interval, Positive
 from gpytorch.priors import Prior
 from linear_operator.operators import MatmulLinearOperator, RootLinearOperator
+from torch import Tensor
 
 from gpytorchwrapper.src.kernels.perminv_kernel import PermInvKernel
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_dist_torch
