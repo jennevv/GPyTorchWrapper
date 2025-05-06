@@ -17,6 +17,18 @@ pip install -e . --use-pep517
 ```
 Currently, GPU support is not available in the wrapper so there is no GPU specific environment. 
 
+## Run example in Docker
+The repository contains a Dockerfile that allows you to easily train a model based on the data and configuration in the example directory.
+
+Run the following commands inside of the repo directory.
+```bash
+docker build -t image .
+```
+```bash
+./run-example-in-docker.sh
+```
+A file called `3d_plot.png` is now present in the local directory and shows a 3D plot of the fit against the noisy training data. 
+
 ## Usage
 ### Training a model
 To train a model, you need to provide the training data and the model configuration. 
