@@ -108,23 +108,24 @@ How to load the model is shown in the example below.
 ```python
 import torch
 import gpytorch
-from gpytorchwrapper.src.config.config_reader import read_yaml
-from gpytorchwrapper.src.config.model_factory import  get_model, get_likelihood
-metadata = torch.load('model.pth')
-config = read_yaml('config.yaml')
+from gpytorchwrapper.src.config.config_classes import create_config
+from gpytorchwrapper.src.models.model_load import load_model
 
-train_x, train_y = metadata['training_data']['train_x'], metadata['training_data']['train_y']
+model_dump = torch.load(args.input)
 
-likelihood_class = get_likelihood(config['trainingSpec'], num_tasks=config['dataSpec']['output']['nOutputs'])
-model_class = get_model(config['trainingSpec'])
+config = create_config(model_dump["config"])
 
-likelihood = likelihood_class()
-model = model_class(train_x, train_y, likelihood)
+train_x, train_y = (
+    model_dump["training_data"]["train_x"],
+    model_dump["training_data"]["train_y"],
+)
 
-model.double()
-likelihood.double()
+if config.transform_conf.transform_input.transform_data:
+    input_transformer = model_dump["training_data"]["input_transformer"]
+else:
+    input_transformer = None
 
-model.load_state_dict(metadata['model_state'])
+model, likelihood = load_model(config, model_dump, train_x, train_y)
 ```
 
 ### Saving the model in TorchScript format
