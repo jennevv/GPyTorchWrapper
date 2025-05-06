@@ -111,7 +111,7 @@ import gpytorch
 from gpytorchwrapper.src.config.config_classes import create_config
 from gpytorchwrapper.src.models.model_load import load_model
 
-model_dump = torch.load(args.input)
+model_dump = torch.load("model.pth")
 
 config = create_config(model_dump["config"])
 
