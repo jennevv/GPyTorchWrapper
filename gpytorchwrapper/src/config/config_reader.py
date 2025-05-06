@@ -35,7 +35,7 @@ def read_yaml(input_path: pathlib.Path | str) -> Config:
 
     try:
         config = create_config(input_dict)
-    except:
+    except Exception:
         raise NotImplementedError("Incorrect YAML file structure.")
 
     return config
