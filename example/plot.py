@@ -1,11 +1,9 @@
 import pandas as pd
 import numpy as np
 import torch
-import gpytorch
 from gpytorchwrapper.src.config.config_classes import create_config
 from gpytorchwrapper.src.models.model_load import load_model
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 def plot_3d_surface(X, y, y_pred):
     """
@@ -24,7 +22,7 @@ def plot_3d_surface(X, y, y_pred):
     # Plotting
     fig = plt.figure(figsize=(10, 7))
     ax = fig.add_subplot(111, projection='3d')
-    surf = ax.plot_surface(X1, X2, Y_pred, cmap='viridis', edgecolor='k', alpha=0.8)
+    ax.plot_surface(X1, X2, Y_pred, cmap='viridis', edgecolor='k', alpha=0.8)
 
     ax.scatter(X[:,0], X[:,1], y, label="original data")
 
