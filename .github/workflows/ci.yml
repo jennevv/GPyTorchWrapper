@@ -24,12 +24,6 @@ jobs:
           conda env update --file environment.yml --name base
           pip install -e . --use-pep517 
       - uses: astral-sh/ruff-action@v3
-      - name: Lint code
-        run: |
-          ruff check --fix .
-      - name: format code
-        run: |
-          ruff format .
       - name: Test with pytest
         run: |
           pytest .
