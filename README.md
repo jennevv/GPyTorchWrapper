@@ -17,6 +17,18 @@ pip install -e . --use-pep517
 ```
 Currently, GPU support is not available in the wrapper so there is no GPU specific environment. 
 
+## Run example in Docker
+The repository contains a Dockerfile that allows you to easily train a model based on the data and configuration in the example directory.
+
+Run the following commands inside of the repo directory.
+```bash
+docker build -t image .
+```
+```bash
+./run-example-in-docker.sh
+```
+A file called `3d_plot.png` is now present in the local directory and shows a 3D plot of the fit against the noisy training data. 
+
 ## Usage
 ### Training a model
 To train a model, you need to provide the training data and the model configuration. 
@@ -108,23 +120,24 @@ How to load the model is shown in the example below.
 ```python
 import torch
 import gpytorch
-from gpytorchwrapper.src.config.config_reader import read_yaml
-from gpytorchwrapper.src.config.model_factory import  get_model, get_likelihood
-metadata = torch.load('model.pth')
-config = read_yaml('config.yaml')
+from gpytorchwrapper.src.config.config_classes import create_config
+from gpytorchwrapper.src.models.model_load import load_model
 
-train_x, train_y = metadata['training_data']['train_x'], metadata['training_data']['train_y']
+model_dump = torch.load("model.pth")
 
-likelihood_class = get_likelihood(config['trainingSpec'], num_tasks=config['dataSpec']['output']['nOutputs'])
-model_class = get_model(config['trainingSpec'])
+config = create_config(model_dump["config"])
 
-likelihood = likelihood_class()
-model = model_class(train_x, train_y, likelihood)
+train_x, train_y = (
+    model_dump["training_data"]["train_x"],
+    model_dump["training_data"]["train_y"],
+)
 
-model.double()
-likelihood.double()
+if config.transform_conf.transform_input.transform_data:
+    input_transformer = model_dump["training_data"]["input_transformer"]
+else:
+    input_transformer = None
 
-model.load_state_dict(metadata['model_state'])
+model, likelihood = load_model(config, model_dump, train_x, train_y)
 ```
 
 ### Saving the model in TorchScript format
