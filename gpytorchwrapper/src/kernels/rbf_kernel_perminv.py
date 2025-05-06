@@ -2,7 +2,6 @@ from typing import Optional
 
 import torch
 from gpytorch.kernels.rbf_kernel import postprocess_rbf
-from torch import Tensor
 
 from gpytorchwrapper.src.kernels.perminv_kernel import PermInvKernel
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_dist_torch
