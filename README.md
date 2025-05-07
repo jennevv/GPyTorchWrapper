@@ -1,6 +1,9 @@
 # GPyTorchWrapper
 This repository contains a wrapper for training GP models using GPyTorch.
 I have created this to simplify modeling potential energy surface models for small molecular systems in GPyTorch, but it is not limited to that application.
+
+For the previously stated purpose, custom permutationally invariant kernel functions have been developed based on the definiton of Bartók and Cśanyi [1], however implemented for a global descriptor.
+These kernel functions are fully differentiable using autograd to allow the models to be used in dynamics simulations.
 ## Installation
 
 Use the `environment.yml` file to install the necessary dependencies on a local machine.
@@ -157,4 +160,7 @@ pred, pred_var = model(x)
 ### Custom models
 Custom models can be added in the `gpytorchwrapper/plugins` directory.  
 The module's name of the module containing the custom model must start with `model_`
+
+# References
+[1] Bartók, A. P.; Csányi, G. Gaussian Approximation Potentials: A Brief Tutorial Introduction. International Journal of Quantum Chemistry 2015, 115 (16), 1051–1057. https://doi.org/10.1002/qua.24927.
 
