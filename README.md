@@ -32,6 +32,9 @@ docker build -t image .
 ```
 A file called `3d_plot.png` is now present in the local directory and shows a 3D plot of the fit against the noisy training data. 
 
+## Run on cluster with Slurm scheduler
+The `bash/` directory contains an example Slurm-based submit script called `sub_gp_training.sh`. The `gp_training.sh` script is a CLI tool to change the submit script for certain input parameters and it submits the job afterwards.  
+
 ## Usage
 ### Training a model
 To train a model, you need to provide the training data and the model configuration. 
