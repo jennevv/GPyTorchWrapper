@@ -2,7 +2,6 @@ from gpytorch import kernels, means, models, distributions
 
 from gpytorchwrapper.src.kernels import (
     PolyxMaternKernelPermInv,
-    LinearxMaternKernelPermInv,
 )
 from botorch.models.gpytorch import GPyTorchModel
 

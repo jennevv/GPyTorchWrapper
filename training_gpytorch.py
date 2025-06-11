@@ -5,7 +5,6 @@ from dataclasses import asdict
 from pathlib import Path
 from sys import platform
 import torch
-import time
 
 from gpytorchwrapper.src.config.config_reader import read_yaml
 from gpytorchwrapper.src.data.data_reader import DataReader

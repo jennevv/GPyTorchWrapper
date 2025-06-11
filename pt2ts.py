@@ -5,15 +5,10 @@ from pathlib import Path
 import gpytorch
 import numpy as np
 import torch
-from gpytorch.likelihoods import Likelihood
-from gpytorch.models import GP
 from numpy.typing import NDArray
-from torch import Tensor
 import logging
-from gpytorchwrapper.src.config.config_classes import Config, create_config
-from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model
+from gpytorchwrapper.src.config.config_classes import create_config
 from gpytorchwrapper.src.models.model_load import load_model
-from gpytorchwrapper.src.models.model_train import define_likelihood, define_model
 
 warnings.filterwarnings("ignore")  # Ignore warnings from the torch.jit.trace function
 
@@ -195,7 +190,7 @@ def trace_model(model, len_training_data, transformer, num_inputs):
         ),  # Disables lazy evaluation
     ):
         model.eval()
-        pred = model(test_x)  # Do precomputation
+        model(test_x)  # Do precomputation
         traced_model = torch.jit.trace(MeanVarModelWrapper(model), test_x)
 
     return traced_model
