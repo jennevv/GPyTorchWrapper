@@ -94,6 +94,34 @@ def transform(
         object,
     ]
 ):
+    """
+    Applies transformations to training and test datasets based on configuration.
+
+    Parameters
+    ----------
+    train_x : pandas.DataFrame
+        Input features for the training dataset.
+    train_y : pandas.DataFrame
+        Output targets for the training dataset.
+    test_x : pandas.DataFrame or None
+        Input features for the test dataset, or None if not provided.
+    test_y : pandas.DataFrame or None
+        Output targets for the test dataset, or None if not provided.
+    transform_conf : TransformConf
+        Configuration object containing settings for input and output transformations.
+
+    Returns
+    -------
+    tuple
+        A tuple containing:
+        - Transformed training input features (pandas.DataFrame)
+        - Transformed test input features (pandas.DataFrame or None)
+        - Transformed training targets (pandas.DataFrame)
+        - Transformed test targets (pandas.DataFrame or None)
+        - Input transformer object used or None
+        - Output transformer object used or None
+    """
+
     logging.info("Transforming data.")
 
     # Transform the input

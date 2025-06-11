@@ -36,7 +36,7 @@ class DataReader:
         """
         Parameters
         ----------
-        file : str
+        file : str or Path
             The path to the file to read.
         file_type : str
             The type of file to read. Either 'csv' or 'pickle'.
@@ -78,6 +78,15 @@ class DataReader:
 def check_df_header(file: str | Path) -> bool:
     """
     Returns True if the file has a header and False if the file doesn't have one.
+
+    Parameters
+    ----------
+    file : str or Path
+        path to the file containing the data
+
+    Returns
+    -------
+    bool
     """
     df = pd.read_csv(file, header=None, nrows=5)
     df_header = pd.read_csv(file, nrows=5)

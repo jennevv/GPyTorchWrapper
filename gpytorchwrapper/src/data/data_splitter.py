@@ -79,7 +79,6 @@ def k_fold_split(
     y: pd.DataFrame,
     training_conf: TrainingConf,
     transform_conf: TransformConf,
-    data_conf: DataConf,
     directory: Path,
     split_size: float = 0.2,
 ) -> None:
@@ -96,8 +95,6 @@ def k_fold_split(
                     Dictionary containing the training specifications
     transform_conf : dict
                     Dictionary containing the transformer specifications
-    data_conf : dict
-                Dictionary containing the data specifications
     directory : pathlib.Path
                 The output directory
     split_size : float
@@ -133,11 +130,7 @@ def k_fold_split(
         )
 
         model, likelihood, fold_params = train_model(
-            train_x,
-            train_y,
-            training_conf,
-            test_x,
-            test_y
+            train_x, train_y, training_conf, test_x, test_y
         )
 
         fold_parameters.append(fold_params)
@@ -184,7 +177,21 @@ def calculate_kfold_results(kfold_data):
     return kfold_results
 
 
-def write_kfold_results(kfold_results, out_dir):
+def write_kfold_results(kfold_results: dict, out_dir: Path) -> None:
+    """
+    Write out the average kfold results to a text file.
+
+    Parameters
+    ----------
+    kfold_results: dict
+        dictionary containing average kfold training and test errors and the r2 correlation for the test set
+    out_dir: Path
+        path the the directory where results are saved
+
+    Returns
+    -------
+    None
+    """
     file_path = out_dir / Path("kfold_results.txt")
 
     with file_path.open(mode="w") as f:
@@ -296,6 +303,11 @@ def split_data(
                      Dictionary containing the testing specifications
     directory : pathlib.Path
                 The output directory
+
+    Returns
+    -------
+    None or tuple of optional DataFrames
+        None is returned if kfold testing is done, otherwise a tuple of training DataFrames and optional test DataFrames
     """
     if testing_conf.test:
         if testing_conf.kfold:
