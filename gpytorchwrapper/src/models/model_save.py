@@ -15,18 +15,18 @@ def save_model(
 
     Parameters
     -----------
-    model_state : object
-                  The state of the model
-    model_metadata : dict
-                     Dictionary containing the metadata of the model
+    state_dict : dict
+        The state of the model
+    config : dict
+        The configuration dictionary to setup the training
     training_data : dict
-                    Dictionary containing the training data and the transformer
+        Contains the training inputs and outputs used
     metrics : dict
-              Dictionary containing the metrics on the training and test sets
+        Dictionary containing the metrics on the training and test sets
     output : str
-           The name of the output file
+        The name of the output file
     directory : pathlib.Path
-              The output directory
+        The output directory
 
     Returns
     --------

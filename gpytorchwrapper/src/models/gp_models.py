@@ -1,5 +1,7 @@
 from gpytorch import kernels, means, models, distributions
 
+# Examples of model classes
+
 
 ##### SINGLE OUTPUT MODELS #####
 class SingleGPRBF(models.ExactGP):

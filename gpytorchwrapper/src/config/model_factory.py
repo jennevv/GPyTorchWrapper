@@ -1,6 +1,7 @@
 import importlib
 import os
 import pkgutil
+from types import ModuleType
 
 import sklearn.preprocessing as transformer_module
 import gpytorch.likelihoods as likelihood_module
@@ -10,7 +11,12 @@ from torch.optim import Optimizer
 
 import gpytorchwrapper.src.models.gp_models as model_module
 import torch.optim as optimizer_module
-from .config_classes import TransformerConf, TrainingConf, OptimizerConf, LikelihoodConf, ModelConf
+from .config_classes import (
+    TransformerConf,
+    OptimizerConf,
+    LikelihoodConf,
+    ModelConf,
+)
 import logging
 import sys
 
@@ -48,8 +54,8 @@ def get_likelihood(likelihood_conf: LikelihoodConf) -> Likelihood:
 
     Parameters
     -----------
-    training_conf : dict
-                    Dictionary containing the training specifications
+    likelihood_conf : dict
+                    Dictionary containing the likelihood specifications
 
     Returns
     --------
@@ -60,7 +66,18 @@ def get_likelihood(likelihood_conf: LikelihoodConf) -> Likelihood:
     return getattr(likelihood_module, selected_likelihood)
 
 
-def get_plugins(path: str | None = None):
+def get_plugins(path: str | None = None) -> dict[str, ModuleType]:
+    """
+    Parameters
+    ----------
+    path : str or None, optional
+        path to the directory containing the model plugins
+
+    Returns
+    -------
+    discovered_plugins : dict
+        dict with the names of the model class as a string and the model classes as values
+    """
     if path is None:
         # Dynamically find the plugins directory relative to this script
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -86,8 +103,8 @@ def get_model(model_conf: ModelConf) -> ExactGP:
 
     Parameters
     -----------
-    training_conf : TrainingConf
-                    dataclass containing the training specifications
+    model_conf : ModelConf
+                    dataclass containing the model specifications
 
     Returns
     --------
@@ -112,6 +129,7 @@ def get_model(model_conf: ModelConf) -> ExactGP:
         raise NotImplementedError(
             f"The specified model class, {selected_model}, is not available in gp_models.py or the plugins folder."
         )
+
 
 def get_optimizer(optimizer_conf: OptimizerConf) -> Optimizer:
     """

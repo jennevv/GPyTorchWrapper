@@ -6,27 +6,42 @@ import logging
 from botorch import fit_gpytorch_mll
 
 from gpytorch.models import ExactGP
-from gpytorch.likelihoods import GaussianLikelihood, MultitaskGaussianLikelihood, Likelihood, \
-    FixedNoiseGaussianLikelihood
+from gpytorch.likelihoods import (
+    GaussianLikelihood,
+    MultitaskGaussianLikelihood,
+    Likelihood,
+    FixedNoiseGaussianLikelihood,
+)
 from gpytorch.mlls import MarginalLogLikelihood
 from torch import Tensor
 
-from gpytorchwrapper.src.config.config_classes import TrainingConf, OptimizerConf, LikelihoodConf
-from gpytorchwrapper.src.config.model_factory import get_likelihood, get_model, get_optimizer
+from gpytorchwrapper.src.config.config_classes import (
+    TrainingConf,
+    OptimizerConf,
+    LikelihoodConf,
+    ModelConf,
+)
+from gpytorchwrapper.src.config.model_factory import (
+    get_likelihood,
+    get_model,
+    get_optimizer,
+)
 
 logger = logging.getLogger(__name__)
 
 
-def define_optimizer(model: ExactGP, optimizer_conf: OptimizerConf) -> torch.optim.Optimizer:
+def define_optimizer(
+    model: ExactGP, optimizer_conf: OptimizerConf
+) -> torch.optim.Optimizer:
     """
-    Define the optimizer for the model
+    Define the optimizer used for training the model
 
     Parameters
     -----------
     model : object
             The model to be optimized
-    learning_rate : float
-                The learning rate for the optimizer
+    optimizer_conf : OptimizerConf
+        Configuration dataclass that specifies the options for the optimizer
 
     Returns
     --------
@@ -37,19 +52,61 @@ def define_optimizer(model: ExactGP, optimizer_conf: OptimizerConf) -> torch.opt
     optimizer = optimizer_class(model.parameters(), **optimizer_conf.optimizer_options)
     return optimizer
 
-def define_likelihood(likelihood_conf: LikelihoodConf, likelihood_class: Likelihood, train_x: Tensor):
+
+def define_likelihood(
+    likelihood_conf: LikelihoodConf, likelihood_class: Likelihood, train_x: Tensor
+):
+    """
+    Define the likelihood used for training the model
+
+    Parameters
+    -----------
+    likelihood_conf : OptimizerConf
+        Configuration dataclass that specifies the options for the likelihood
+    likelihood_class : Likelihood
+        Likelihood class to instantiate
+    train_x : Tensor
+        The training input tensor
+
+    Returns
+    --------
+    optimizer : object
+            The optimizer for the model
+
+    Raises
+    ------
+    KeyError
+        If a fixed noise likelihood is selected but the noise level is not specified
+    """
+
     if likelihood_class is FixedNoiseGaussianLikelihood:
         if "noise" not in likelihood_conf.likelihood_options.keys():
-            raise KeyError("The noise parameter is not specified in the likelihood options.")
-        elif type(likelihood_conf.likelihood_options["noise"]) == str:
-            likelihood_conf.likelihood_options["noise"] = eval(likelihood_conf.likelihood_options["noise"])
-            likelihood_conf.likelihood_options["noise"] = torch.tensor([likelihood_conf.likelihood_options["noise"]] * train_x.shape[0], dtype=torch.float64)
+            raise KeyError(
+                "The noise parameter is not specified in the likelihood options."
+            )
+        elif isinstance(type(likelihood_conf.likelihood_options["noise"]), str):
+            likelihood_conf.likelihood_options["noise"] = eval(
+                likelihood_conf.likelihood_options["noise"]
+            )
+            likelihood_conf.likelihood_options["noise"] = torch.tensor(
+                [likelihood_conf.likelihood_options["noise"]] * train_x.shape[0],
+                dtype=torch.float64,
+            )
         elif isinstance(likelihood_conf.likelihood_options["noise"], list):
-            likelihood_conf.likelihood_options["noise"] = torch.tensor(likelihood_conf.likelihood_options["noise"], dtype=torch.float64)
+            likelihood_conf.likelihood_options["noise"] = torch.tensor(
+                likelihood_conf.likelihood_options["noise"], dtype=torch.float64
+            )
         elif isinstance(likelihood_conf.likelihood_options["noise"], float):
-            likelihood_conf.likelihood_options["noise"] = torch.tensor([likelihood_conf.likelihood_options["noise"]] * train_x.shape[0], dtype=torch.float64)
+            likelihood_conf.likelihood_options["noise"] = torch.tensor(
+                [likelihood_conf.likelihood_options["noise"]] * train_x.shape[0],
+                dtype=torch.float64,
+            )
         elif isinstance(likelihood_conf.likelihood_options["noise"], Tensor):
-            likelihood_conf.likelihood_options["noise"] = torch.tensor([likelihood_conf.likelihood_options["noise"][0].item()] * train_x.shape[0], dtype=torch.float64)
+            likelihood_conf.likelihood_options["noise"] = torch.tensor(
+                [likelihood_conf.likelihood_options["noise"][0].item()]
+                * train_x.shape[0],
+                dtype=torch.float64,
+            )
 
     if likelihood_conf.likelihood_options:
         likelihood = likelihood_class(**likelihood_conf.likelihood_options)
@@ -58,7 +115,34 @@ def define_likelihood(likelihood_conf: LikelihoodConf, likelihood_class: Likelih
 
     return likelihood
 
-def define_model(model_conf, model_class, train_x, train_y, likelihood):
+
+def define_model(
+    model_conf: ModelConf,
+    model_class: ExactGP,
+    train_x: Tensor,
+    train_y: Tensor,
+    likelihood: Likelihood,
+) -> ExactGP:
+    """
+
+    Parameters
+    ----------
+    model_conf : ModelConf
+        Model configuration dataclass
+    model_class : ExactGP
+        Model class
+    train_x : Tensor
+        The training input tensor
+    train_y : Tensor
+        The training output tensor
+    likelihood : Likelihood
+        Likelihood object
+
+    Returns
+    -------
+    Tensor or Distribution or LinearOperator
+        Instantiated model
+    """
     if model_conf.model_options:
         model = model_class(train_x, train_y, likelihood, **model_conf.model_options)
     else:
@@ -66,17 +150,19 @@ def define_model(model_conf, model_class, train_x, train_y, likelihood):
     return model
 
 
-def loss_figure(train_loss: list[float], iteration: list[int], val_loss: list[float] = None) -> None:
+def loss_figure(
+    train_loss: list[float], iteration: list[int], val_loss: list[float] = None
+) -> None:
     """
     Plot the change of loss during training
 
     Parameters
     -----------
     loss : list
-           List containing the loss values
+        List containing the loss values
 
     iteration : list
-                List containing the iteration values
+        List containing the iteration values
 
     Returns
     --------
@@ -102,7 +188,7 @@ def training_loop(
     learning_iterations: int,
     debug: bool,
     test_x: torch.Tensor = None,
-    test_y: torch.Tensor = None
+    test_y: torch.Tensor = None,
 ) -> None:
     """
     The training loop for the model
@@ -130,13 +216,19 @@ def training_loop(
     None
     """
     loss_hash = {"train_loss": [], "val_loss": [], "iteration": []}
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.1)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", factor=0.1
+    )
 
     with gpytorch.settings.debug(debug):
         for iteration in range(learning_iterations):
             if (iteration + 1) % 10 == 0:
                 logger.info(f"Iteration {iteration + 1}/{learning_iterations}")
-                loss_figure(loss_hash["train_loss"], loss_hash["iteration"], loss_hash["val_loss"])
+                loss_figure(
+                    loss_hash["train_loss"],
+                    loss_hash["iteration"],
+                    loss_hash["val_loss"],
+                )
 
             optimizer.zero_grad()
 
@@ -165,7 +257,25 @@ def training_loop(
     # Plot the loss one last time
     loss_figure(loss_hash["train_loss"], loss_hash["iteration"], loss_hash["val_loss"])
 
-def model_parameters(model, transformed: bool = True):
+
+def model_parameters(
+    model: ExactGP, transformed: bool = True
+) -> tuple[list[str], list[Tensor | None]]:
+    """
+    Helper function to get the current model parameters and parameter values.
+
+    Parameters
+    ----------
+    model : ExactGP
+        The model object
+    transformed : bool, default True
+        If the parameters must be transformed from the raw parameters used by the model to human-readable ones.
+
+    Returns
+    -------
+    parameter_names, parameters : tuple of list of str and list of (Tensor or None)
+        A tuple containing the parameter names and their values
+    """
     parameters, parameter_names = [], []
 
     for full_param_name, param in model.named_parameters():
@@ -205,7 +315,25 @@ def model_parameters(model, transformed: bool = True):
     return parameter_names, parameters
 
 
-def print_model_parameters(parameter_names: list, parameters: list) -> str:
+def create_model_parameters_string(
+    parameter_names: list[str], parameters: list[Tensor | None]
+) -> str:
+    """
+    Helper function to print the model parameters generated by `model_parameters()`
+
+    Parameters
+    ----------
+    parameter_names : list of string
+        The parameter name strings
+    parameters : list of Tensor and/or None
+        The parameter values
+
+    Returns
+    -------
+    return : str
+        The string to print
+
+    """
     parameter_strings = []
     for parameter_name, parameter in zip(parameter_names, parameters):
         parameter_strings.append(
@@ -214,12 +342,13 @@ def print_model_parameters(parameter_names: list, parameters: list) -> str:
 
     return "".join(parameter_strings)
 
+
 def train_model(
     train_x: torch.Tensor,
     train_y: torch.Tensor,
     training_conf: TrainingConf,
     test_x: torch.Tensor = None,
-    test_y: torch.Tensor = None
+    test_y: torch.Tensor = None,
 ) -> tuple[
     ExactGP, GaussianLikelihood | MultitaskGaussianLikelihood, dict[str, list[float]]
 ]:
@@ -229,19 +358,24 @@ def train_model(
     Parameters
     -----------
     train_x : torch.Tensor
-              The input training data
+        The input training data
     train_y : torch.Tensor
-              The output training data
+        The output training data
     training_conf : TrainingConf
-                    Dictionary containing the training specifications
+        Dictionary containing the training specifications
+    test_x : Tensor
+        The input test data
+    test_y : Tensor
+        The output test data
 
     Returns
     --------
-    model : object
-            The trained model
+    model : ExactGP
+        The trained model
     likelihood : object
-                 The likelihood of the trained model
+        The likelihood of the trained model
     parameter_dict : dict
+        Dictionary containing the parameter values after training
     """
     logger.info("Defining the model specifications.")
 
@@ -260,7 +394,7 @@ def train_model(
 
     parameter_names, parameters = model_parameters(model)
     logger.info(
-        f"Parameters before training: \n{print_model_parameters(parameter_names, parameters)}"
+        f"Parameters before training: \n{create_model_parameters_string(parameter_names, parameters)}"
     )
 
     # Training in double precision
@@ -283,12 +417,20 @@ def train_model(
             # Optimize model hyperparameters
             optimizer = define_optimizer(model, optimizer_conf)
             training_loop(
-                train_x, train_y, model, mll, optimizer, learning_iterations, debug, test_x, test_y
+                train_x,
+                train_y,
+                model,
+                mll,
+                optimizer,
+                learning_iterations,
+                debug,
+                test_x,
+                test_y,
             )
 
     parameter_names, parameters = model_parameters(model)
     logger.info(
-        f"Parameters after training: \n{print_model_parameters(parameter_names, parameters)}"
+        f"Parameters after training: \n{create_model_parameters_string(parameter_names, parameters)}"
     )
 
     parameter_dict = dict(zip(parameter_names, parameters))

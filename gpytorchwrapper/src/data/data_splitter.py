@@ -15,7 +15,7 @@ from gpytorchwrapper.src.config.config_classes import (
 )
 from gpytorchwrapper.src.data.data_transform import transform
 from gpytorchwrapper.src.models.model_evaluate import evaluate_model
-from gpytorchwrapper.src.models.model_train import train_model, print_model_parameters
+from gpytorchwrapper.src.models.model_train import train_model, create_model_parameters_string
 from gpytorchwrapper.src.utils import dataframe_to_tensor
 
 logger = logging.getLogger(__name__)
@@ -148,7 +148,7 @@ def k_fold_split(
 
     logger.info(f"Best fold: Fold {best_fold}")
     logger.info(
-        f"Best model parameters: \n{print_model_parameters(fold_parameters[best_fold].keys(), fold_parameters[best_fold].values())}\n"
+        f"Best model parameters: \n{create_model_parameters_string(fold_parameters[best_fold].keys(), fold_parameters[best_fold].values())}\n"
     )
 
     kfold_data = np.stack([train_rmse_arr, test_rmse_arr, test_corr_arr], axis=1)
