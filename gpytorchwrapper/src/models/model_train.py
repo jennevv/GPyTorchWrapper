@@ -78,13 +78,13 @@ def define_likelihood(
     KeyError
         If a fixed noise likelihood is selected but the noise level is not specified
     """
-
+    print(likelihood_class)
     if likelihood_class is FixedNoiseGaussianLikelihood:
         if "noise" not in likelihood_conf.likelihood_options.keys():
             raise KeyError(
                 "The noise parameter is not specified in the likelihood options."
             )
-        elif isinstance(type(likelihood_conf.likelihood_options["noise"]), str):
+        elif isinstance(likelihood_conf.likelihood_options["noise"], str):
             likelihood_conf.likelihood_options["noise"] = eval(
                 likelihood_conf.likelihood_options["noise"]
             )
@@ -219,40 +219,41 @@ def training_loop(
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode="min", factor=0.1
     )
+    print(train_x.shape)
+    for iteration in range(learning_iterations):
+        if (iteration + 1) % 10 == 0:
+            logger.info(f"Iteration {iteration + 1}/{learning_iterations}")
+            loss_figure(
+                loss_hash["train_loss"],
+                loss_hash["iteration"],
+                loss_hash["val_loss"],
+            )
 
-    with gpytorch.settings.debug(debug):
-        for iteration in range(learning_iterations):
-            if (iteration + 1) % 10 == 0:
-                logger.info(f"Iteration {iteration + 1}/{learning_iterations}")
-                loss_figure(
-                    loss_hash["train_loss"],
-                    loss_hash["iteration"],
-                    loss_hash["val_loss"],
-                )
+        optimizer.zero_grad()
 
-            optimizer.zero_grad()
+        output = model(train_x)
 
-            output = model(train_x)
+        loss = -mll(output, train_y)
 
-            loss = -mll(output, train_y)
+        loss_hash["train_loss"].append(loss.item())
 
-            loss_hash["train_loss"].append(loss.item())
+        loss_hash["iteration"].append(iteration)
+        loss.backward()
+        optimizer.step()
 
-            loss_hash["iteration"].append(iteration)
-            loss.backward()
-            optimizer.step()
+        if test_x is not None:
+            model.eval()  # Set model to evaluation mode
+            with torch.no_grad():
+                print(train_y.shape)
+                print(test_y.shape)
+                val_output = model(test_x)
+                val_loss = -mll(val_output, test_y)
+                loss_hash["val_loss"].append(val_loss.item())
 
-            if test_x is not None:
-                model.eval()  # Set model to evaluation mode
-                with torch.no_grad():
-                    val_output = model(test_x)
-                    val_loss = -mll(val_output, test_y)
-                    loss_hash["val_loss"].append(val_loss.item())
-
-                scheduler.step(val_loss)
-                model.train()  # Switch back to training mode
-            else:
-                scheduler.step(loss)
+            scheduler.step(val_loss)
+            model.train()  # Switch back to training mode
+        else:
+            scheduler.step(loss)
 
     # Plot the loss one last time
     loss_figure(loss_hash["train_loss"], loss_hash["iteration"], loss_hash["val_loss"])
@@ -372,7 +373,7 @@ def train_model(
     --------
     model : ExactGP
         The trained model
-    likelihood : object
+    likelihood : Likelihood
         The likelihood of the trained model
     parameter_dict : dict
         Dictionary containing the parameter values after training

@@ -22,9 +22,7 @@ training_conf:
     model_class: TestModel
     model_options: null
   likelihood:
-    likelihood_class: FixedNoiseGaussianLikelihood
-    likelihood_options:
-        noise: 1e-6
+    likelihood_class: GaussianLikelihood
   learning_rate: 0.5
   learning_iterations: 5
   botorch: false

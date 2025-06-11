@@ -269,8 +269,8 @@ def main(args=None):
     if test_x is not None:
         test_x, test_y = map(dataframe_to_tensor, [test_x, test_y])
 
-    training_timer.set_init_time()
     # Model training
+    training_timer.set_init_time()
     model, likelihood, _ = train_model(train_x, train_y, training_conf, test_x, test_y)
     training_timer.set_final_time()
     training_timer.log_timings()

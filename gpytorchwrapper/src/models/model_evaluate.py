@@ -3,11 +3,14 @@ import logging
 import gpytorch
 import torch
 
+from torch import Tensor
+
 from gpytorch.models import ExactGP
 from gpytorch.likelihoods import (
     GaussianLikelihood,
     MultitaskGaussianLikelihood,
     FixedNoiseGaussianLikelihood,
+    Likelihood,
 )
 
 logger = logging.getLogger(__name__)
@@ -41,9 +44,10 @@ class ModelEvaluator:
         self.likelihood = likelihood
         self.output_transformer = output_transformer
 
-    def _predict(self, x: torch.Tensor) -> gpytorch.distributions.Distribution:
+    def _predict(self, x: Tensor) -> gpytorch.distributions.Distribution:
         self.model.eval()
         self.likelihood.eval()
+
         with (
             torch.no_grad(),
             gpytorch.settings.fast_computations(
@@ -53,13 +57,13 @@ class ModelEvaluator:
             if isinstance(self.likelihood, FixedNoiseGaussianLikelihood):
                 predictions = self.likelihood(
                     self.model(x),
-                    noise=torch.tensor([self.likelihood.noise[0].item()] * x.shape[0]),
+                    noise=Tensor([self.likelihood.noise[0].item()] * x.shape[0]),
                 )
             else:
                 predictions = self.likelihood(self.model(x))
         return predictions
 
-    def _rmse(self, a: torch.Tensor, b: torch.Tensor) -> float:
+    def _rmse(self, a: Tensor, b: Tensor) -> float:
         return torch.sqrt(torch.mean(torch.square(a - b))).item()
 
     def _check_if_tensor(self, tensor):
@@ -67,14 +71,14 @@ class ModelEvaluator:
             raise NotImplementedError("The input should be a PyTorch tensor.")
 
     def _compare_mean_and_output_dimensions(
-        self, output: torch.Tensor, mean: torch.Tensor
+        self, output: Tensor, mean: Tensor
     ) -> None:
         if output.squeeze().dim() != mean.squeeze().dim():
             raise ValueError(
                 "The number of output dimensions does not match the number of prediction dimensions."
             )
 
-    def evaluate_rmse(self, x: torch.Tensor, y: torch.Tensor) -> list[float]:
+    def evaluate_rmse(self, x: Tensor, y: Tensor) -> list[float]:
         self._check_if_tensor(x)
         self._check_if_tensor(y)
 
@@ -112,7 +116,7 @@ class ModelEvaluator:
             rmse.append(self._rmse(mean, y))
         return rmse
 
-    def evaluate_correlation(self, x: torch.Tensor, y: torch.Tensor) -> list[float]:
+    def evaluate_correlation(self, x: Tensor, y: Tensor) -> list[float]:
         self._check_if_tensor(x)
         self._check_if_tensor(y)
 
@@ -137,12 +141,12 @@ class ModelEvaluator:
 
 def evaluate_model(
     model: ExactGP,
-    likelihood: GaussianLikelihood | MultitaskGaussianLikelihood,
+    likelihood: Likelihood,
     output_transformer: object,
-    train_x: torch.Tensor,
-    train_y: torch.Tensor,
-    test_x: torch.Tensor,
-    test_y: torch.Tensor,
+    train_x: Tensor,
+    train_y: Tensor,
+    test_x: Tensor,
+    test_y: Tensor,
 ) -> tuple[list[float], list[float], list[float]] | tuple[list[float], None, None]:
     """
     Evaluate the model on the training and test sets
@@ -151,15 +155,17 @@ def evaluate_model(
     -----------
     model : ExactGP
             The trained model
-    likelihood : GaussianLikelihood | MultitaskGaussianLikelihood
+    likelihood : Likelihood
                  The trained likelihood of the model
-    train_x : torch.Tensor
+    output_transformer : object
+        The output transformer 
+    train_x : Tensor
               The input training data
-    train_y : torch.Tensor
+    train_y : Tensor
               The output training data
-    test_x : torch.Tensor
+    test_x : Tensor
              The input test data
-    test_y : torch.Tensor
+    test_y : Tensor
              The output test data
 
     Returns
