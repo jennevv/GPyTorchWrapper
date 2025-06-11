@@ -1,6 +1,9 @@
 # GPyTorchWrapper
 This repository contains a wrapper for training GP models using GPyTorch.
 I have created this to simplify modeling potential energy surface models for small molecular systems in GPyTorch, but it is not limited to that application.
+
+For the previously stated purpose, custom permutationally invariant kernel functions have been developed based on the definiton of Bartók and Cśanyi [1], however implemented for a global descriptor.
+These kernel functions are fully differentiable using autograd to allow the models to be used in dynamics simulations.
 ## Installation
 
 Use the `environment.yml` file to install the necessary dependencies on a local machine.
@@ -15,7 +18,22 @@ Activate the environment and install the package in development mode using pip.
 conda activate gpytorchwrapper
 pip install -e . --use-pep517
 ```
-Currently, GPU support, although supported by GPyTorch, is not available in the wrapper. When it is made available, a GPU specific conda environment will be added. 
+Currently, GPU support is not available in the wrapper so there is no GPU specific environment. 
+
+## Run example in Docker
+The repository contains a Dockerfile that allows you to easily train a model based on the data and configuration in the example directory.
+
+Run the following commands inside of the repo directory.
+```bash
+docker build -t image .
+```
+```bash
+./run-example-in-docker.sh
+```
+A file called `3d_plot.png` is now present in the local directory and shows a 3D plot of the fit against the noisy training data. 
+
+## Run on cluster with Slurm scheduler
+The `bash/` directory contains an example Slurm-based submit script called `sub_gp_training.sh`. The `gp_training.sh` script is a CLI tool to change the submit script for certain input parameters and it submits the job afterwards.  
 
 ## Usage
 ### Training a model
@@ -108,23 +126,24 @@ How to load the model is shown in the example below.
 ```python
 import torch
 import gpytorch
-from gpytorchwrapper.src.config.config_reader import read_yaml
-from gpytorchwrapper.src.config.model_factory import  get_model, get_likelihood
-metadata = torch.load('model.pth')
-config = read_yaml('config.yaml')
+from gpytorchwrapper.src.config.config_classes import create_config
+from gpytorchwrapper.src.models.model_load import load_model
 
-train_x, train_y = metadata['training_data']['train_x'], metadata['training_data']['train_y']
+model_dump = torch.load("model.pth")
 
-likelihood_class = get_likelihood(config['trainingSpec'], num_tasks=config['dataSpec']['output']['nOutputs'])
-model_class = get_model(config['trainingSpec'])
+config = create_config(model_dump["config"])
 
-likelihood = likelihood_class()
-model = model_class(train_x, train_y, likelihood)
+train_x, train_y = (
+    model_dump["training_data"]["train_x"],
+    model_dump["training_data"]["train_y"],
+)
 
-model.double()
-likelihood.double()
+if config.transform_conf.transform_input.transform_data:
+    input_transformer = model_dump["training_data"]["input_transformer"]
+else:
+    input_transformer = None
 
-model.load_state_dict(metadata['model_state'])
+model, likelihood = load_model(config, model_dump, train_x, train_y)
 ```
 
 ### Saving the model in TorchScript format
@@ -144,4 +163,7 @@ pred, pred_var = model(x)
 ### Custom models
 Custom models can be added in the `gpytorchwrapper/plugins` directory.  
 The module's name of the module containing the custom model must start with `model_`
+
+# References
+[1] Bartók, A. P.; Csányi, G. Gaussian Approximation Potentials: A Brief Tutorial Introduction. International Journal of Quantum Chemistry 2015, 115 (16), 1051–1057. https://doi.org/10.1002/qua.24927.
 

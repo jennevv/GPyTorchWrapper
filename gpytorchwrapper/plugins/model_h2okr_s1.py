@@ -1,4 +1,4 @@
-from gpytorch import kernels, means, models, distributions, constraints
+from gpytorch import kernels, means, models, distributions
 
 from gpytorchwrapper.src.kernels.linearxmatern_kernel_perminv import (
     LinearxMaternKernelPermInv,
@@ -14,7 +14,7 @@ class H2OKrS1(models.ExactGP, GPyTorchModel):
         idx_equiv_atoms = [[1, 2]]
         dims = [2, 4, 5]
 
-        l_constraint = constraints.GreaterThan(0.075)
+        #l_constraint = constraints.GreaterThan(0.075)
 
         self.mean_module = means.ConstantMean()
         self.covar_module = kernels.ScaleKernel(

@@ -47,7 +47,7 @@ def test_wrong_type_file(sample_data, data_reader):
     sample_data.to_csv(tmp_file, index=False)
 
     with pytest.raises(ImportError):
-        data = data_reader.read_data(tmp_file, "pickle")
+        data_reader.read_data(tmp_file, "pickle")
 
     tmp_file.unlink()
 
@@ -55,7 +55,7 @@ def test_wrong_type_file(sample_data, data_reader):
     dict = {"processed_dataset": sample_data}
     joblib.dump(dict, tmp_file)
     with pytest.raises(ImportError):
-        data = data_reader.read_data(tmp_file, "csv")
+        data_reader.read_data(tmp_file, "csv")
 
     tmp_file.unlink()
 
@@ -73,6 +73,6 @@ def test_not_dataframe_in_pickle(sample_data, data_reader):
     joblib.dump(dict, tmp_file)
 
     with pytest.raises(NotImplementedError):
-        data = data_reader._read_pickle(tmp_file)
+        data_reader._read_pickle(tmp_file)
 
     tmp_file.unlink()

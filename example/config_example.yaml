@@ -1,11 +1,11 @@
 data_conf:
-  num_inputs: 3
+  num_inputs: 2
   num_outputs: 1
   output_index: 0
 
 transform_conf:
   transform_input:
-    transform_data: true
+    transform_data: false
     transformer_class: PowerTransformer
     transformer_options:
       method: yeo-johnson
@@ -18,8 +18,11 @@ transform_conf:
     columns: null
 
 training_conf:
-  model_class: SingleGPRBF
-  likelihood_class: GaussianLikelihood
+  model:
+    model_class: SingleGPRBF
+  likelihood:  
+    likelihood_class: GaussianLikelihood
+    likelihood_options:
   learning_iterations: 100
   botorch: false
   debug: True

@@ -29,7 +29,7 @@ def test_get_transformer():
     transformer = get_transformer(transformer_conf)
     assert isinstance(transformer, sklearn.preprocessing.PowerTransformer)
     assert transformer.method == "yeo-johnson"
-    assert transformer.standardize == True
+    assert transformer.standardize is True
 
     # Test with StandardScaler and no options
     transformer_conf = TransformerConf(
