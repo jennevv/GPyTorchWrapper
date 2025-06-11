@@ -10,16 +10,21 @@ def read_yaml(input_path: pathlib.Path | str) -> Config:
     Parameters
     -----------
     input_path : pathlib.Path
-            Path to the input file
+        Path to the input file
 
     Returns
     --------
     input_dict : Config
-            Dictionary containing the specifications
+        Dictionary containing the specifications
 
     Raises
     ------
-
+    TypeError
+        If the input_path variable is not of Path type
+    FileNotFoundError
+        If the file does not exist
+    NotImplementedError
+        If the file structure of the YAML file is incorrect
     """
     if isinstance(input_path, str):
         input_path = pathlib.Path(input_path)
