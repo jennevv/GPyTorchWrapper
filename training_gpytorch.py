@@ -17,17 +17,21 @@ from gpytorchwrapper.src.models.model_save import save_model
 from gpytorchwrapper.src.utils import metadata_dict, dataframe_to_tensor, Timer
 
 from dataclasses import dataclass
+
 __author__ = "Jenne Van Veerdeghem"
 __version__ = "0.0.1"
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
+training_timer = Timer("training")
+
 torch.set_default_dtype(torch.float64)
 
 # Needed for training on HPC cluster
 if platform == "linux":
     pathlib.WindowsPath = pathlib.PosixPath
+
 
 @dataclass
 class Arguments:
@@ -48,6 +52,43 @@ class Arguments:
 
 
 def parse_args():
+    """
+    Parse command-line arguments for GPR training script.
+
+    Parses command-line arguments required for training a Gaussian Process
+    Regressor using GPytorch. Handles input data file, configuration file,
+    output specifications, and optional test set.
+
+    Returns
+    -------
+    argparse.Namespace
+        Parsed command-line arguments with the following attributes:
+        - input : pathlib.Path
+            Path to file containing the training data
+        - file_type : str
+            Format of the data file ('csv' or 'pickle')
+        - config : pathlib.Path
+            Path to configuration file containing script options
+        - output : str
+            Name of the output file for saving model and metadata
+        - directory : pathlib.Path
+            Output directory path (created if it doesn't exist)
+        - test_set : pathlib.Path or None
+            Path to test data file, or None if not provided
+
+    Notes
+    -----
+    The function automatically creates the output directory if it doesn't exist.
+    The test_set argument is incompatible with cross-validation mode specified
+    in the configuration file.
+
+    Examples
+    --------
+    >>> args = parse_args()
+    >>> print(args.input)
+    PosixPath('/path/to/data.csv')
+    """
+
     parser = argparse.ArgumentParser(
         prog="GPR Training",
         description="Train a Gaussian Process Regressor using GPytorch.",
@@ -107,8 +148,78 @@ def parse_args():
 
     return args
 
+
 def main(args=None):
-    timer = Timer(logger)
+    """
+    Main training pipeline.
+
+    Executes the complete GPR training workflow including data loading,
+    preprocessing, model training, evaluation, and saving. Can be run
+    either from command line or programmatically with provided arguments.
+
+    Parameters
+    ----------
+    args : dict or None, optional
+        Dictionary containing training arguments. If None, arguments are
+        parsed from command line. Expected keys match those returned by
+        parse_args():
+        - input : str or Path, path to training data file
+        - file_type : str, data file format ('csv' or 'pickle')
+        - config : str or Path, path to configuration file
+        - output : str, output filename for model
+        - directory : str or Path, output directory
+        - test_set : str or Path or None, path to test data file
+
+    Returns
+    -------
+    None
+        Function performs training and saves results to disk
+
+    Raises
+    ------
+    FileNotFoundError
+        If input data file or configuration file cannot be found
+    ValueError
+        If file_type is not 'csv' or 'pickle'
+    torch.cuda.OutOfMemoryError
+        If GPU memory is insufficient for training
+
+    Notes
+    -----
+    The function performs the following workflow:
+    1. Load and validate input data
+    2. Parse configuration settings
+    3. Split data into input/output features
+    4. Apply data transformations using scikit-learn transformers if requested
+    5. Train GPR model using GPytorch
+    6. Evaluate model performance (RMSE, correlation)
+    7. Save trained model with metadata
+
+    Training uses float64 precision by default.
+
+    Examples
+    --------
+    Command line usage:
+    >>> main()  # Uses command line arguments
+
+    Programmatic usage:
+    >>> args = {
+    ...     'input': 'data.csv',
+    ...     'file_type': 'csv',
+    ...     'config': 'config.yaml',
+    ...     'output': 'model.pth',
+    ...     'directory': 'results/',
+    ...     'test_set': None
+    ... }
+    >>> main(args)
+
+    See Also
+    --------
+    parse_args : Parse command line arguments
+    DataReader.read_data : Load data from file
+    train_model : Train GPR model
+    evaluate_model : Evaluate model performance
+    """
 
     if args is None:
         args = parse_args()
@@ -159,13 +270,11 @@ def main(args=None):
     if test_x is not None:
         test_x, test_y = map(dataframe_to_tensor, [test_x, test_y])
 
-    timer.set_init_time()
+    training_timer.set_init_time()
     # Model training
-    model, likelihood, _ = train_model(
-        train_x, train_y, training_conf, test_x, test_y
-    )
-    timer.set_final_time()
-    timer.log_timings(step_name="training")
+    model, likelihood, _ = train_model(train_x, train_y, training_conf, test_x, test_y)
+    training_timer.set_final_time()
+    training_timer.log_timings()
 
     # Evaluate the model on the training and test sets
     train_rmse, test_rmse, test_corr = evaluate_model(
