@@ -4,12 +4,18 @@ import sklearn
 import torch
 
 import gpytorchwrapper.src.models.gp_models as model_module
-from gpytorchwrapper.src.config.config_classes import TransformerConf, TrainingConf, OptimizerConf, ModelConf, \
-    LikelihoodConf
+from gpytorchwrapper.src.config.config_classes import (
+    TransformerConf,
+    TrainingConf,
+    OptimizerConf,
+    ModelConf,
+    LikelihoodConf,
+)
 from gpytorchwrapper.src.config.model_factory import (
     get_transformer,
     get_likelihood,
-    get_model, get_optimizer,
+    get_model,
+    get_optimizer,
 )
 
 
@@ -47,12 +53,8 @@ def test_get_transformer():
 def test_get_likelihood():
     # Test with GaussianLikelihood
     training_conf = TrainingConf(
-        model=ModelConf(
-            model_class="TestModel"
-        ),
-        likelihood=LikelihoodConf(
-            "GaussianLikelihood"
-        ),
+        model=ModelConf(model_class="TestModel"),
+        likelihood=LikelihoodConf("GaussianLikelihood"),
         learning_iterations=100,
     )
     likelihood = get_likelihood(training_conf.likelihood)
@@ -60,12 +62,8 @@ def test_get_likelihood():
 
     # Test with MultitaskGaussianLikelihood
     training_conf = TrainingConf(
-        model=ModelConf(
-            model_class="TestMultitaskGPModel"
-        ),
-        likelihood=LikelihoodConf(
-            "MultitaskGaussianLikelihood"
-        ),
+        model=ModelConf(model_class="TestMultitaskGPModel"),
+        likelihood=LikelihoodConf("MultitaskGaussianLikelihood"),
         learning_iterations=100,
     )
     likelihood = get_likelihood(training_conf.likelihood)
@@ -73,12 +71,8 @@ def test_get_likelihood():
 
     # Test with non-existent likelihood
     training_conf = TrainingConf(
-        model=ModelConf(
-            model_class="TestModel"
-        ),
-        likelihood=LikelihoodConf(
-            "NonexistentLikelihood"
-        ),
+        model=ModelConf(model_class="TestModel"),
+        likelihood=LikelihoodConf("NonexistentLikelihood"),
         learning_iterations=100,
     )
     with pytest.raises(AttributeError):
@@ -87,39 +81,28 @@ def test_get_likelihood():
 
 def test_get_model():
     training_conf = TrainingConf(
-        model=ModelConf(
-            model_class="TestModel"
-        ),
-        likelihood=LikelihoodConf(
-            "GaussianLikelihood"
-        ),
-        learning_iterations=100
+        model=ModelConf(model_class="TestModel"),
+        likelihood=LikelihoodConf("GaussianLikelihood"),
+        learning_iterations=100,
     )
     model_class = get_model(training_conf.model)
     assert model_class == model_module.TestModel
 
     # Test with non-existent model
     training_conf = TrainingConf(
-        model=ModelConf(
-            model_class="NonexistentModel"
-        ),
-        likelihood=LikelihoodConf(
-            "GaussianLikelihood"
-        ),
+        model=ModelConf(model_class="NonexistentModel"),
+        likelihood=LikelihoodConf("GaussianLikelihood"),
         learning_iterations=100,
     )
 
     with pytest.raises(NotImplementedError):
         get_model(training_conf.model)
 
+
 def test_get_optimizer():
     training_conf = TrainingConf(
-        model=ModelConf(
-            model_class="TestModel"
-        ),
-        likelihood=LikelihoodConf(
-            "GaussianLikelihood"
-        ),
+        model=ModelConf(model_class="TestModel"),
+        likelihood=LikelihoodConf("GaussianLikelihood"),
         learning_iterations=100,
         optimizer=OptimizerConf(
             optimizer_class="Adam",
@@ -131,12 +114,8 @@ def test_get_optimizer():
 
     # Test with non-existent optimizer
     training_conf = TrainingConf(
-        model=ModelConf(
-            model_class="TestModel"
-        ),
-        likelihood=LikelihoodConf(
-            "GaussianLikelihood"
-        ),
+        model=ModelConf(model_class="TestModel"),
+        likelihood=LikelihoodConf("GaussianLikelihood"),
         learning_iterations=100,
         optimizer=OptimizerConf(
             optimizer_class="NonExistentOptimizer",

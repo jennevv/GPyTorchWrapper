@@ -1,6 +1,9 @@
 from gpytorch import kernels, means, models, distributions
 
-from gpytorchwrapper.src.kernels import PolyxMaternKernelPermInv, LinearxMaternKernelPermInv
+from gpytorchwrapper.src.kernels import (
+    PolyxMaternKernelPermInv,
+    LinearxMaternKernelPermInv,
+)
 from botorch.models.gpytorch import GPyTorchModel
 
 
@@ -15,8 +18,8 @@ class H2OKrS0(models.ExactGP, GPyTorchModel):
         # l_constraint = constraints.GreaterThan(0.075)
 
         self.mean_module = means.ConstantMean()
-        self.covar_module = kernels.ScaleKernel(PolyxMaternKernelPermInv
-            (
+        self.covar_module = kernels.ScaleKernel(
+            PolyxMaternKernelPermInv(
                 n_atoms=n_atoms,
                 idx_equiv_atoms=idx_equiv_atoms,
                 select_dims=dims,

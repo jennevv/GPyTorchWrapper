@@ -145,4 +145,3 @@ def generate_dist_permutations(
     dist_permutations = generate_permutations(grouped_distance_idx)
 
     return dist_permutations
-
