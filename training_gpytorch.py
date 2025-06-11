@@ -14,7 +14,7 @@ from gpytorchwrapper.src.data.data_transform import transform
 from gpytorchwrapper.src.models.model_train import train_model
 from gpytorchwrapper.src.models.model_evaluate import evaluate_model
 from gpytorchwrapper.src.models.model_save import save_model
-from gpytorchwrapper.src.utils import metadata_dict, dataframe_to_tensor
+from gpytorchwrapper.src.utils import metadata_dict, dataframe_to_tensor, Timer
 
 from dataclasses import dataclass
 __author__ = "Jenne Van Veerdeghem"
@@ -107,29 +107,8 @@ def parse_args():
 
     return args
 
-class Timer:
-    def __init__(self):
-        self.t1 = (0., 0.)
-        self.t2 = (0., 0.)
-    @staticmethod
-    def _time() -> tuple[float, float]:
-        return time.perf_counter(), time.process_time()
-    def set_init_time(self):
-        self.t1 = self._time()
-    def set_final_time(self):
-        self.t2 = self._time()
-    def real_time(self):
-        return self.t2[0] - self.t1[0]
-    def cpu_time(self):
-        return self.t2[1] - self.t1[1]
-    def log_timings(self, step_name: str):
-        logger.info(f"------------------------------------------\nTIMINGS FOR {step_name.upper()}")
-        logger.info(f"Real time: {self.real_time():.2f} seconds")
-        logger.info(f"CPU time: {self.cpu_time():.2f} seconds")
-        logger.info("------------------------------------------\n")
-
 def main(args=None):
-    timer = Timer()
+    timer = Timer(logger)
 
     if args is None:
         args = parse_args()
