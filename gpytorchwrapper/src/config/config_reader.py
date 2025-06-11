@@ -9,13 +9,13 @@ def read_yaml(input_path: pathlib.Path | str) -> Config:
 
     Parameters
     -----------
-    input_path : pathlib.Path
+    input_path : pathlib.Path or str
         Path to the input file
 
     Returns
     --------
     input_dict : Config
-        Dictionary containing the specifications
+        Dictionary containing the specifications for running the program
 
     Raises
     ------
@@ -40,7 +40,7 @@ def read_yaml(input_path: pathlib.Path | str) -> Config:
 
     try:
         config = create_config(input_dict)
-    except:
-        raise NotImplementedError("Incorrect YAML file structure.")
+    except Exception as e:
+        raise NotImplementedError(f"Incorrect YAML file structure. Missing field: {e}.")
 
     return config

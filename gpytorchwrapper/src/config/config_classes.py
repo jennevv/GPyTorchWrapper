@@ -22,20 +22,24 @@ class TransformConf:
     transform_input: TransformerConf = field(default_factory=TransformerConf)
     transform_output: TransformerConf = field(default_factory=TransformerConf)
 
+
 @dataclass
 class OptimizerConf:
     optimizer_class: str = "Adam"
-    optimizer_options: Optional[dict] = field(default_factory= lambda: {"lr": 0.1})
+    optimizer_options: Optional[dict] = field(default_factory=lambda: {"lr": 0.1})
+
 
 @dataclass
 class LikelihoodConf:
     likelihood_class: str = "GaussianLikelihood"
-    likelihood_options: Optional[dict] = field(default_factory= dict)
+    likelihood_options: Optional[dict] = field(default_factory=dict)
+
 
 @dataclass
 class ModelConf:
     model_class: str
-    model_options: Optional[dict] = field(default_factory= dict)
+    model_options: Optional[dict] = field(default_factory=dict)
+
 
 @dataclass
 class TrainingConf:
@@ -133,8 +137,12 @@ def create_config(config_dict: dict) -> Config:
                 transformer_options=config_dict["transform_conf"][
                     "transform_input"
                 ].get("transformer_options", {}),
-                columns=config_dict["transform_conf"]["transform_input"].get("columns", None),
-            ) if config_dict["transform_conf"].get("transform_input", False) else TransformerConf(),
+                columns=config_dict["transform_conf"]["transform_input"].get(
+                    "columns", None
+                ),
+            )
+            if config_dict["transform_conf"].get("transform_input", False)
+            else TransformerConf(),
             transform_output=TransformerConf(
                 transform_data=config_dict["transform_conf"]["transform_output"].get(
                     "transform_data", False
@@ -148,7 +156,9 @@ def create_config(config_dict: dict) -> Config:
                 columns=config_dict["transform_conf"]["transform_output"].get(
                     "columns", []
                 ),
-            ) if config_dict["transform_conf"].get("transform_output", False) else TransformerConf()
+            )
+            if config_dict["transform_conf"].get("transform_output", False)
+            else TransformerConf(),
         )
 
     if config_dict.get("testing_conf", None) is None:
@@ -176,7 +186,7 @@ def create_config(config_dict: dict) -> Config:
                 model_class=config_dict["training_conf"]["model"]["model_class"],
                 model_options=config_dict["training_conf"]["model"].get(
                     "model_options", {}
-                )
+                ),
             ),
             likelihood=LikelihoodConf(
                 likelihood_class=config_dict["training_conf"]["likelihood"].get(
@@ -184,7 +194,9 @@ def create_config(config_dict: dict) -> Config:
                 ),
                 likelihood_options=config_dict["training_conf"]["likelihood"].get(
                     "likelihood_options", {}
-                ) if config_dict["training_conf"].get("likelihood", False) else LikelihoodConf()
+                )
+                if config_dict["training_conf"].get("likelihood", False)
+                else LikelihoodConf(),
             ),
             learning_iterations=config_dict["training_conf"].get(
                 "learning_iterations", 100
@@ -197,11 +209,12 @@ def create_config(config_dict: dict) -> Config:
                 ),
                 optimizer_options=config_dict["training_conf"]["optimizer"].get(
                     "optimizer_options", {"lr": 0.1}
-                )
-            ) if config_dict["training_conf"].get("optimizer", False) else OptimizerConf()
+                ),
+            )
+            if config_dict["training_conf"].get("optimizer", False)
+            else OptimizerConf(),
         ),
-        testing_conf=testing_conf
+        testing_conf=testing_conf,
     )
 
     return config
-
