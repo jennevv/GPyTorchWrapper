@@ -4,7 +4,6 @@ from typing import Optional
 import torch
 from gpytorch.constraints import Interval, Positive
 from gpytorch.priors import Prior
-from torch import Tensor
 
 from gpytorchwrapper.src.kernels.perminv_kernel import PermInvKernel
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_dist_torch
@@ -28,6 +27,50 @@ class PolyxMaternKernelPermInv(PermInvKernel):
         variance_constraint: Optional[Interval] = None,
         **kwargs,
     ):
+        """
+        Initialize the PolyxMaternKernelPermInv kernel, the product kernel of a polynomial kernel and a Matern kernel.
+        The polynomial kernel reduces to a linear kernel with an offset if `power = 1`.
+
+        Parameters
+        ----------
+        n_atoms : int
+            Number of atoms in the molecule or structure.
+        idx_equiv_atoms : list of list of int
+            Groups of indices indicating equivalent atoms under permutations.
+        power : int
+            The exponent used in the polynomial kernel component.
+        select_dims : list of int, optional
+            Dimensions to select from the distance representation.
+        nu : float, default=2.5
+            Smoothness parameter of the Matérn kernel. Must be one of {0.5, 1.5, 2.5}.
+        ard : bool, default=False
+            If True, use automatic relevance determination (ARD).
+        representation : str, default="invdist"
+            The type of representation to use for distances, choose from:
+                `invdist` for inverse distances
+                `morse` for features exp(-r_ij)
+        offset_prior : gpytorch.priors.Prior, optional
+            Prior distribution for the offset parameter.
+        offset_constraint : gpytorch.constraints.Interval, optional
+            Constraint for the offset parameter.
+        variance_prior : gpytorch.priors.Prior, optional
+            Prior distribution for the variance parameter.
+        variance_constraint : gpytorch.constraints.Interval, optional
+            Constraint for the variance parameter.
+        **kwargs
+            Additional keyword arguments for the base class.
+
+        Raises
+        ------
+        NotImplementedError
+            If `nu` is not one of {0.5, 1.5, 2.5}.
+        NotImplementedError
+            If `active_dims` is provided in `kwargs`, which is not supported.
+        RuntimeError
+            If `power` is a tensor with more than one element.
+        TypeError
+            If `offset_prior` or `variance_prior` is not an instance of `gpytorch.priors.Prior`.
+        """
         super().__init__(
             n_atoms=n_atoms,
             idx_equiv_atoms=idx_equiv_atoms,
@@ -85,7 +128,13 @@ class PolyxMaternKernelPermInv(PermInvKernel):
 
         self.register_parameter(
             name="raw_variance",
-            parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1, 1 if self.ard_num_dims is None else self.ard_num_dims)),
+            parameter=torch.nn.Parameter(
+                torch.zeros(
+                    *self.batch_shape,
+                    1,
+                    1 if self.ard_num_dims is None else self.ard_num_dims,
+                )
+            ),
         )
         if variance_prior is not None:
             if not isinstance(variance_prior, Prior):

@@ -3,7 +3,6 @@ from typing import Optional
 
 import gpytorch.settings
 import torch
-from torch import Tensor
 
 from gpytorchwrapper.src.kernels.perminv_kernel import PermInvKernel
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_dist_torch
@@ -22,6 +21,36 @@ class MaternKernelPermInv(PermInvKernel):
         representation: str = "invdist",
         **kwargs,
     ):
+        """
+        Initialize the MaternKernelPermInv kernel.
+
+        Parameters
+        ----------
+        n_atoms : int
+            Number of atoms in the molecule or structure.
+        idx_equiv_atoms : list of list of int
+            Groups of indices indicating equivalent atoms under permutations.
+        select_dims : list of int, optional
+            Dimensions to select from the distance representation.
+        nu : float, default=2.5
+            Smoothness parameter of the Matérn kernel. Must be one of {0.5, 1.5, 2.5}.
+        ard : bool, default=False
+            If True, use automatic relevance determination (ARD).
+        representation : str, default="invdist"
+            The type of representation to use for distances, choose from:
+                `invdist` for inverse distances
+                `morse` for features exp(-r_ij)
+        **kwargs
+            Additional keyword arguments for the base class.
+
+        Raises
+        ------
+        NotImplementedError
+            If `nu` is not one of {0.5, 1.5, 2.5}.
+        NotImplementedError
+            If `active_dims` is provided in `kwargs`, which is not supported.
+        """
+
         super().__init__(
             n_atoms=n_atoms,
             idx_equiv_atoms=idx_equiv_atoms,
@@ -108,9 +137,12 @@ class Model(gpytorch.models.ExactGP):
     def __init__(self, train_x, train_y, likelihood):
         super().__init__(train_x, train_y, likelihood)
         self.mean_module = gpytorch.means.ZeroMean()
-        self.covar_module = gpytorch.kernels.ScaleKernel(MaternKernelPermInv(n_atoms=3, idx_equiv_atoms=[[0,1]], ard=True))
-    def forward(self, x):
-       mean_x = self.mean_module(x)
-       covar_x = self.covar_module(x)
+        self.covar_module = gpytorch.kernels.ScaleKernel(
+            MaternKernelPermInv(n_atoms=3, idx_equiv_atoms=[[0, 1]], ard=True)
+        )
 
-       return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+    def forward(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+
+        return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)

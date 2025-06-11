@@ -5,7 +5,6 @@ import torch
 from gpytorch.constraints import Interval, Positive
 from gpytorch.priors import Prior
 from linear_operator.operators import MatmulLinearOperator, RootLinearOperator
-from torch import Tensor
 
 from gpytorchwrapper.src.kernels.perminv_kernel import PermInvKernel
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_dist_torch
@@ -26,6 +25,42 @@ class LinearxMaternKernelPermInv(PermInvKernel):
         variance_constraint: Optional[Interval] = None,
         **kwargs,
     ):
+        """
+        Initialize the LinearxMaternKernelPermInv kernel, a product kernel of a linear kernel and a Matern kernel.
+
+        Parameters
+        ----------
+        n_atoms : int
+            Number of atoms in the molecule or structure.
+        idx_equiv_atoms : list of list of int
+            Groups of indices indicating equivalent atoms under permutations.
+        select_dims : list of int, optional
+            Dimensions to select from the distance representation.
+        nu : float, default=2.5
+            Smoothness parameter of the Matérn kernel. Must be one of {0.5, 1.5, 2.5}.
+        ard : bool, default=False
+            If True, use automatic relevance determination (ARD).
+        representation : str, default="invdist"
+            The type of representation to use for distances, choose from:
+                `invdist` for inverse distances
+                `morse` for features exp(-r_ij)
+        variance_prior : gpytorch.priors.Prior, optional
+            Prior distribution for the variance parameter.
+        variance_constraint : gpytorch.constraints.Interval, optional
+            Constraint for the variance parameter.
+        **kwargs
+            Additional keyword arguments for the base class.
+
+
+        Raises
+        ------
+        ValueError
+            If `nu` is not one of {0.5, 1.5, 2.5}.
+        NotImplementedError
+            If `active_dims` is provided in `kwargs`, which is not supported.
+        TypeError
+            If `variance_prior` is not an instance of `gpytorch.priors.Prior`.
+        """
         super().__init__(
             n_atoms=n_atoms,
             idx_equiv_atoms=idx_equiv_atoms,
@@ -35,7 +70,7 @@ class LinearxMaternKernelPermInv(PermInvKernel):
         )
 
         if nu not in {0.5, 1.5, 2.5}:
-            raise NotImplementedError(
+            raise ValueError(
                 "Please select one of the following nu values: {0.5, 1.5, 2.5}"
             )
 
@@ -49,7 +84,13 @@ class LinearxMaternKernelPermInv(PermInvKernel):
 
         self.register_parameter(
             name="raw_variance",
-            parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1, 1 if self.ard_num_dims is None else self.ard_num_dims)),
+            parameter=torch.nn.Parameter(
+                torch.zeros(
+                    *self.batch_shape,
+                    1,
+                    1 if self.ard_num_dims is None else self.ard_num_dims,
+                )
+            ),
         )
         if variance_prior is not None:
             if not isinstance(variance_prior, Prior):
@@ -109,7 +150,7 @@ class LinearxMaternKernelPermInv(PermInvKernel):
                 (math.sqrt(5) * distance).add(1).add(5.0 / 3.0 * distance**2)
             )
         else:
-            raise NotImplementedError(
+            raise ValueError(
                 "Please select one of the following nu values: {0.5, 1.5, 2.5}"
             )
 

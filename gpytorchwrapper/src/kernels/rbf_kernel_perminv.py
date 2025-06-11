@@ -2,7 +2,6 @@ from typing import Optional
 
 import torch
 from gpytorch.kernels.rbf_kernel import postprocess_rbf
-from torch import Tensor
 
 from gpytorchwrapper.src.kernels.perminv_kernel import PermInvKernel
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_dist_torch
@@ -20,6 +19,31 @@ class RBFKernelPermInv(PermInvKernel):
         representation: str = "invdist",
         **kwargs,
     ):
+        """
+        Initialize the RBFKernelPermInv kernel.
+
+        Parameters
+        ----------
+        n_atoms : int
+            Number of atoms in the molecule or structure.
+        idx_equiv_atoms : list of list of int
+            Groups of indices indicating equivalent atoms under permutations.
+        select_dims : list of int, optional
+            Dimensions to select from the distance representation.
+        ard : bool, default=False
+            If True, use automatic relevance determination (ARD).
+        representation : str, default="invdist"
+            The type of representation to use for distances, choose from:
+                `invdist` for inverse distances
+                `morse` for features exp(-r_ij)
+        **kwargs
+            Additional keyword arguments for the base class.
+
+        Raises
+        ------
+        NotImplementedError
+            If `active_dims` is provided in `kwargs`, which is not supported.
+        """
         super().__init__(
             n_atoms=n_atoms,
             idx_equiv_atoms=idx_equiv_atoms,

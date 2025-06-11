@@ -5,7 +5,6 @@ from gpytorch.constraints import Interval, Positive
 from gpytorch.kernels.rbf_kernel import postprocess_rbf
 from gpytorch.priors import Prior
 from linear_operator.operators import MatmulLinearOperator, RootLinearOperator
-from torch import Tensor
 
 from gpytorchwrapper.src.kernels.perminv_kernel import PermInvKernel
 from gpytorchwrapper.src.utils.input_transformer import xyz_to_dist_torch
@@ -25,12 +24,43 @@ class LinearxRBFKernelPermInv(PermInvKernel):
         variance_constraint: Optional[Interval] = None,
         **kwargs,
     ):
+        """
+        Initialize the LinearxRBFKernelPermInv kernel, a product kernel of a linear kernel and an RBF kernel.
+
+        Parameters
+        ----------
+        n_atoms : int
+            Number of atoms in the molecule or structure.
+        idx_equiv_atoms : list of list of int
+            Groups of indices indicating equivalent atoms under permutations.
+        select_dims : list of int, optional
+            Dimensions to select from the distance representation.
+        ard : bool, default=False
+            If True, use automatic relevance determination (ARD).
+        representation : str, default="invdist"
+            The type of representation to use for distances, choose from:
+                `invdist` for inverse distances
+                `morse` for features exp(-r_ij)
+        variance_prior : gpytorch.priors.Prior, optional
+            Prior distribution for the variance parameter.
+        variance_constraint : gpytorch.constraints.Interval, optional
+            Constraint for the variance parameter.
+        **kwargs
+            Additional keyword arguments for the base class.
+
+        Raises
+        ------
+        NotImplementedError
+            If `active_dims` is provided in `kwargs`, which is not supported.
+        TypeError
+            If `variance_prior` is not an instance of `gpytorch.priors.Prior`.
+        """
         super().__init__(
             n_atoms=n_atoms,
             idx_equiv_atoms=idx_equiv_atoms,
             select_dims=select_dims,
             ard=ard,
-            **kwargs
+            **kwargs,
         )
 
         if self.active_dims is not None:
@@ -43,7 +73,13 @@ class LinearxRBFKernelPermInv(PermInvKernel):
 
         self.register_parameter(
             name="raw_variance",
-            parameter=torch.nn.Parameter(torch.zeros(*self.batch_shape, 1, 1 if self.ard_num_dims is None else self.ard_num_dims)),
+            parameter=torch.nn.Parameter(
+                torch.zeros(
+                    *self.batch_shape,
+                    1,
+                    1 if self.ard_num_dims is None else self.ard_num_dims,
+                )
+            ),
         )
         if variance_prior is not None:
             if not isinstance(variance_prior, Prior):
