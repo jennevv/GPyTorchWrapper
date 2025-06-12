@@ -1,3 +1,5 @@
+import sys
+from pathlib import Path
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -13,8 +15,6 @@ author = 'Jenne Van Veerdeghem'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-import sys
-from pathlib import Path
 sys.path.insert(0,str(Path('../..').resolve()))
 
 extensions = [
