@@ -27,6 +27,7 @@ def parse_args():
     -------
     argparse.Namespace
         Parsed command-line arguments with the following attributes:
+
         - input : pathlib.Path
             Path to the input PyTorch model (.pth file)
         - output : str
@@ -155,6 +156,7 @@ def trace_model(model, len_training_data, transformer, num_inputs):
     Notes
     -----
     The tracing process uses several GPyTorch-specific performance enhancing settings:
+
     - fast_pred_var(): Enables LOVE method for efficient predictive variance
     - fast_pred_samples(): Enables LOVE method for predictive samples
     - trace_mode(): Disables GPyTorch features incompatible with tracing

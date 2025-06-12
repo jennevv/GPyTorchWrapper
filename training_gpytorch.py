@@ -62,6 +62,7 @@ def parse_args():
     -------
     argparse.Namespace
         Parsed command-line arguments with the following attributes:
+
         - input : pathlib.Path
             Path to file containing the training data
         - file_type : str
@@ -162,12 +163,19 @@ def main(args=None):
         Dictionary containing training arguments. If None, arguments are
         parsed from command line. Expected keys match those returned by
         parse_args():
-        - input : str or Path, path to training data file
-        - file_type : str, data file format ('csv' or 'pickle')
-        - config : str or Path, path to configuration file
-        - output : str, output filename for model
-        - directory : str or Path, output directory
-        - test_set : str or Path or None, path to test data file
+
+        - input : str or Path 
+              path to training data file
+        - file_type : str
+              data file format ('csv' or 'pickle')
+        - config : str or Path
+              path to configuration file
+        - output : str
+              output filename for model
+        - directory : str or Path
+              output directory
+        - test_set : str or Path or None
+              path to test data file
 
     Returns
     -------
@@ -180,19 +188,18 @@ def main(args=None):
         If input data file or configuration file cannot be found
     ValueError
         If file_type is not 'csv' or 'pickle'
-    torch.cuda.OutOfMemoryError
-        If GPU memory is insufficient for training
 
     Notes
     -----
     The function performs the following workflow:
-    1. Load and validate input data
-    2. Parse configuration settings
-    3. Split data into input/output features
-    4. Apply data transformations using scikit-learn transformers if requested
-    5. Train GPR model using GPytorch
-    6. Evaluate model performance (RMSE, correlation)
-    7. Save trained model with metadata
+
+    #. Load and validate input data
+    #. Parse configuration settings
+    #. Split data into input/output features
+    #. Apply data transformations using scikit-learn transformers if requested
+    #. Train GPR model using GPytorch
+    #. Evaluate model performance (RMSE, correlation)
+    #. Save trained model with metadata
 
     Training uses float64 precision by default.
 
