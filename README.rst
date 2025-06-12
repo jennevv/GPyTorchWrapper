@@ -1,7 +1,7 @@
 GPyTorchWrapper
 ===============
 
-**GPyTorchWrapper** is a lightweight Python package designed to streamline the training of Gaussian Process (GP) models using `GPyTorch <https://gpytorch.ai/>`. While it was developed for modeling potential energy surfaces (PES) in small molecular systems using custom permutationally invariant kernels (based on Bartók & Csányi [1]), it is general enough for other regression tasks.
+**GPyTorchWrapper** is a lightweight Python package designed to streamline the training of Gaussian Process (GP) models using `GPyTorch <https://gpytorch.ai/>`_. While it was developed for modeling potential energy surfaces (PES) in small molecular systems using custom permutationally invariant kernels (based on Bartók & Csányi [1]), it is general enough for other regression tasks.
 
 Features
 --------
