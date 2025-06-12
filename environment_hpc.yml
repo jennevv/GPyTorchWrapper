@@ -1,4 +1,4 @@
-name: GPyTorchWrapper
+name: gpytorchwrapper
 channels:
   - https://software.repos.intel.com/python/conda
   - conda-forge
