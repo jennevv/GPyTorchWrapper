@@ -1,4 +1,4 @@
 /src.egg-info/
 /notebooks/*
-*/__pycache__/*
+__pycache__/
 /gpytorchwrapper.egg-info/*
