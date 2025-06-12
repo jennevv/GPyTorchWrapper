@@ -7,9 +7,7 @@ Features
 --------
 
 - Modular YAML-based configuration
-- Fully differentiable custom kernels
-- Support for SLURM-based HPC environments
-- Docker-based example training
+- Fully differentiable, permutationally invariant kernels
 - TorchScript export for deployment
 
 Installation
