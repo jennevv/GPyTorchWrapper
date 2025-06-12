@@ -26,6 +26,7 @@ jobs:
         run: |
           conda env update --file environment.yml --name base
           pip install -e . --use-pep517 
+          pip install sphinx sphinx-rtd-theme
       - uses: astral-sh/ruff-action@v3
       - name: Lint code
         run: |
@@ -36,5 +37,14 @@ jobs:
       - name: Test with pytest
         run: |
           pytest .
+      - name: Build docs
+        run: |
+          sphinx-build -b html docs/source/ docs/build/
+      - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/_build/html
       
         
