@@ -7,8 +7,8 @@ Features
 --------
 
 - Modular YAML-based configuration
-- Fully differentiable, permutationally invariant kernels
-- TorchScript export for deployment
+- Fully differentiable, permutationally invariant kernel functions
+- Script for exporting models as TorchScript for deployment
 
 Installation
 ------------
@@ -17,34 +17,40 @@ Set up the environment locally:
 
 .. code-block:: bash
 
-   conda env create -f environment.yml
-   conda activate gpytorchwrapper
-   pip install -e . --use-pep517
-
-For Intel-optimized HPC environments, use `environment_hpc.yml`.
-
-Quickstart
-----------
-
-Run the example in Docker:
+  conda env create -f environment.yml
 
 .. code-block:: bash
 
-   docker build -t gpytorchwrapper .
-   ./run-example-in-docker.sh
+  conda activate gpytorchwrapper
 
-After training, `3d_plot.png` will appear in the working directory.
+.. code-block:: bash
+
+  pip install -e . --use-pep517
+
+For an Intel-optimized HPC environment, use `environment_hpc.yml`.
 
 HPC Support
 -----------
 
 A SLURM-based submission script is available in `bash/sub_gp_training.sh`. Use `gp_training.sh` to configure and launch training jobs with CLI options.
 
+Docker Example
+----------
+
+Run the example in Docker:
+
+.. code-block:: bash
+
+   docker build -t gpytorchwrapper . && ./run-example-in-docker.sh
+
+After training, `3d_plot.png` will appear in the working directory.
+
+
 Documentation
 -------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    usage
    deployment
