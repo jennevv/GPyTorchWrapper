@@ -35,3 +35,53 @@ jobs:
       - name: Test with pytest
         run: |
           pytest .
+          name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+      - name: Add conda to system path
+        run: |
+          echo $CONDA/bin >> $GITHUB_PATH
+      - name: Install dependencies
+        run: |
+          conda env update --file environment.yml --name base
+      - uses: astral-sh/ruff-action@v3
+      - name: Lint code
+        run: |
+          ruff check --fix .
+      - name: format code
+        run: |
+          ruff format .
+      - name: Test with pytest
+        run: |
+          pytest .
+      - name: Build HTML
+        uses: ammaraskar/sphinx-action@master
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-docs
+          path: docs/build/
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/html    
