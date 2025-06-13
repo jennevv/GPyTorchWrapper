@@ -44,8 +44,7 @@ Documentation
 -------------
 
 .. toctree::
-   :maxdepth: 4
-   :caption: Contents
+   :maxdepth: 2
 
    usage
    deployment
