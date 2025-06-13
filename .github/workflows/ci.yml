@@ -2,86 +2,103 @@ name: CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   pull_request:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
-  test:
+  lint-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set up Python 3.11
+
+      - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.11'
-      - name: Add conda to system path
+
+      - name: Add Conda to PATH
+        run: echo $CONDA/bin >> $GITHUB_PATH
+
+      - name: Cache Conda packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.conda/pkgs
+            ~/.conda/envs
+          key: conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+
+      - name: Create Conda environment
         run: |
-          echo $CONDA/bin >> $GITHUB_PATH
-      - name: Install dependencies
+          conda env create --name ci-env --file environment.yml || echo "Env already exists"
+          conda activate ci-env
+
+      - name: Use Conda environment
         run: |
-          conda env update --file environment.yml --name base
+          source activate ci-env
+          which python
+          python --version
+
       - uses: astral-sh/ruff-action@v3
+
       - name: Lint code
         run: |
+          source activate ci-env
           ruff check --fix .
-      - name: format code
+
+      - name: Format code
         run: |
+          source activate ci-env
           ruff format .
-      - name: Test with pytest
+
+      - name: Run tests
         run: |
+          source activate ci-env
           pytest .
-          name: CI
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
-jobs:
-  test:
+  docs:
+    needs: lint-and-test
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
-      - name: Set up Python 3.11
+
+      - name: Set up Python
         uses: actions/setup-python@v3
         with:
           python-version: '3.11'
-      - name: Add conda to system path
+
+      - name: Add Conda to PATH
+        run: echo $CONDA/bin >> $GITHUB_PATH
+
+      - name: Cache Conda packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.conda/pkgs
+            ~/.conda/envs
+          key: conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}
+
+      - name: Create Conda environment
         run: |
-          echo $CONDA/bin >> $GITHUB_PATH
-      - name: Install dependencies
-        run: |
-          conda env update --file environment.yml --name base
-      - uses: astral-sh/ruff-action@v3
-      - name: Lint code
-        run: |
-          ruff check --fix .
-      - name: format code
-        run: |
-          ruff format .
-      - name: Test with pytest
-        run: |
-          pytest .
-      - name: Build HTML
+          conda env create --name ci-env --file environment.yml || echo "Env already exists"
+          conda activate ci-env
+
+      - name: Build HTML with Sphinx
         uses: ammaraskar/sphinx-action@master
-      - name: Upload artifacts
+
+      - name: Upload HTML Docs
         uses: actions/upload-artifact@v4
         with:
           name: html-docs
           path: docs/build/
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+
+      - name: Deploy (main branch only)
         if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/build/html    
+          publish_dir: docs/build/html
