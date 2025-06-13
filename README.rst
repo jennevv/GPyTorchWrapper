@@ -45,7 +45,7 @@ A SLURM-based submission script is available in `bash/sub_gp_training.sh`. Use `
 Documentation
 -------------
 
-Documentation is available on `<https://jennevv.github.io/GPyTorchWrapper/>`
+Documentation is available on `https://jennevv.github.io/GPyTorchWrapper/`
 
 Reference
 ---------
