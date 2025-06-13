@@ -21,9 +21,8 @@ jobs:
           environment-name: ci-env
           cache-environment: true
           cache-downloads: true
-      - name: install package
-        run: | 
-          micromamba activate ci-env && pip install -e . --use-pep517
+      - name: Install local package
+        run: micromamba run -n ci-env pip install -e .
       - uses: astral-sh/ruff-action@v3
 
       - name: Lint code
