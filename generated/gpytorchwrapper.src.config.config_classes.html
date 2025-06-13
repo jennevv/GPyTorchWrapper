@@ -1,0 +1,489 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gpytorchwrapper.src.config.config_classes &mdash; GPyTorchWrapper  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gpytorchwrapper.src.config.config_reader" href="gpytorchwrapper.src.config.config_reader.html" />
+    <link rel="prev" title="gpytorchwrapper.src.config" href="gpytorchwrapper.src.config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GPyTorchWrapper
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_models.html">Custom Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example.html">Example</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="gpytorchwrapper.html">gpytorchwrapper</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gpytorchwrapper.plugins.html">gpytorchwrapper.plugins</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gpytorchwrapper.src.html">gpytorchwrapper.src</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="gpytorchwrapper.src.config.html">gpytorchwrapper.src.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gpytorchwrapper.src.data.html">gpytorchwrapper.src.data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gpytorchwrapper.src.kernels.html">gpytorchwrapper.src.kernels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gpytorchwrapper.src.models.html">gpytorchwrapper.src.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gpytorchwrapper.src.utils.html">gpytorchwrapper.src.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="training_gpytorch.html">training_gpytorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pt2ts.html">pt2ts</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GPyTorchWrapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+          <li class="breadcrumb-item"><a href="gpytorchwrapper.html">gpytorchwrapper</a></li>
+          <li class="breadcrumb-item"><a href="gpytorchwrapper.src.html">gpytorchwrapper.src</a></li>
+          <li class="breadcrumb-item"><a href="gpytorchwrapper.src.config.html">gpytorchwrapper.src.config</a></li>
+      <li class="breadcrumb-item active">gpytorchwrapper.src.config.config_classes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/gpytorchwrapper.src.config.config_classes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gpytorchwrapper.src.config.config_classes">
+<span id="gpytorchwrapper-src-config-config-classes"></span><h1>gpytorchwrapper.src.config.config_classes<a class="headerlink" href="#module-gpytorchwrapper.src.config.config_classes" title="Link to this heading"></a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.create_config" title="gpytorchwrapper.src.config.config_classes.create_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_config</span></code></a>(config_dict)</p></td>
+<td><p>Create a Config object from a nested configuration dictionary.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.Config" title="gpytorchwrapper.src.config.config_classes.Config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code></a>(data_conf, transform_conf, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.DataConf" title="gpytorchwrapper.src.config.config_classes.DataConf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataConf</span></code></a>(num_inputs, num_outputs[, output_index])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.LikelihoodConf" title="gpytorchwrapper.src.config.config_classes.LikelihoodConf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LikelihoodConf</span></code></a>(likelihood_class, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.ModelConf" title="gpytorchwrapper.src.config.config_classes.ModelConf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModelConf</span></code></a>(model_class, model_options)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.OptimizerConf" title="gpytorchwrapper.src.config.config_classes.OptimizerConf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OptimizerConf</span></code></a>(optimizer_class, optimizer_options)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TestingConf" title="gpytorchwrapper.src.config.config_classes.TestingConf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TestingConf</span></code></a>([test, test_size, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TrainingConf" title="gpytorchwrapper.src.config.config_classes.TrainingConf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrainingConf</span></code></a>(model, likelihood, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TransformConf" title="gpytorchwrapper.src.config.config_classes.TransformConf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransformConf</span></code></a>(transform_input, transform_output)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TransformerConf" title="gpytorchwrapper.src.config.config_classes.TransformerConf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TransformerConf</span></code></a>(transform_data, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.Config">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.DataConf" title="gpytorchwrapper.src.config.config_classes.DataConf"><span class="pre">gpytorchwrapper.src.config.config_classes.DataConf</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TransformConf" title="gpytorchwrapper.src.config.config_classes.TransformConf"><span class="pre">gpytorchwrapper.src.config.config_classes.TransformConf</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">training_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TrainingConf" title="gpytorchwrapper.src.config.config_classes.TrainingConf"><span class="pre">gpytorchwrapper.src.config.config_classes.TrainingConf</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">testing_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TestingConf" title="gpytorchwrapper.src.config.config_classes.TestingConf"><span class="pre">gpytorchwrapper.src.config.config_classes.TestingConf</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.Config" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.Config.data_conf">
+<span class="sig-name descname"><span class="pre">data_conf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.DataConf" title="gpytorchwrapper.src.config.config_classes.DataConf"><span class="pre">DataConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.Config.data_conf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.Config.testing_conf">
+<span class="sig-name descname"><span class="pre">testing_conf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TestingConf" title="gpytorchwrapper.src.config.config_classes.TestingConf"><span class="pre">TestingConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.Config.testing_conf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.Config.training_conf">
+<span class="sig-name descname"><span class="pre">training_conf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TrainingConf" title="gpytorchwrapper.src.config.config_classes.TrainingConf"><span class="pre">TrainingConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.Config.training_conf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.Config.transform_conf">
+<span class="sig-name descname"><span class="pre">transform_conf</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TransformConf" title="gpytorchwrapper.src.config.config_classes.TransformConf"><span class="pre">TransformConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.Config.transform_conf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.DataConf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">DataConf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">NoneType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#DataConf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.DataConf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.DataConf.num_inputs">
+<span class="sig-name descname"><span class="pre">num_inputs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.DataConf.num_inputs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.DataConf.num_outputs">
+<span class="sig-name descname"><span class="pre">num_outputs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.DataConf.num_outputs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.DataConf.output_index">
+<span class="sig-name descname"><span class="pre">output_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.DataConf.output_index" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.LikelihoodConf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">LikelihoodConf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">likelihood_class:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'GaussianLikelihood'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihood_options:</span> <span class="pre">Optional[dict]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#LikelihoodConf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.LikelihoodConf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.LikelihoodConf.likelihood_class">
+<span class="sig-name descname"><span class="pre">likelihood_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'GaussianLikelihood'</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.LikelihoodConf.likelihood_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.LikelihoodConf.likelihood_options">
+<span class="sig-name descname"><span class="pre">likelihood_options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.LikelihoodConf.likelihood_options" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.ModelConf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">ModelConf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_class:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_options:</span> <span class="pre">Optional[dict]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#ModelConf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.ModelConf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.ModelConf.model_class">
+<span class="sig-name descname"><span class="pre">model_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.ModelConf.model_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.ModelConf.model_options">
+<span class="sig-name descname"><span class="pre">model_options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.ModelConf.model_options" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.OptimizerConf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">OptimizerConf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer_class:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'Adam'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_options:</span> <span class="pre">Optional[dict]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#OptimizerConf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.OptimizerConf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.OptimizerConf.optimizer_class">
+<span class="sig-name descname"><span class="pre">optimizer_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Adam'</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.OptimizerConf.optimizer_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.OptimizerConf.optimizer_options">
+<span class="sig-name descname"><span class="pre">optimizer_options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.OptimizerConf.optimizer_options" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TestingConf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">TestingConf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strat_shuffle_split</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfold_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#TestingConf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TestingConf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TestingConf.kfold">
+<span class="sig-name descname"><span class="pre">kfold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TestingConf.kfold" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TestingConf.kfold_bins">
+<span class="sig-name descname"><span class="pre">kfold_bins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TestingConf.kfold_bins" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TestingConf.strat_shuffle_split">
+<span class="sig-name descname"><span class="pre">strat_shuffle_split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TestingConf.strat_shuffle_split" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TestingConf.test">
+<span class="sig-name descname"><span class="pre">test</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TestingConf.test" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TestingConf.test_size">
+<span class="sig-name descname"><span class="pre">test_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TestingConf.test_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TrainingConf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">TrainingConf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model:</span> <span class="pre">gpytorchwrapper.src.config.config_classes.ModelConf</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihood:</span> <span class="pre">gpytorchwrapper.src.config.config_classes.LikelihoodConf</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_iterations:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">botorch:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug:</span> <span class="pre">Optional[bool]</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">gpytorchwrapper.src.config.config_classes.OptimizerConf</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#TrainingConf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TrainingConf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TrainingConf.botorch">
+<span class="sig-name descname"><span class="pre">botorch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TrainingConf.botorch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TrainingConf.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TrainingConf.debug" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TrainingConf.learning_iterations">
+<span class="sig-name descname"><span class="pre">learning_iterations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TrainingConf.learning_iterations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TrainingConf.likelihood">
+<span class="sig-name descname"><span class="pre">likelihood</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.LikelihoodConf" title="gpytorchwrapper.src.config.config_classes.LikelihoodConf"><span class="pre">LikelihoodConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TrainingConf.likelihood" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TrainingConf.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.ModelConf" title="gpytorchwrapper.src.config.config_classes.ModelConf"><span class="pre">ModelConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TrainingConf.model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TrainingConf.optimizer">
+<span class="sig-name descname"><span class="pre">optimizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.OptimizerConf" title="gpytorchwrapper.src.config.config_classes.OptimizerConf"><span class="pre">OptimizerConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TrainingConf.optimizer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TransformConf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">TransformConf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform_input:</span> <span class="pre">gpytorchwrapper.src.config.config_classes.TransformerConf</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_output:</span> <span class="pre">gpytorchwrapper.src.config.config_classes.TransformerConf</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#TransformConf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TransformConf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TransformConf.transform_input">
+<span class="sig-name descname"><span class="pre">transform_input</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TransformerConf" title="gpytorchwrapper.src.config.config_classes.TransformerConf"><span class="pre">TransformerConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TransformConf.transform_input" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TransformConf.transform_output">
+<span class="sig-name descname"><span class="pre">transform_output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.TransformerConf" title="gpytorchwrapper.src.config.config_classes.TransformerConf"><span class="pre">TransformerConf</span></a></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TransformConf.transform_output" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TransformerConf">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">TransformerConf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transform_data:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_class:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'DefaultTransformer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_options:</span> <span class="pre">Optional[dict]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns:</span> <span class="pre">Optional[list[int]]</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#TransformerConf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TransformerConf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TransformerConf.columns">
+<span class="sig-name descname"><span class="pre">columns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TransformerConf.columns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TransformerConf.transform_data">
+<span class="sig-name descname"><span class="pre">transform_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TransformerConf.transform_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TransformerConf.transformer_class">
+<span class="sig-name descname"><span class="pre">transformer_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DefaultTransformer'</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TransformerConf.transformer_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.TransformerConf.transformer_options">
+<span class="sig-name descname"><span class="pre">transformer_options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.TransformerConf.transformer_options" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.config.config_classes.create_config">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.config.config_classes.</span></span><span class="sig-name descname"><span class="pre">create_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.Config" title="gpytorchwrapper.src.config.config_classes.Config"><span class="pre">Config</span></a></span></span><a class="reference internal" href="../_modules/gpytorchwrapper/src/config/config_classes.html#create_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.config.config_classes.create_config" title="Link to this definition"></a></dt>
+<dd><p>Create a Config object from a nested configuration dictionary.</p>
+<p>This function initializes a <cite>Config</cite> dataclass using values from the provided
+<cite>config_dict</cite>. Optional fields not specified in the dictionary are populated
+with default values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_dict</strong> (<em>dict</em>) – <dl class="simple">
+<dt>A nested dictionary with the following structure:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>data_conf :</dt><dd><ul>
+<li><dl class="simple">
+<dt>num_inputs<span class="classifier">int</span></dt><dd><p>Number of input features.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>num_outputs<span class="classifier">int</span></dt><dd><p>Number of output targets.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>output_index<span class="classifier">int or list of int, optional</span></dt><dd><p>Index or indices of outputs to use.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>transform_conf<span class="classifier">dict, optional</span></dt><dd><ul>
+<li><dl class="simple">
+<dt>transform_input<span class="classifier">dict</span></dt><dd><ul>
+<li><p>transform_data : bool, default False</p></li>
+<li><p>transformer_class : str, default “DefaultTransformer”</p></li>
+<li><p>transformer_options : dict, default {}</p></li>
+<li><p>columns : list of int, optional</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>transform_output<span class="classifier">dict</span></dt><dd><p>Same structure as <cite>transform_input</cite>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>training_conf<span class="classifier">dict</span></dt><dd><ul>
+<li><dl class="simple">
+<dt>model<span class="classifier">dict</span></dt><dd><ul>
+<li><p>model_class : str</p></li>
+<li><p>model_options : dict, default {}</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>likelihood<span class="classifier">dict, optional</span></dt><dd><ul>
+<li><p>likelihood_class : str, default “GaussianLikelihood”</p></li>
+<li><p>likelihood_options : dict, default {}</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>learning_iterations : int, default 100</p></li>
+<li><p>botorch : bool, default False</p></li>
+<li><p>debug : bool, default True</p></li>
+<li><dl class="simple">
+<dt>optimizer<span class="classifier">dict, optional</span></dt><dd><ul>
+<li><p>optimizer_class : str, default “Adam”</p></li>
+<li><p>optimizer_options : dict, default {“lr”: 0.1}</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>testing_conf<span class="classifier">dict, optional</span></dt><dd><ul>
+<li><p>test : bool, default False</p></li>
+<li><p>test_size : float, default 0.2</p></li>
+<li><p>strat_shuffle_split : bool, default False</p></li>
+<li><p>kfold : bool, default False</p></li>
+<li><p>kfold_bins : int, optional</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A fully populated <cite>Config</cite> dataclass instance, with missing optional values
+filled in using defaults.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gpytorchwrapper.src.config.config_classes.Config" title="gpytorchwrapper.src.config.config_classes.Config">Config</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gpytorchwrapper.src.config.html" class="btn btn-neutral float-left" title="gpytorchwrapper.src.config" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gpytorchwrapper.src.config.config_reader.html" class="btn btn-neutral float-right" title="gpytorchwrapper.src.config.config_reader" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Jenne Van Veerdeghem.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>training_gpytorch &mdash; GPyTorchWrapper  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pt2ts" href="pt2ts.html" />
+    <link rel="prev" title="gpytorchwrapper.src.utils.timer" href="gpytorchwrapper.src.utils.timer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GPyTorchWrapper
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_models.html">Custom Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example.html">Example</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gpytorchwrapper.html">gpytorchwrapper</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">training_gpytorch</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#training_gpytorch.Arguments"><code class="docutils literal notranslate"><span class="pre">Arguments</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#training_gpytorch.Arguments.config"><code class="docutils literal notranslate"><span class="pre">Arguments.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training_gpytorch.Arguments.directory"><code class="docutils literal notranslate"><span class="pre">Arguments.directory</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training_gpytorch.Arguments.file_type"><code class="docutils literal notranslate"><span class="pre">Arguments.file_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training_gpytorch.Arguments.input"><code class="docutils literal notranslate"><span class="pre">Arguments.input</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training_gpytorch.Arguments.output"><code class="docutils literal notranslate"><span class="pre">Arguments.output</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training_gpytorch.Arguments.test_set"><code class="docutils literal notranslate"><span class="pre">Arguments.test_set</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#training_gpytorch.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#training_gpytorch.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pt2ts.html">pt2ts</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GPyTorchWrapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+      <li class="breadcrumb-item active">training_gpytorch</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/training_gpytorch.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-training_gpytorch">
+<span id="training-gpytorch"></span><h1>training_gpytorch<a class="headerlink" href="#module-training_gpytorch" title="Link to this heading"></a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#training_gpytorch.main" title="training_gpytorch.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>([args])</p></td>
+<td><p>Main training pipeline.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#training_gpytorch.parse_args" title="training_gpytorch.parse_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_args</span></code></a>()</p></td>
+<td><p>Parse command-line arguments for GPR training script.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#training_gpytorch.Arguments" title="training_gpytorch.Arguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Arguments</span></code></a>(input, file_type, config, output, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="training_gpytorch.Arguments">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">training_gpytorch.</span></span><span class="sig-name descname"><span class="pre">Arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training_gpytorch.html#Arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training_gpytorch.Arguments" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="training_gpytorch.Arguments.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#training_gpytorch.Arguments.config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="training_gpytorch.Arguments.directory">
+<span class="sig-name descname"><span class="pre">directory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#training_gpytorch.Arguments.directory" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="training_gpytorch.Arguments.file_type">
+<span class="sig-name descname"><span class="pre">file_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#training_gpytorch.Arguments.file_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="training_gpytorch.Arguments.input">
+<span class="sig-name descname"><span class="pre">input</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#training_gpytorch.Arguments.input" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="training_gpytorch.Arguments.output">
+<span class="sig-name descname"><span class="pre">output</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#training_gpytorch.Arguments.output" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="training_gpytorch.Arguments.test_set">
+<span class="sig-name descname"><span class="pre">test_set</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#training_gpytorch.Arguments.test_set" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="training_gpytorch.main">
+<span class="sig-prename descclassname"><span class="pre">training_gpytorch.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training_gpytorch.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training_gpytorch.main" title="Link to this definition"></a></dt>
+<dd><p>Main training pipeline.</p>
+<p>Executes the complete GPR training workflow including data loading,
+preprocessing, model training, evaluation, and saving. Can be run
+either from command line or programmatically with provided arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>dict</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>Dictionary containing training arguments. If None, arguments are
+parsed from command line. Expected keys match those returned by
+parse_args():</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>input<span class="classifier">str or Path</span></dt><dd><p>path to training data file</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>file_type<span class="classifier">str</span></dt><dd><p>data file format (‘csv’ or ‘pickle’)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>config<span class="classifier">str or Path</span></dt><dd><p>path to configuration file</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>output<span class="classifier">str</span></dt><dd><p>output filename for model</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>directory<span class="classifier">str or Path</span></dt><dd><p>output directory</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>test_set<span class="classifier">str or Path or None</span></dt><dd><p>path to test data file</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Function performs training and saves results to disk</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If input data file or configuration file cannot be found</p></li>
+<li><p><strong>ValueError</strong> – If file_type is not ‘csv’ or ‘pickle’</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function performs the following workflow:</p>
+<ol class="arabic simple">
+<li><p>Load and validate input data</p></li>
+<li><p>Parse configuration settings</p></li>
+<li><p>Split data into input/output features</p></li>
+<li><p>Apply data transformations using scikit-learn transformers if requested</p></li>
+<li><p>Train GPR model using GPytorch</p></li>
+<li><p>Evaluate model performance (RMSE, correlation)</p></li>
+<li><p>Save trained model with metadata</p></li>
+</ol>
+<p>Training uses float64 precision by default.</p>
+<p class="rubric">Examples</p>
+<p>Command line usage:
+&gt;&gt;&gt; main()  # Uses command line arguments</p>
+<p>Programmatic usage:
+&gt;&gt;&gt; args = {
+…     ‘input’: ‘data.csv’,
+…     ‘file_type’: ‘csv’,
+…     ‘config’: ‘config.yaml’,
+…     ‘output’: ‘model.pth’,
+…     ‘directory’: ‘results/’,
+…     ‘test_set’: None
+… }
+&gt;&gt;&gt; main(args)</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#training_gpytorch.parse_args" title="training_gpytorch.parse_args"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_args</span></code></a></dt><dd><p>Parse command line arguments</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataReader.read_data</span></code></dt><dd><p>Load data from file</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_model</span></code></dt><dd><p>Train GPR model</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_model</span></code></dt><dd><p>Evaluate model performance</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="training_gpytorch.parse_args">
+<span class="sig-prename descclassname"><span class="pre">training_gpytorch.</span></span><span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/training_gpytorch.html#parse_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#training_gpytorch.parse_args" title="Link to this definition"></a></dt>
+<dd><p>Parse command-line arguments for GPR training script.</p>
+<p>Parses command-line arguments required for training a Gaussian Process
+Regressor using GPytorch. Handles input data file, configuration file,
+output specifications, and optional test set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>Parsed command-line arguments with the following attributes:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>input<span class="classifier">pathlib.Path</span></dt><dd><p>Path to file containing the training data</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>file_type<span class="classifier">str</span></dt><dd><p>Format of the data file (‘csv’ or ‘pickle’)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>config<span class="classifier">pathlib.Path</span></dt><dd><p>Path to configuration file containing script options</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>output<span class="classifier">str</span></dt><dd><p>Name of the output file for saving model and metadata</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>directory<span class="classifier">pathlib.Path</span></dt><dd><p>Output directory path (created if it doesn’t exist)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>test_set<span class="classifier">pathlib.Path or None</span></dt><dd><p>Path to test data file, or None if not provided</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>argparse.Namespace</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The function automatically creates the output directory if it doesn’t exist.
+The test_set argument is incompatible with cross-validation mode specified
+in the configuration file.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
+<span class="go">PosixPath(&#39;/path/to/data.csv&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gpytorchwrapper.src.utils.timer.html" class="btn btn-neutral float-left" title="gpytorchwrapper.src.utils.timer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pt2ts.html" class="btn btn-neutral float-right" title="pt2ts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Jenne Van Veerdeghem.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

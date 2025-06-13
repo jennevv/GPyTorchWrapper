@@ -1,0 +1,267 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gpytorchwrapper.src.utils.permutational_invariance &mdash; GPyTorchWrapper  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            GPyTorchWrapper
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../custom_models.html">Custom Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../example.html">Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">GPyTorchWrapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gpytorchwrapper.src.utils.permutational_invariance</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gpytorchwrapper.src.utils.permutational_invariance</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+
+<div class="viewcode-block" id="generate_permutations">
+<a class="viewcode-back" href="../../../../generated/gpytorchwrapper.src.utils.permutational_invariance.html#gpytorchwrapper.src.utils.permutational_invariance.generate_permutations">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_permutations</span><span class="p">(</span><span class="n">idx_equiv_atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    idx_equiv_atoms : list[list[int]]</span>
+<span class="sd">        List containing lists of indices for equivalent atoms</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Tensor of all possible permutations</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    For the reaction between N2 and H3+, the nitrogen atoms have indices 0 and 1,</span>
+<span class="sd">    while the hydrogen atoms have indices 2, 3, and 4.</span>
+
+<span class="sd">    The `idx_equiv_atoms` list should look like [[0,1],[2,3,4]] or [[1,2]].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_perms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">idx_equiv_atoms</span><span class="p">:</span>
+        <span class="n">all_perms</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">group</span><span class="p">)])</span>
+
+    <span class="n">perms</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span> <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">all_perms</span><span class="p">)]</span>
+
+    <span class="n">perms</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">((</span><span class="n">sublist</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">item</span><span class="p">),</span> <span class="p">[])</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">perms</span><span class="p">]</span>
+
+    <span class="n">perms</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">perms</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">perms</span></div>
+
+
+
+<div class="viewcode-block" id="generate_unique_distances">
+<a class="viewcode-back" href="../../../../generated/gpytorchwrapper.src.utils.permutational_invariance.html#gpytorchwrapper.src.utils.permutational_invariance.generate_unique_distances">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_unique_distances</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">idx_equiv_atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_atoms: int</span>
+<span class="sd">        The total number of atoms in the system</span>
+<span class="sd">    idx_equiv_atoms: list[list[int]]</span>
+<span class="sd">        List of lists representing the groups of permutationally invariant atoms</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    num_unique_dist: int</span>
+<span class="sd">        The number of unique distances in the system taking into account permutational invariance</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    The H2O system contains two permutationally invariant hydrogen atoms H1 and H2. The energy is invariant to</span>
+<span class="sd">    the permutation of the distances O-H1 and O-H2.</span>
+<span class="sd">    Therefore there are 2 unique distances in the system: O-H and H-H.</span>
+
+<span class="sd">    The general formula is,</span>
+<span class="sd">                                unique distances = n(n-1)/2 + k,</span>
+<span class="sd">    where n is the number of atom groups and k is the number of groups containing more than a single atom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">num_perminv_groups</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_equiv_atoms</span><span class="p">)</span>
+    <span class="n">num_reg_groups</span> <span class="o">=</span> <span class="n">num_atoms</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_equiv_atoms</span><span class="p">])</span>
+    <span class="n">num_groups</span> <span class="o">=</span> <span class="n">num_reg_groups</span> <span class="o">+</span> <span class="n">num_perminv_groups</span>
+
+    <span class="n">num_unique_dist</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_groups</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_groups</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">num_perminv_groups</span>
+
+    <span class="k">return</span> <span class="n">num_unique_dist</span></div>
+
+
+
+<div class="viewcode-block" id="generate_interatomic_distance_indices">
+<a class="viewcode-back" href="../../../../generated/gpytorchwrapper.src.utils.permutational_invariance.html#gpytorchwrapper.src.utils.permutational_invariance.generate_interatomic_distance_indices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_interatomic_distance_indices</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">distance_indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">atom1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">atom2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">atom1</span> <span class="o">!=</span> <span class="n">atom2</span><span class="p">:</span>
+                <span class="n">distance_idx</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">distance_idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">distance_indices</span><span class="p">:</span>
+                    <span class="n">distance_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">distance_idx</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">distance_indices</span></div>
+
+
+
+<div class="viewcode-block" id="generate_ard_expansion">
+<a class="viewcode-back" href="../../../../generated/gpytorchwrapper.src.utils.permutational_invariance.html#gpytorchwrapper.src.utils.permutational_invariance.generate_ard_expansion">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_ard_expansion</span><span class="p">(</span>
+    <span class="n">distance_idx</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">idx_inv_atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="n">group_labels</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Flatten list to loop over</span>
+    <span class="n">flat_distance_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">distance_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">dist</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">flat_distance_idx</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">inv_group</span> <span class="ow">in</span> <span class="n">idx_inv_atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">inv_group</span><span class="p">:</span>
+                <span class="n">flat_distance_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">inv_group</span><span class="p">)</span>
+
+    <span class="c1"># Reshape list to 2D for setting as dictionary keys</span>
+    <span class="n">mapped_distance_idx</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">flat_distance_idx</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">flat_distance_idx</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="c1"># Lists are not hashable so turn into tuples and sort for unique representation</span>
+    <span class="n">mapped_distance_idx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">dist</span><span class="p">))</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">mapped_distance_idx</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">mapped_distance_idx</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">group_labels</span><span class="p">:</span>  <span class="c1"># If empty</span>
+            <span class="n">group_labels</span><span class="p">[</span><span class="n">dist</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">dist</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_labels</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">group_labels</span><span class="p">[</span><span class="n">dist</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">group_labels</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">expansion</span> <span class="o">=</span> <span class="p">[</span><span class="n">group_labels</span><span class="p">[</span><span class="n">dist</span><span class="p">]</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">mapped_distance_idx</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">expansion</span></div>
+
+
+
+<div class="viewcode-block" id="generate_dist_permutations">
+<a class="viewcode-back" href="../../../../generated/gpytorchwrapper.src.utils.permutational_invariance.html#gpytorchwrapper.src.utils.permutational_invariance.generate_dist_permutations">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_dist_permutations</span><span class="p">(</span>
+    <span class="n">distance_idx</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">idx_inv_atoms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="n">group_labels</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Flatten list to loop over</span>
+    <span class="n">flat_distance_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">distance_idx</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">dist</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">flat_distance_idx</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">inv_group</span> <span class="ow">in</span> <span class="n">idx_inv_atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">inv_group</span><span class="p">:</span>
+                <span class="n">flat_distance_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">inv_group</span><span class="p">)</span>
+
+    <span class="n">mapped_distance_idx</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">flat_distance_idx</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">flat_distance_idx</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">mapped_distance_idx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">dist</span><span class="p">))</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">mapped_distance_idx</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mapped_distance_idx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">group_labels</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">group_labels</span><span class="p">[</span><span class="n">dist</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">group_labels</span><span class="p">[</span><span class="n">dist</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="n">grouped_distance_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">group_labels</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">dist_permutations</span> <span class="o">=</span> <span class="n">generate_permutations</span><span class="p">(</span><span class="n">grouped_distance_idx</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dist_permutations</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Jenne Van Veerdeghem.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

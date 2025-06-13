@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gpytorchwrapper.src.models.model_train &mdash; GPyTorchWrapper  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gpytorchwrapper.src.utils" href="gpytorchwrapper.src.utils.html" />
+    <link rel="prev" title="gpytorchwrapper.src.models.model_save" href="gpytorchwrapper.src.models.model_save.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GPyTorchWrapper
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_models.html">Custom Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example.html">Example</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="gpytorchwrapper.html">gpytorchwrapper</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gpytorchwrapper.plugins.html">gpytorchwrapper.plugins</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="gpytorchwrapper.src.html">gpytorchwrapper.src</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="gpytorchwrapper.src.config.html">gpytorchwrapper.src.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gpytorchwrapper.src.data.html">gpytorchwrapper.src.data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gpytorchwrapper.src.kernels.html">gpytorchwrapper.src.kernels</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="gpytorchwrapper.src.models.html">gpytorchwrapper.src.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gpytorchwrapper.src.utils.html">gpytorchwrapper.src.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="training_gpytorch.html">training_gpytorch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pt2ts.html">pt2ts</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GPyTorchWrapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+          <li class="breadcrumb-item"><a href="gpytorchwrapper.html">gpytorchwrapper</a></li>
+          <li class="breadcrumb-item"><a href="gpytorchwrapper.src.html">gpytorchwrapper.src</a></li>
+          <li class="breadcrumb-item"><a href="gpytorchwrapper.src.models.html">gpytorchwrapper.src.models</a></li>
+      <li class="breadcrumb-item active">gpytorchwrapper.src.models.model_train</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/gpytorchwrapper.src.models.model_train.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gpytorchwrapper.src.models.model_train">
+<span id="gpytorchwrapper-src-models-model-train"></span><h1>gpytorchwrapper.src.models.model_train<a class="headerlink" href="#module-gpytorchwrapper.src.models.model_train" title="Link to this heading"></a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.models.model_train.create_model_parameters_string" title="gpytorchwrapper.src.models.model_train.create_model_parameters_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_model_parameters_string</span></code></a>(...)</p></td>
+<td><p>Helper function to print the model parameters generated by <cite>model_parameters()</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gpytorchwrapper.src.models.model_train.define_likelihood" title="gpytorchwrapper.src.models.model_train.define_likelihood"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_likelihood</span></code></a>(likelihood_conf, ...)</p></td>
+<td><p>Define the likelihood used for training the model</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.models.model_train.define_model" title="gpytorchwrapper.src.models.model_train.define_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_model</span></code></a>(model_conf, model_class, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gpytorchwrapper.src.models.model_train.define_optimizer" title="gpytorchwrapper.src.models.model_train.define_optimizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_optimizer</span></code></a>(model, optimizer_conf)</p></td>
+<td><p>Define the optimizer used for training the model</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.models.model_train.loss_figure" title="gpytorchwrapper.src.models.model_train.loss_figure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loss_figure</span></code></a>(train_loss, iteration[, val_loss])</p></td>
+<td><p>Plot the change of loss during training</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gpytorchwrapper.src.models.model_train.model_parameters" title="gpytorchwrapper.src.models.model_train.model_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_parameters</span></code></a>(model[, transformed])</p></td>
+<td><p>Helper function to get the current model parameters and parameter values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gpytorchwrapper.src.models.model_train.train_model" title="gpytorchwrapper.src.models.model_train.train_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train_model</span></code></a>(train_x, train_y, training_conf)</p></td>
+<td><p>Train the model using the training data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gpytorchwrapper.src.models.model_train.training_loop" title="gpytorchwrapper.src.models.model_train.training_loop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">training_loop</span></code></a>(train_x, train_y, model, mll, ...)</p></td>
+<td><p>The training loop for the model</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.models.model_train.create_model_parameters_string">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.models.model_train.</span></span><span class="sig-name descname"><span class="pre">create_model_parameters_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/gpytorchwrapper/src/models/model_train.html#create_model_parameters_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.models.model_train.create_model_parameters_string" title="Link to this definition"></a></dt>
+<dd><p>Helper function to print the model parameters generated by <cite>model_parameters()</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameter_names</strong> (<em>list</em><em> of </em><em>string</em>) – The parameter name strings</p></li>
+<li><p><strong>parameters</strong> (<em>list</em><em> of </em><em>Tensor and/or None</em>) – The parameter values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>return</strong> – The string to print</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.models.model_train.define_likelihood">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.models.model_train.</span></span><span class="sig-name descname"><span class="pre">define_likelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">likelihood_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gpytorchwrapper.src.config.config_classes.html#gpytorchwrapper.src.config.config_classes.LikelihoodConf" title="gpytorchwrapper.src.config.config_classes.LikelihoodConf"><span class="pre">LikelihoodConf</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihood_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Likelihood</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gpytorchwrapper/src/models/model_train.html#define_likelihood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.models.model_train.define_likelihood" title="Link to this definition"></a></dt>
+<dd><p>Define the likelihood used for training the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>likelihood_conf</strong> (<a class="reference internal" href="gpytorchwrapper.src.config.config_classes.html#gpytorchwrapper.src.config.config_classes.OptimizerConf" title="gpytorchwrapper.src.config.config_classes.OptimizerConf"><em>OptimizerConf</em></a>) – Configuration dataclass that specifies the options for the likelihood</p></li>
+<li><p><strong>likelihood_class</strong> (<em>Likelihood</em>) – Likelihood class to instantiate</p></li>
+<li><p><strong>train_x</strong> (<em>Tensor</em>) – The training input tensor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>optimizer</strong> – The optimizer for the model</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If a fixed noise likelihood is selected but the noise level is not specified</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.models.model_train.define_model">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.models.model_train.</span></span><span class="sig-name descname"><span class="pre">define_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gpytorchwrapper.src.config.config_classes.html#gpytorchwrapper.src.config.config_classes.ModelConf" title="gpytorchwrapper.src.config.config_classes.ModelConf"><span class="pre">ModelConf</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExactGP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">likelihood</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Likelihood</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ExactGP</span></span></span><a class="reference internal" href="../_modules/gpytorchwrapper/src/models/model_train.html#define_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.models.model_train.define_model" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_conf</strong> (<a class="reference internal" href="gpytorchwrapper.src.config.config_classes.html#gpytorchwrapper.src.config.config_classes.ModelConf" title="gpytorchwrapper.src.config.config_classes.ModelConf"><em>ModelConf</em></a>) – Model configuration dataclass</p></li>
+<li><p><strong>model_class</strong> (<em>ExactGP</em>) – Model class</p></li>
+<li><p><strong>train_x</strong> (<em>Tensor</em>) – The training input tensor</p></li>
+<li><p><strong>train_y</strong> (<em>Tensor</em>) – The training output tensor</p></li>
+<li><p><strong>likelihood</strong> (<em>Likelihood</em>) – Likelihood object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Instantiated model</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor or Distribution or LinearOperator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.models.model_train.define_optimizer">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.models.model_train.</span></span><span class="sig-name descname"><span class="pre">define_optimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExactGP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gpytorchwrapper.src.config.config_classes.html#gpytorchwrapper.src.config.config_classes.OptimizerConf" title="gpytorchwrapper.src.config.config_classes.OptimizerConf"><span class="pre">OptimizerConf</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optimizer</span></span></span><a class="reference internal" href="../_modules/gpytorchwrapper/src/models/model_train.html#define_optimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.models.model_train.define_optimizer" title="Link to this definition"></a></dt>
+<dd><p>Define the optimizer used for training the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>object</em>) – The model to be optimized</p></li>
+<li><p><strong>optimizer_conf</strong> (<a class="reference internal" href="gpytorchwrapper.src.config.config_classes.html#gpytorchwrapper.src.config.config_classes.OptimizerConf" title="gpytorchwrapper.src.config.config_classes.OptimizerConf"><em>OptimizerConf</em></a>) – Configuration dataclass that specifies the options for the optimizer</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>optimizer</strong> – The optimizer for the model</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.models.model_train.loss_figure">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.models.model_train.</span></span><span class="sig-name descname"><span class="pre">loss_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iteration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/gpytorchwrapper/src/models/model_train.html#loss_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.models.model_train.loss_figure" title="Link to this definition"></a></dt>
+<dd><p>Plot the change of loss during training</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loss</strong> (<em>list</em>) – List containing the loss values</p></li>
+<li><p><strong>iteration</strong> (<em>list</em>) – List containing the iteration values</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.models.model_train.model_parameters">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.models.model_train.</span></span><span class="sig-name descname"><span class="pre">model_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExactGP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/gpytorchwrapper/src/models/model_train.html#model_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.models.model_train.model_parameters" title="Link to this definition"></a></dt>
+<dd><p>Helper function to get the current model parameters and parameter values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>ExactGP</em>) – The model object</p></li>
+<li><p><strong>transformed</strong> (<em>bool</em><em>, </em><em>default True</em>) – If the parameters must be transformed from the raw parameters used by the model to human-readable ones.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>parameter_names, parameters</strong> – A tuple containing the parameter names and their values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of list of str and list of (Tensor or None)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.models.model_train.train_model">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.models.model_train.</span></span><span class="sig-name descname"><span class="pre">train_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">training_conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gpytorchwrapper.src.config.config_classes.html#gpytorchwrapper.src.config.config_classes.TrainingConf" title="gpytorchwrapper.src.config.config_classes.TrainingConf"><span class="pre">TrainingConf</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ExactGP</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">GaussianLikelihood</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MultitaskGaussianLikelihood</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/gpytorchwrapper/src/models/model_train.html#train_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.models.model_train.train_model" title="Link to this definition"></a></dt>
+<dd><p>Train the model using the training data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_x</strong> (<em>torch.Tensor</em>) – The input training data</p></li>
+<li><p><strong>train_y</strong> (<em>torch.Tensor</em>) – The output training data</p></li>
+<li><p><strong>training_conf</strong> (<a class="reference internal" href="gpytorchwrapper.src.config.config_classes.html#gpytorchwrapper.src.config.config_classes.TrainingConf" title="gpytorchwrapper.src.config.config_classes.TrainingConf"><em>TrainingConf</em></a>) – Dictionary containing the training specifications</p></li>
+<li><p><strong>test_x</strong> (<em>Tensor</em>) – The input test data</p></li>
+<li><p><strong>test_y</strong> (<em>Tensor</em>) – The output test data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>model</strong> (<em>ExactGP</em>) – The trained model</p></li>
+<li><p><strong>likelihood</strong> (<em>Likelihood</em>) – The likelihood of the trained model</p></li>
+<li><p><strong>parameter_dict</strong> (<em>dict</em>) – Dictionary containing the parameter values after training</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gpytorchwrapper.src.models.model_train.training_loop">
+<span class="sig-prename descclassname"><span class="pre">gpytorchwrapper.src.models.model_train.</span></span><span class="sig-name descname"><span class="pre">training_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExactGP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mll</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MarginalLogLikelihood</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/gpytorchwrapper/src/models/model_train.html#training_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gpytorchwrapper.src.models.model_train.training_loop" title="Link to this definition"></a></dt>
+<dd><p>The training loop for the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_x</strong> (<em>torch.Tensor</em>) – The input training data</p></li>
+<li><p><strong>train_y</strong> (<em>torch.Tensor</em>) – The output training data</p></li>
+<li><p><strong>model</strong> (<em>object</em>) – The model to be trained</p></li>
+<li><p><strong>mll</strong> (<em>MarginalLogLikelihood</em>) – The marginal likelihood of the model</p></li>
+<li><p><strong>optimizer</strong> (<em>object</em>) – The optimizer for the model</p></li>
+<li><p><strong>learning_iterations</strong> (<em>int</em>) – The number of iterations to train the model</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – Whether to use the debug mode in GPyTorch. Turn off if unwanted debug exceptions interfere with training.</p></li>
+<li><p><strong>test_x</strong></p></li>
+<li><p><strong>test_y</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gpytorchwrapper.src.models.model_save.html" class="btn btn-neutral float-left" title="gpytorchwrapper.src.models.model_save" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gpytorchwrapper.src.utils.html" class="btn btn-neutral float-right" title="gpytorchwrapper.src.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Jenne Van Veerdeghem.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

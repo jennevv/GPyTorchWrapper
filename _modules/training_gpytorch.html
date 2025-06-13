@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>training_gpytorch &mdash; GPyTorchWrapper  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GPyTorchWrapper
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_models.html">Custom Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example.html">Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GPyTorchWrapper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">training_gpytorch</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for training_gpytorch</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.config.config_reader</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_yaml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.data.data_reader</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.data.data_splitter</span><span class="w"> </span><span class="kn">import</span> <span class="n">input_output_split</span><span class="p">,</span> <span class="n">split_data</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.data.data_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">transform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.models.model_train</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.models.model_evaluate</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.models.model_save</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">metadata_dict</span><span class="p">,</span> <span class="n">dataframe_to_tensor</span><span class="p">,</span> <span class="n">Timer</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Jenne Van Veerdeghem&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.1&quot;</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">training_timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="s2">&quot;training&quot;</span><span class="p">)</span>
+
+<span class="n">torch</span><span class="o">.</span><span class="n">set_default_dtype</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+<span class="c1"># Needed for training on HPC cluster</span>
+<span class="k">if</span> <span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;linux&quot;</span><span class="p">:</span>
+    <span class="n">pathlib</span><span class="o">.</span><span class="n">WindowsPath</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">PosixPath</span>
+
+
+<div class="viewcode-block" id="Arguments">
+<a class="viewcode-back" href="../generated/training_gpytorch.html#training_gpytorch.Arguments">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Arguments</span><span class="p">:</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">file_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">output</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">test_set</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_set</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_set</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="parse_args">
+<a class="viewcode-back" href="../generated/training_gpytorch.html#training_gpytorch.parse_args">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_args</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse command-line arguments for GPR training script.</span>
+
+<span class="sd">    Parses command-line arguments required for training a Gaussian Process</span>
+<span class="sd">    Regressor using GPytorch. Handles input data file, configuration file,</span>
+<span class="sd">    output specifications, and optional test set.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    argparse.Namespace</span>
+<span class="sd">        Parsed command-line arguments with the following attributes:</span>
+
+<span class="sd">        - input : pathlib.Path</span>
+<span class="sd">            Path to file containing the training data</span>
+<span class="sd">        - file_type : str</span>
+<span class="sd">            Format of the data file (&#39;csv&#39; or &#39;pickle&#39;)</span>
+<span class="sd">        - config : pathlib.Path</span>
+<span class="sd">            Path to configuration file containing script options</span>
+<span class="sd">        - output : str</span>
+<span class="sd">            Name of the output file for saving model and metadata</span>
+<span class="sd">        - directory : pathlib.Path</span>
+<span class="sd">            Output directory path (created if it doesn&#39;t exist)</span>
+<span class="sd">        - test_set : pathlib.Path or None</span>
+<span class="sd">            Path to test data file, or None if not provided</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The function automatically creates the output directory if it doesn&#39;t exist.</span>
+<span class="sd">    The test_set argument is incompatible with cross-validation mode specified</span>
+<span class="sd">    in the configuration file.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; args = parse_args()</span>
+<span class="sd">    &gt;&gt;&gt; print(args.input)</span>
+<span class="sd">    PosixPath(&#39;/path/to/data.csv&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;GPR Training&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Train a Gaussian Process Regressor using GPytorch.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--input&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;File containing the data&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-f&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--file-type&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Format of the data file. Can be either csv or pickle.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--config&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The config file containing the script options.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--output&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Name of the output file containing the model and its metadata.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--directory&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output directory&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--test-set&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;File containing the test data. Not usable when cross-validation is selected in the config file.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
+        <span class="n">Path</span><span class="p">,</span> <span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">directory</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">test_set</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">test_set</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">test_set</span><span class="p">)</span>
+
+    <span class="c1"># Allow for the creation of the output directory if it does not exist</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">args</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../generated/training_gpytorch.html#training_gpytorch.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main training pipeline.</span>
+
+<span class="sd">    Executes the complete GPR training workflow including data loading,</span>
+<span class="sd">    preprocessing, model training, evaluation, and saving. Can be run</span>
+<span class="sd">    either from command line or programmatically with provided arguments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    args : dict or None, optional</span>
+<span class="sd">        Dictionary containing training arguments. If None, arguments are</span>
+<span class="sd">        parsed from command line. Expected keys match those returned by</span>
+<span class="sd">        parse_args():</span>
+
+<span class="sd">        - input : str or Path </span>
+<span class="sd">              path to training data file</span>
+<span class="sd">        - file_type : str</span>
+<span class="sd">              data file format (&#39;csv&#39; or &#39;pickle&#39;)</span>
+<span class="sd">        - config : str or Path</span>
+<span class="sd">              path to configuration file</span>
+<span class="sd">        - output : str</span>
+<span class="sd">              output filename for model</span>
+<span class="sd">        - directory : str or Path</span>
+<span class="sd">              output directory</span>
+<span class="sd">        - test_set : str or Path or None</span>
+<span class="sd">              path to test data file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Function performs training and saves results to disk</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If input data file or configuration file cannot be found</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If file_type is not &#39;csv&#39; or &#39;pickle&#39;</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The function performs the following workflow:</span>
+
+<span class="sd">    #. Load and validate input data</span>
+<span class="sd">    #. Parse configuration settings</span>
+<span class="sd">    #. Split data into input/output features</span>
+<span class="sd">    #. Apply data transformations using scikit-learn transformers if requested</span>
+<span class="sd">    #. Train GPR model using GPytorch</span>
+<span class="sd">    #. Evaluate model performance (RMSE, correlation)</span>
+<span class="sd">    #. Save trained model with metadata</span>
+
+<span class="sd">    Training uses float64 precision by default.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Command line usage:</span>
+<span class="sd">    &gt;&gt;&gt; main()  # Uses command line arguments</span>
+
+<span class="sd">    Programmatic usage:</span>
+<span class="sd">    &gt;&gt;&gt; args = {</span>
+<span class="sd">    ...     &#39;input&#39;: &#39;data.csv&#39;,</span>
+<span class="sd">    ...     &#39;file_type&#39;: &#39;csv&#39;,</span>
+<span class="sd">    ...     &#39;config&#39;: &#39;config.yaml&#39;,</span>
+<span class="sd">    ...     &#39;output&#39;: &#39;model.pth&#39;,</span>
+<span class="sd">    ...     &#39;directory&#39;: &#39;results/&#39;,</span>
+<span class="sd">    ...     &#39;test_set&#39;: None</span>
+<span class="sd">    ... }</span>
+<span class="sd">    &gt;&gt;&gt; main(args)</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    parse_args : Parse command line arguments</span>
+<span class="sd">    DataReader.read_data : Load data from file</span>
+<span class="sd">    train_model : Train GPR model</span>
+<span class="sd">    evaluate_model : Evaluate model performance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">Arguments</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">DataReader</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data loaded from </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">input</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Read the input files and split the specifications</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">read_yaml</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">data_conf</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">data_conf</span>
+    <span class="n">transform_conf</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">transform_conf</span>
+    <span class="n">training_conf</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">training_conf</span>
+    <span class="n">testing_conf</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">testing_conf</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input file </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">config</span><span class="si">}</span><span class="s2"> read.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Data processing</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">input_output_split</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_conf</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">test_set</span><span class="p">:</span>
+        <span class="n">train_x</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">test_y</span> <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data_conf</span><span class="p">,</span> <span class="n">transform_conf</span><span class="p">,</span> <span class="n">training_conf</span><span class="p">,</span> <span class="n">testing_conf</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">directory</span>
+        <span class="p">)</span>
+        <span class="n">train_x</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">test_y</span><span class="p">,</span> <span class="n">input_transformer</span><span class="p">,</span> <span class="n">output_transformer</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">transform</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span><span class="p">,</span> <span class="n">transform_conf</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">train_x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data_conf</span><span class="p">,</span> <span class="n">transform_conf</span><span class="p">,</span> <span class="n">training_conf</span><span class="p">,</span> <span class="n">testing_conf</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">directory</span>
+        <span class="p">)</span>
+        <span class="n">train_x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">input_transformer</span><span class="p">,</span> <span class="n">output_transformer</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span>
+            <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">transform_conf</span>
+        <span class="p">)</span>
+
+        <span class="n">test_data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">test_set</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test data loaded from </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">test_set</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">input_output_split</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">data_conf</span><span class="p">)</span>
+        <span class="n">test_x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">test_y</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">data_conf</span><span class="p">,</span> <span class="n">transform_conf</span><span class="p">,</span> <span class="n">training_conf</span><span class="p">,</span> <span class="n">testing_conf</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">directory</span>
+        <span class="p">)</span>
+        <span class="n">test_x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">test_y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">input_transformer</span><span class="p">,</span> <span class="n">output_transformer</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span>
+            <span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">transform_conf</span>
+        <span class="p">)</span>
+
+    <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">dataframe_to_tensor</span><span class="p">,</span> <span class="p">[</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">test_x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">dataframe_to_tensor</span><span class="p">,</span> <span class="p">[</span><span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span><span class="p">])</span>
+
+    <span class="c1"># Model training</span>
+    <span class="n">training_timer</span><span class="o">.</span><span class="n">set_init_time</span><span class="p">()</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">training_conf</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span><span class="p">)</span>
+    <span class="n">training_timer</span><span class="o">.</span><span class="n">set_final_time</span><span class="p">()</span>
+    <span class="n">training_timer</span><span class="o">.</span><span class="n">log_timings</span><span class="p">()</span>
+
+    <span class="c1"># Evaluate the model on the training and test sets</span>
+    <span class="n">train_rmse</span><span class="p">,</span> <span class="n">test_rmse</span><span class="p">,</span> <span class="n">test_corr</span> <span class="o">=</span> <span class="n">evaluate_model</span><span class="p">(</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">output_transformer</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">test_x</span><span class="p">,</span> <span class="n">test_y</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Save metadata to dictionaries</span>
+    <span class="n">training_metadata</span> <span class="o">=</span> <span class="n">metadata_dict</span><span class="p">(</span>
+        <span class="n">train_x</span><span class="o">=</span><span class="n">train_x</span><span class="p">,</span>
+        <span class="n">train_y</span><span class="o">=</span><span class="n">train_y</span><span class="p">,</span>
+        <span class="n">test_x</span><span class="o">=</span><span class="n">test_x</span><span class="p">,</span>
+        <span class="n">test_y</span><span class="o">=</span><span class="n">test_y</span><span class="p">,</span>
+        <span class="n">input_transformer</span><span class="o">=</span><span class="n">input_transformer</span><span class="p">,</span>
+        <span class="n">output_transformer</span><span class="o">=</span><span class="n">output_transformer</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">metrics_metadata</span> <span class="o">=</span> <span class="n">metadata_dict</span><span class="p">(</span>
+        <span class="n">train_rmse</span><span class="o">=</span><span class="n">train_rmse</span><span class="p">,</span> <span class="n">test_rmse</span><span class="o">=</span><span class="n">test_rmse</span><span class="p">,</span> <span class="n">test_corr</span><span class="o">=</span><span class="n">test_corr</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Save the model to a .pth file</span>
+    <span class="n">save_model</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+        <span class="n">asdict</span><span class="p">(</span><span class="n">config</span><span class="p">),</span>
+        <span class="n">training_metadata</span><span class="p">,</span>
+        <span class="n">metrics_metadata</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Jenne Van Veerdeghem.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
