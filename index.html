@@ -45,6 +45,7 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_models.html">Custom Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_models.html#using-custom-models-and-kernels-with-gpytorchwrapper">Using Custom Models and Kernels with <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
@@ -80,32 +81,35 @@
 <h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Modular YAML-based configuration</p></li>
-<li><p>Fully differentiable, permutationally invariant kernels</p></li>
-<li><p>TorchScript export for deployment</p></li>
+<li><p>Fully differentiable, permutationally invariant kernel functions</p></li>
+<li><p>Script for exporting models as TorchScript for deployment</p></li>
 </ul>
 </section>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>Set up the environment locally:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>environment.yml
-conda<span class="w"> </span>activate<span class="w"> </span>gpytorchwrapper
-pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>--use-pep517
 </pre></div>
 </div>
-<p>For Intel-optimized HPC environments, use <cite>environment_hpc.yml</cite>.</p>
-</section>
-<section id="quickstart">
-<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h2>
-<p>Run the example in Docker:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>gpytorchwrapper<span class="w"> </span>.
-./run-example-in-docker.sh
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>gpytorchwrapper
 </pre></div>
 </div>
-<p>After training, <cite>3d_plot.png</cite> will appear in the working directory.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span>--use-pep517
+</pre></div>
+</div>
+<p>For an Intel-optimized HPC environment, use <cite>environment_hpc.yml</cite>.</p>
 </section>
 <section id="hpc-support">
 <h2>HPC Support<a class="headerlink" href="#hpc-support" title="Link to this heading"></a></h2>
 <p>A SLURM-based submission script is available in <cite>bash/sub_gp_training.sh</cite>. Use <cite>gp_training.sh</cite> to configure and launch training jobs with CLI options.</p>
+</section>
+<section id="docker-example">
+<h2>Docker Example<a class="headerlink" href="#docker-example" title="Link to this heading"></a></h2>
+<p>Run the example in Docker:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>gpytorchwrapper<span class="w"> </span>.<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./run-example-in-docker.sh
+</pre></div>
+</div>
+<p>After training, <cite>3d_plot.png</cite> will appear in the working directory.</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
@@ -114,13 +118,9 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_models.html">Custom Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_models.html#using-custom-models-and-kernels-with-gpytorchwrapper">Using Custom Models and Kernels with <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="generated/gpytorchwrapper.html">gpytorchwrapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/training_gpytorch.html">training_gpytorch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="generated/pt2ts.html">pt2ts</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 </div>
 </section>

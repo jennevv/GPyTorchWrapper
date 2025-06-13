@@ -46,6 +46,17 @@
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Custom Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#using-custom-models-and-kernels-with-gpytorchwrapper">Using Custom Models and Kernels with <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#directory-structure-for-plugins">Directory Structure for Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-a-custom-model">Writing a Custom Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-kernel-functions">Custom Kernel Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#polyxmaternkernelperminv">PolyxMaternKernelPermInv</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-more-custom-kernels">Adding More Custom Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
@@ -76,6 +87,121 @@
              
   <section id="custom-models">
 <h1>Custom Models<a class="headerlink" href="#custom-models" title="Link to this heading"></a></h1>
+</section>
+<section id="using-custom-models-and-kernels-with-gpytorchwrapper">
+<h1>Using Custom Models and Kernels with <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code><a class="headerlink" href="#using-custom-models-and-kernels-with-gpytorchwrapper" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code> package provides an extensible framework for integrating
+custom Gaussian Process (GP) models and kernels using GPyTorch and BoTorch.
+This guide explains how to add and use your own models and describes the supported
+custom kernel functions.</p>
+<section id="directory-structure-for-plugins">
+<h2>Directory Structure for Plugins<a class="headerlink" href="#directory-structure-for-plugins" title="Link to this heading"></a></h2>
+<p>All custom models must be placed inside the <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper/plugins/</span></code> directory.</p>
+<p><strong>Naming Convention</strong></p>
+<p>Custom model modules <strong>must start with</strong> <code class="docutils literal notranslate"><span class="pre">model_</span></code> to be discovered and loaded
+automatically by the wrapper.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>gpytorchwrapper/
+└── plugins/
+    ├── model_custom_gp.py     ✅ Picked up automatically
+    └── my_model.py            ❌ Ignored
+</pre></div>
+</div>
+<p>Each module should define at least one class that subclasses
+<code class="docutils literal notranslate"><span class="pre">gpytorch.models.ExactGP</span></code> and <code class="docutils literal notranslate"><span class="pre">botorch.models.gpytorch.GPyTorchModel</span></code>.</p>
+</section>
+<section id="writing-a-custom-model">
+<h2>Writing a Custom Model<a class="headerlink" href="#writing-a-custom-model" title="Link to this heading"></a></h2>
+<p>Here’s an example using a custom kernel (<code class="docutils literal notranslate"><span class="pre">PolyxMaternKernelPermInv</span></code>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">gpytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernels</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">distributions</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">priors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gpytorchwrapper.src.kernels.polyxmatern_kernel_perminv</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PolyxMaternKernelPermInv</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">botorch.models.gpytorch</span><span class="w"> </span><span class="kn">import</span> <span class="n">GPyTorchModel</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ArH2pS0</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">ExactGP</span><span class="p">,</span> <span class="n">GPyTorchModel</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">)</span>
+
+        <span class="n">outputscale_prior</span> <span class="o">=</span> <span class="n">priors</span><span class="o">.</span><span class="n">NormalPrior</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">lengthscale_prior</span> <span class="o">=</span> <span class="n">priors</span><span class="o">.</span><span class="n">NormalPrior</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>
+        <span class="n">variance_prior</span> <span class="o">=</span> <span class="n">priors</span><span class="o">.</span><span class="n">NormalPrior</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>
+
+        <span class="n">n_atoms</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">idx_equiv_atoms</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>  <span class="c1"># Permutational symmetry</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_module</span> <span class="o">=</span> <span class="n">means</span><span class="o">.</span><span class="n">ConstantMean</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covar_module</span> <span class="o">=</span> <span class="n">kernels</span><span class="o">.</span><span class="n">ScaleKernel</span><span class="p">(</span>
+            <span class="n">PolyxMaternKernelPermInv</span><span class="p">(</span>
+                <span class="n">n_atoms</span><span class="o">=</span><span class="n">n_atoms</span><span class="p">,</span>
+                <span class="n">idx_equiv_atoms</span><span class="o">=</span><span class="n">idx_equiv_atoms</span><span class="p">,</span>
+                <span class="n">ard</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">nu</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
+                <span class="n">lengthscale_prior</span><span class="o">=</span><span class="n">lengthscale_prior</span><span class="p">,</span>
+                <span class="n">power</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">representation</span><span class="o">=</span><span class="s2">&quot;morse&quot;</span><span class="p">,</span>
+                <span class="n">variance_constraint</span><span class="o">=</span><span class="n">constraints</span><span class="o">.</span><span class="n">Positive</span><span class="p">(),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Optional: manually initialize kernel parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covar_module</span><span class="o">.</span><span class="n">base_kernel</span><span class="o">.</span><span class="n">lengthscale</span> <span class="o">=</span> <span class="p">[</span><span class="n">lengthscale_prior</span><span class="o">.</span><span class="n">mean</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covar_module</span><span class="o">.</span><span class="n">base_kernel</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="p">[</span><span class="n">variance_prior</span><span class="o">.</span><span class="n">mean</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">covar_module</span><span class="o">.</span><span class="n">outputscale</span> <span class="o">=</span> <span class="n">outputscale_prior</span><span class="o">.</span><span class="n">mean</span>
+
+        <span class="c1"># Optional: fix the constant mean</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_module</span><span class="o">.</span><span class="n">constant</span> <span class="o">=</span> <span class="mf">4.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_module</span><span class="o">.</span><span class="n">raw_constant</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">mean_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_module</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">covar_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">covar_module</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">distributions</span><span class="o">.</span><span class="n">MultivariateNormal</span><span class="p">(</span><span class="n">mean_x</span><span class="p">,</span> <span class="n">covar_x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Save this file as <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper/plugins/model_arh2ps0.py</span></code>. The wrapper will detect it automatically.</p>
+</section>
+<section id="custom-kernel-functions">
+<h2>Custom Kernel Functions<a class="headerlink" href="#custom-kernel-functions" title="Link to this heading"></a></h2>
+<p>The wrapper supports several custom kernel functions, including:</p>
+<section id="polyxmaternkernelperminv">
+<h3>PolyxMaternKernelPermInv<a class="headerlink" href="#polyxmaternkernelperminv" title="Link to this heading"></a></h3>
+<p>A permutation-invariant kernel that combines polynomial transformations with
+Matérn-type behavior.</p>
+<p><strong>Location:</strong>
+<code class="docutils literal notranslate"><span class="pre">gpytorchwrapper/src/kernels/polyxmatern_kernel_perminv.py</span></code></p>
+<p><strong>Constructor Arguments:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">n_atoms</span></code> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): Number of atoms in the system.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">idx_equiv_atoms</span></code> (<code class="docutils literal notranslate"><span class="pre">List[List[int]]</span></code>): Groups of indices for symmetric atoms.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ard</span></code> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>): Use automatic relevance determination (ARD).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nu</span></code> (<code class="docutils literal notranslate"><span class="pre">float</span></code>): Smoothness parameter of the Matérn kernel.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lengthscale_prior</span></code> (<code class="docutils literal notranslate"><span class="pre">gpytorch.priors.Prior</span></code>): Prior on lengthscales.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">power</span></code> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): Degree of the polynomial transformation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">representation</span></code> (<code class="docutils literal notranslate"><span class="pre">str</span></code>): Type of descriptor (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;morse&quot;</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variance_constraint</span></code> (<code class="docutils literal notranslate"><span class="pre">gpytorch.constraints.Constraint</span></code>, optional): Constraint on kernel variance.</p></li>
+</ul>
+<p>See <span class="xref std std-ref">permutationally_invariant_kernels</span> for the theory behind these kernel functions.</p>
+</section>
+</section>
+<section id="adding-more-custom-kernels">
+<h2>Adding More Custom Kernels<a class="headerlink" href="#adding-more-custom-kernels" title="Link to this heading"></a></h2>
+<p>To define and use new custom kernels:</p>
+<ol class="arabic simple">
+<li><p>Add your kernel implementation to <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper/src/kernels/</span></code>.</p></li>
+<li><p>Import and instantiate the kernel in a plugin model file under <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper/plugins/model_*.py</span></code>.</p></li>
+<li><p>Follow the GPyTorch API for compatibility.</p></li>
+</ol>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Place models in <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper/plugins/</span></code>, named <code class="docutils literal notranslate"><span class="pre">model_*.py</span></code>.</p></li>
+<li><p>Subclass <code class="docutils literal notranslate"><span class="pre">ExactGP</span></code> and <code class="docutils literal notranslate"><span class="pre">GPyTorchModel</span></code>.</p></li>
+<li><p>Use custom kernels like <code class="docutils literal notranslate"><span class="pre">PolyxMaternKernelPermInv</span></code> for molecular systems containing invariant atoms.</p></li>
+<li><p>Optionally use priors and constraints for fine control over parameters.</p></li>
+</ul>
+</section>
 </section>
 
 
