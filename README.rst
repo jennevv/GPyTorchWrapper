@@ -10,6 +10,8 @@ Features
 - Fully differentiable, permutationally invariant kernels
 - TorchScript export for deployment
 
+Read m
+
 Installation
 ------------
 
@@ -43,10 +45,7 @@ A SLURM-based submission script is available in `bash/sub_gp_training.sh`. Use `
 Documentation
 -------------
 
-- :doc:`usage`: Model training and YAML configuration
-- :doc:`deployment`: TorchScript model export
-- :doc:`custom_models`: Adding your own models and kernels
-- :doc:`example`: Running the included training example
+Documentation is available on `<https://jennevv.github.io/GPyTorchWrapper/>`
 
 Reference
 ---------
