@@ -14,49 +14,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - name: Set up Micromamba
+        uses: mamba-org/setup-micromamba@v1
         with:
-          python-version: '3.11'
-
-      - name: Add Conda to PATH
-        run: echo $CONDA/bin >> $GITHUB_PATH
-
-      - name: Cache Conda packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.conda/pkgs
-            ~/.conda/envs
-          key: conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}
-
-      - name: Create Conda environment
-        run: |
-          conda env create --name ci-env --file environment.yml || echo "Env already exists"
-          conda activate ci-env
-
-      - name: Use Conda environment
-        run: |
-          source activate ci-env
-          which python
-          python --version
+          environment-file: environment.yml
+          environment-name: ci-env
+          cache-environment: true
+          cache-downloads: true
 
       - uses: astral-sh/ruff-action@v3
 
       - name: Lint code
-        run: |
-          source activate ci-env
-          ruff check --fix .
+        run: micromamba run -n ci-env ruff check --fix .
 
       - name: Format code
-        run: |
-          source activate ci-env
-          ruff format .
+        run: micromamba run -n ci-env ruff format .
 
       - name: Run tests
-        run: |
-          source activate ci-env
-          pytest .
+        run: micromamba run -n ci-env pytest .
 
   docs:
     needs: lint-and-test
@@ -66,26 +41,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - name: Set up Micromamba
+        uses: mamba-org/setup-micromamba@v1
         with:
-          python-version: '3.11'
-
-      - name: Add Conda to PATH
-        run: echo $CONDA/bin >> $GITHUB_PATH
-
-      - name: Cache Conda packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.conda/pkgs
-            ~/.conda/envs
-          key: conda-${{ runner.os }}-${{ hashFiles('environment.yml') }}
-
-      - name: Create Conda environment
-        run: |
-          conda env create --name ci-env --file environment.yml || echo "Env already exists"
-          conda activate ci-env
+          environment-file: environment.yml
+          environment-name: ci-env
+          cache-environment: true
+          cache-downloads: true
 
       - name: Build HTML with Sphinx
         uses: ammaraskar/sphinx-action@master
