@@ -43,11 +43,22 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#training-a-model">Training a Model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#yaml-configuration">YAML Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-conf-required">data_conf (Required)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#training-conf-required">training_conf (Required)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transform-conf-optional">transform_conf (Optional)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-conf-optional">testing_conf (Optional)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-training-script">Running the Training Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-workflow">Main Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#programmatic-example">Programmatic Example</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_models.html">Custom Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="custom_models.html#using-custom-models-and-kernels-with-gpytorchwrapper">Using Custom Models and Kernels with <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 
@@ -77,6 +88,159 @@
              
   <section id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<section id="training-a-model">
+<h2>Training a Model<a class="headerlink" href="#training-a-model" title="Link to this heading"></a></h2>
+<p>To train a model, you need to provide:</p>
+<ul class="simple">
+<li><p><strong>Training data</strong> (CSV or pickle format)</p></li>
+<li><p><strong>Model configuration</strong>: a YAML file specifying the architecture and training parameters.</p></li>
+</ul>
+<section id="yaml-configuration">
+<h3>YAML Configuration<a class="headerlink" href="#yaml-configuration" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">data_conf</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">num_inputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">  </span><span class="nt">num_outputs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">  </span><span class="nt">output_index</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int | list[int]</span>
+
+<span class="nt">transform_conf</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">transform_input</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">transform_data</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool</span>
+<span class="w">    </span><span class="nt">transformer_class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">    </span><span class="nt">transformer_options</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">      </span><span class="nt">standardize</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool</span>
+<span class="w">    </span><span class="nt">columns</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">list | null</span>
+<span class="w">  </span><span class="nt">transform_output</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">transform_data</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool</span>
+<span class="w">    </span><span class="nt">transformer_class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">    </span><span class="nt">transformer_options</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dict | null</span>
+<span class="w">    </span><span class="nt">columns</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">list | null</span>
+
+<span class="nt">training_conf</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">model</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">model_class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">  </span><span class="nt">likelihood</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">likelihood_class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">    </span><span class="nt">likelihood_options</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">option1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str | float</span>
+<span class="w">  </span><span class="nt">optimizer</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">optimizer_class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+<span class="w">    </span><span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">float</span>
+<span class="w">  </span><span class="nt">learning_iterations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+<span class="w">  </span><span class="nt">botorch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool</span>
+<span class="w">  </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool</span>
+
+<span class="nt">testing_conf</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool</span>
+<span class="w">  </span><span class="nt">test_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">float</span>
+<span class="w">  </span><span class="nt">strat_shuffle_split</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool</span>
+<span class="w">  </span><span class="nt">kfold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bool</span>
+<span class="w">  </span><span class="nt">kfold_bins</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int | null</span>
+</pre></div>
+</div>
+</section>
+<section id="data-conf-required">
+<h3>data_conf (Required)<a class="headerlink" href="#data-conf-required" title="Link to this heading"></a></h3>
+<p>Specifies input/output structure:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">num_inputs</span></code>: Number of input columns (first N columns).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_outputs</span></code>: Number of output columns.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_index</span></code>: (Optional) Index or list of indices for outputs to train on. Index 0 corresponds to the first output column (i.e., column <code class="docutils literal notranslate"><span class="pre">total_columns</span> <span class="pre">-</span> <span class="pre">num_inputs</span></code>).</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">output_index</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>This selects the second and third output variables.</p>
+</section>
+<section id="training-conf-required">
+<h3>training_conf (Required)<a class="headerlink" href="#training-conf-required" title="Link to this heading"></a></h3>
+<p>Specifies model details and training parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model_class</span></code> must match a model defined in <code class="docutils literal notranslate"><span class="pre">gp_models.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">likelihood_class</span></code> is the likelihood used by GPyTorch</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimizer_class</span></code> is typically Adam, but can be any PyTorch optimizer</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">botorch:</span> <span class="pre">true</span></code> enables Bayesian optimization using BoTorch instead of Adam, ignores the other optimizer options</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Training is always performed using <strong>double precision (float64)</strong>.</p>
+</div>
+<p>For more on BoTorch, visit: <a class="reference external" href="https://botorch.org/">https://botorch.org/</a></p>
+</section>
+<section id="transform-conf-optional">
+<h3>transform_conf (Optional)<a class="headerlink" href="#transform-conf-optional" title="Link to this heading"></a></h3>
+<p>Configures preprocessing steps for input and output data. Supports any valid <code class="docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code> transformer class.</p>
+<p>Transformed and fitted transformers are stored in the final model pickle file.</p>
+</section>
+<section id="testing-conf-optional">
+<h3>testing_conf (Optional)<a class="headerlink" href="#testing-conf-optional" title="Link to this heading"></a></h3>
+<p>While GP models do not require a validation set, testing options are provided for evaluation and comparison purposes:</p>
+<p>Three testing modes are available:</p>
+<ul class="simple">
+<li><p><strong>Random split</strong></p></li>
+<li><p><strong>Stratified shuffle split</strong></p></li>
+<li><p><strong>K-fold cross-validation</strong></p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">test:</span> <span class="pre">true</span></code> and <code class="docutils literal notranslate"><span class="pre">test_size</span></code> is set, a random train/test split is applied using <code class="docutils literal notranslate"><span class="pre">scikit-learn.train_test_split</span></code>.</p>
+</section>
+</section>
+<section id="running-the-training-script">
+<h2>Running the Training Script<a class="headerlink" href="#running-the-training-script" title="Link to this heading"></a></h2>
+<p>The training process is initiated via a command-line interface or programmatically.</p>
+<p>Command-line Example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--input<span class="w"> </span>data.csv<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--file-type<span class="w"> </span>csv<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config<span class="w"> </span>config.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--output<span class="w"> </span>model.pth<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--directory<span class="w"> </span>results/<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--test-set<span class="w"> </span>test.csv
+</pre></div>
+</div>
+<p>Command-line Arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--input</span></code>: Path to training dataset</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--file-type</span></code>: Format of input data (<code class="docutils literal notranslate"><span class="pre">csv</span></code> or <code class="docutils literal notranslate"><span class="pre">pickle</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--config</span></code>: Path to YAML configuration file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--output</span></code>: Name of output model file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--directory</span></code>: Output directory (created if it does not exist)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-set</span></code>: Optional test set path (incompatible with cross-validation)</p></li>
+</ul>
+</section>
+<section id="main-workflow">
+<h2>Main Workflow<a class="headerlink" href="#main-workflow" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>1. Load and validate input data
+2. Parse YAML configuration
+3. Split into inputs and outputs
+4. Apply optional data transformations
+5. Train GPR model with GPyTorch
+6. Evaluate (optional)
+7. Save model and metadata to disk
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Data is always converted to float64 tensors. Model training and evaluation are logged and optionally saved.</p>
+</div>
+</section>
+<section id="programmatic-example">
+<h2>Programmatic Example<a class="headerlink" href="#programmatic-example" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">train</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span>
+
+<span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="s2">&quot;data.csv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;file_type&quot;</span><span class="p">:</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="s2">&quot;config.yaml&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;model.pth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;directory&quot;</span><span class="p">:</span> <span class="s2">&quot;results/&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;test_set&quot;</span><span class="p">:</span> <span class="kc">None</span>
+<span class="p">}</span>
+
+<span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 

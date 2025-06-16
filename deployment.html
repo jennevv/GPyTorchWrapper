@@ -44,10 +44,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Deployment</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#saving-the-model-in-torchscript-format">Saving the Model in TorchScript Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#torchscript-model-usage">TorchScript Model Usage</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="custom_models.html">Custom Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="custom_models.html#using-custom-models-and-kernels-with-gpytorchwrapper">Using Custom Models and Kernels with <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 
@@ -77,6 +79,39 @@
              
   <section id="deployment">
 <h1>Deployment<a class="headerlink" href="#deployment" title="Link to this heading"></a></h1>
+<section id="saving-the-model-in-torchscript-format">
+<h2>Saving the Model in TorchScript Format<a class="headerlink" href="#saving-the-model-in-torchscript-format" title="Link to this heading"></a></h2>
+<p>For deployment purposes, the model can be converted and saved in <strong>TorchScript</strong> format using the <code class="docutils literal notranslate"><span class="pre">pt2ts.py</span></code> script.
+This means that the inference can be ran without needing the model class to be specified.</p>
+<p>Command-line usage:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>pt2ts.py<span class="w"> </span>-i<span class="w"> </span>model.pth<span class="w"> </span>-o<span class="w"> </span>model.ts<span class="w"> </span>-d<span class="w"> </span>./
+</pre></div>
+</div>
+<p>This will produce a <code class="docutils literal notranslate"><span class="pre">model.ts</span></code> file that can be loaded and used in production environments.</p>
+<p>Command-line Arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">-i,</span> <span class="pre">--input</span></code>: Path to trained model pickle file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-o,</span> <span class="pre">--output</span></code>: Name of output torcschript file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-d,</span> <span class="pre">--directory</span></code>: Output directory (created if it does not exist)</p></li>
+</ul>
+</section>
+<section id="torchscript-model-usage">
+<h2>TorchScript Model Usage<a class="headerlink" href="#torchscript-model-usage" title="Link to this heading"></a></h2>
+<p>The resulting TorchScript model can be loaded with PyTorch’s JIT interface. It outputs both the <strong>predictions</strong> and the <strong>uncertainty</strong> (predictive variance) for a given set of inputs <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;model.ts&#39;</span><span class="p">)</span>
+
+<span class="n">pred</span><span class="p">,</span> <span class="n">pred_var</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">pred</span></code> and <code class="docutils literal notranslate"><span class="pre">pred_var</span></code> are both tensors of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">output_dim)</span></code>.
+<code class="docutils literal notranslate"><span class="pre">pred_var</span></code> represents the model’s uncertainty (variance) at each input point.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure that the input tensor <code class="docutils literal notranslate"><span class="pre">x</span></code> has the correct shape and dtype (<code class="docutils literal notranslate"><span class="pre">float64</span></code>) expected by the model.</p>
+</div>
+</section>
 </section>
 
 

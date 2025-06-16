@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Example" href="example.html" />
+    <link rel="next" title="API" href="api.html" />
     <link rel="prev" title="Deployment" href="deployment.html" /> 
 </head>
 
@@ -45,8 +45,7 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Custom Models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#using-custom-models-and-kernels-with-gpytorchwrapper">Using Custom Models and Kernels with <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code></a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Custom Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#directory-structure-for-plugins">Directory Structure for Plugins</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#writing-a-custom-model">Writing a Custom Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#custom-kernel-functions">Custom Kernel Functions</a><ul>
@@ -57,7 +56,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="example.html">Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 
@@ -87,13 +85,8 @@
              
   <section id="custom-models">
 <h1>Custom Models<a class="headerlink" href="#custom-models" title="Link to this heading"></a></h1>
-</section>
-<section id="using-custom-models-and-kernels-with-gpytorchwrapper">
-<h1>Using Custom Models and Kernels with <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code><a class="headerlink" href="#using-custom-models-and-kernels-with-gpytorchwrapper" title="Link to this heading"></a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code> package provides an extensible framework for integrating
-custom Gaussian Process (GP) models and kernels using GPyTorch and BoTorch.
-This guide explains how to add and use your own models and describes the supported
-custom kernel functions.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper</span></code> package provides an simple way to use custom Gaussian Process (GP) models and kernels using GPyTorch and BoTorch.
+This guide explains how to add and use your own models and describes the supported custom kernel functions.</p>
 <section id="directory-structure-for-plugins">
 <h2>Directory Structure for Plugins<a class="headerlink" href="#directory-structure-for-plugins" title="Link to this heading"></a></h2>
 <p>All custom models must be placed inside the <code class="docutils literal notranslate"><span class="pre">gpytorchwrapper/plugins/</span></code> directory.</p>
@@ -209,7 +202,7 @@ Matérn-type behavior.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="deployment.html" class="btn btn-neutral float-left" title="Deployment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="example.html" class="btn btn-neutral float-right" title="Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
