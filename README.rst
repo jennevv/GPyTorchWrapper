@@ -23,7 +23,7 @@ Set up the environment locally:
    conda activate gpytorchwrapper
    pip install -e . --use-pep517
 
-For Intel-optimized HPC environments, use `environment_hpc.yml`.
+For Intel-optimized HPC environments, use ``environment_hpc.yml``.
 
 Quickstart
 ----------
@@ -35,12 +35,12 @@ Run the example in Docker:
    docker build -t gpytorchwrapper .
    ./run-example-in-docker.sh
 
-After training, `3d_plot.png` will appear in the working directory.
+After training, ``3d_plot.png`` will appear in the working directory.
 
 HPC Support
 -----------
 
-A SLURM-based submission script is available in `bash/sub_gp_training.sh`. Use `gp_training.sh` to configure and launch training jobs with CLI options.
+A SLURM-based submission script is available in ``bash/sub_gp_training.sh``. Use ``gp_training.sh`` to configure and launch training jobs with CLI options.
 
 Documentation
 -------------
