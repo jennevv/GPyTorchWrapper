@@ -3,13 +3,8 @@
 Custom Models
 =============
 
-Using Custom Models and Kernels with ``gpytorchwrapper``
-=========================================================
-
-The ``gpytorchwrapper`` package provides an extensible framework for integrating
-custom Gaussian Process (GP) models and kernels using GPyTorch and BoTorch.
-This guide explains how to add and use your own models and describes the supported
-custom kernel functions.
+The ``gpytorchwrapper`` package provides an simple way to use custom Gaussian Process (GP) models and kernels using GPyTorch and BoTorch.
+This guide explains how to add and use your own models and describes the supported custom kernel functions.
 
 Directory Structure for Plugins
 -------------------------------
