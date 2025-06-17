@@ -1,10 +1,10 @@
-Usage
-=====
+Training
+========
 
 Training a Model
 ----------------
 
-To train a model, you need to provide:
+To train a model, you need to provide the following to the ``training_gpytorch.py`` script.
 
 - **Training data** (CSV or pickle format)
 - **Model configuration**: a YAML file specifying the architecture and training parameters.
@@ -110,9 +110,10 @@ If ``test: true`` and ``test_size`` is set, a random train/test split is applied
 Running the Training Script
 ---------------------------
 
-The training process is initiated via a command-line interface or programmatically.
+The training process is initiated via a command-line interface or programmatically through the ``training_gpytorch.py`` script.
 
-Command-line Example:
+Command-line Example
+^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -133,8 +134,28 @@ Command-line Arguments:
 - ``--directory``: Output directory (created if it does not exist)
 - ``--test-set``: Optional test set path (incompatible with cross-validation)
 
+Programmatic Example
+^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+    from training_gpytorch import main
+
+    args = {
+        "input": "data.csv",
+        "file_type": "csv",
+        "config": "config.yaml",
+        "output": "model.pth",
+        "directory": "results/",
+        "test_set": None
+    }
+
+    main(args)
+
+
 Main Workflow
 -------------
+The following is the main workflow used by the training script.
 
 .. code-block:: text
 
@@ -149,23 +170,5 @@ Main Workflow
 .. note::
 
     Data is always converted to float64 tensors. Model training and evaluation are logged and optionally saved.
-
-Programmatic Example
---------------------
-
-.. code-block:: python
-
-    from train import main
-
-    args = {
-        "input": "data.csv",
-        "file_type": "csv",
-        "config": "config.yaml",
-        "output": "model.pth",
-        "directory": "results/",
-        "test_set": None
-    }
-
-    main(args)
 
 

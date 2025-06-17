@@ -52,10 +52,10 @@ Documentation
 .. toctree::
    :maxdepth: 1
 
-   usage
+   training
    deployment
    custom_models
-   example
+   permutationally_invariant_kernels
    api
 
 Reference
