@@ -20,7 +20,13 @@ Set up the environment locally:
 .. code-block:: bash
 
    conda env create -f environment.yml
+
+.. code-block:: bash
+
    conda activate gpytorchwrapper
+
+.. code-block:: bash
+   
    pip install -e . --use-pep517
 
 For Intel-optimized HPC environments, use ``environment_hpc.yml``.
