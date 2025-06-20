@@ -1,0 +1,4 @@
+- Rasmussen, C. E.; Williams, C. K. I. _Gaussian Processes for Machine Learning_; Adaptive computation and machine learning; MIT Press: Cambridge, Mass, 2006.
+- Duvenaud, D. Automatic Model Construction with Gaussian Processes, 2014.
+- Terenin, A. Gaussian Processes and Statistical Decision-Making in Non-Euclidean Spaces. arXiv April 28, 2022. [https://doi.org/10.48550/arXiv.2202.10613](https://doi.org/10.48550/arXiv.2202.10613).
+- _Intro to GPs - GPJax_. [https://docs.jaxgaussianprocesses.com/examples/intro_to_gps/#gaussian-process-regression](https://docs.jaxgaussianprocesses.com/_examples/intro_to_gps/#gaussian-process-regression).
