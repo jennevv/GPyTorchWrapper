@@ -1,7 +1,7 @@
 GPyTorchWrapper
 ===============
 
-**GPyTorchWrapper** is a lightweight Python package designed to streamline the training of Gaussian Process (GP) models using `GPyTorch <https://gpytorch.ai/>`_. While it was developed for modeling potential energy surfaces (PES) in small molecular systems using custom permutationally invariant kernels (based on Bartók & Csányi [1]), it is general enough for other regression tasks.
+**GPyTorchWrapper** is a lightweight Python package designed to streamline the training of Gaussian Process (GP) models using `GPyTorch <https://gpytorch.ai/>`_. While it was developed for modeling potential energy surfaces (PES) in small molecular systems using custom permutationally invariant kernels (based on Bartók & Csányi [Bartok2015]_), it is general enough for other regression tasks.
 
 Features
 --------
@@ -61,6 +61,6 @@ Documentation
 Reference
 ---------
 
-[1] Bartók, A. P.; Csányi, G. *Gaussian Approximation Potentials: A Brief Tutorial Introduction*. Int. J. Quantum Chem. 2015, 115 (16), 1051–1057. https://doi.org/10.1002/qua.24927
+.. [Bartok2015] Bartók, A. P.; Csányi, G. *Gaussian Approximation Potentials: A Brief Tutorial Introduction*. Int. J. Quantum Chem. 2015, 115 (16), 1051–1057. https://doi.org/10.1002/qua.24927
 
 
