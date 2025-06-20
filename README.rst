@@ -39,6 +39,9 @@ Run the example in Docker:
 .. code-block:: bash
 
    docker build -t gpytorchwrapper .
+
+.. code-block:: bash
+
    ./run-example-in-docker.sh
 
 After training, ``3d_plot.png`` will appear in the working directory.
