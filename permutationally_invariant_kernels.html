@@ -16,6 +16,7 @@
       <script src="_static/documentation_options.js?v=5929fcd5"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -46,7 +47,12 @@
 <li class="toctree-l1"><a class="reference internal" href="training.html">Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_models.html">Custom Models</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Permutationally Invariant Kernels</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Permutationally Invariant Kernels</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#derivatives-with-respect-to-atomic-coordinates">Derivatives with Respect to Atomic Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anisotropic-lengthscales-ard">Anisotropic Lengthscales (ARD)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 
@@ -76,6 +82,39 @@
              
   <section id="permutationally-invariant-kernels">
 <h1>Permutationally Invariant Kernels<a class="headerlink" href="#permutationally-invariant-kernels" title="Link to this heading"></a></h1>
+<p>Permutational invariance is both a physical constraint and an inherent property of the potential energy surface: exchanging two identical atoms does not change the potential energy. Several strategies exist to enforce this property. For example, sorting the internuclear distances of like bonds works, but that approach is not analytically differentiable <a class="reference internal" href="#dral2017" id="id1"><span>[Dral2017]</span></a>. In contrast, permutationally invariant kernels, as described by Bartók and Csányi, are fully differentiable <a class="reference internal" href="#bartok2015" id="id2"><span>[Bartok2015]</span></a>. These kernels are therefore well suited for automatic differentiation frameworks like PyTorch to model a potential energy surface for molecular dynamics.</p>
+<p>To enforce permutational symmetry in a kernel function, start with any kernel <span class="math notranslate nohighlight">\(K(\mathbf{x}, \mathbf{x'})\)</span> with vector inputs <span class="math notranslate nohighlight">\(\mathbf{x}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{x'}\)</span>. Define a new kernel by summing over all permutations <span class="math notranslate nohighlight">\(\hat{P}\)</span> of <span class="math notranslate nohighlight">\(\mathbf{x'}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[K'(\mathbf{x}, \mathbf{x'}) = \sum_{\hat{P}} K(\mathbf{x}, \hat{P}\mathbf{x'})\ .\]</div>
+<p>In the implementation under <code class="docutils literal notranslate"><span class="pre">src/kernels/</span></code>, this idea is followed but with a simplified normalization step. Instead of the protocol suggested by Bartók and Csányi, the result is divided by the number of permutations. This ensures that hyperparameter searches yield magnitudes comparable to those of non-permutational kernels.</p>
+<section id="derivatives-with-respect-to-atomic-coordinates">
+<h2>Derivatives with Respect to Atomic Coordinates<a class="headerlink" href="#derivatives-with-respect-to-atomic-coordinates" title="Link to this heading"></a></h2>
+<p>These kernels allow automatic computation of derivatives via AutoGrad. When the model output represents energies, those derivatives are the forces needed for molecular dynamics simulations.</p>
+<p>However, using atomic coordinates directly as input features is suboptimal: their absolute values do not correlate directly with the potential energy, and they do not respect translational or rotational invariance. Instead, we train on interatomic distances or a related descriptor, which does respect those invariances.</p>
+<p>Transforming to distance-based features introduces a challenge because it obscures the direct relationship to atomic coordinates and makes analytical derivatives harder. To address this, the transformation is performed inside the kernel’s <code class="docutils literal notranslate"><span class="pre">forward</span></code> method. This way, we train on internuclear distances but still rely on AutoGrad to produce exact forces in atomic coordinates — the best of both worlds.</p>
+</section>
+<section id="anisotropic-lengthscales-ard">
+<h2>Anisotropic Lengthscales (ARD)<a class="headerlink" href="#anisotropic-lengthscales-ard" title="Link to this heading"></a></h2>
+<p>Each input dimension’s lengthscale must respect the same permutational symmetry as the output. In practice, this means any bonds involving permutationally equivalent atoms must share the same lengthscale for the model to remain valid.</p>
+<p>This behavior is implemented in the <code class="docutils literal notranslate"><span class="pre">PermInvKernel</span></code> base class, from which all other permutationally invariant kernels inherit. Note that GPyTorch’s built-in <code class="docutils literal notranslate"><span class="pre">ard_num_dims</span></code> option does not work with these kernels. Instead, ARD must be enabled by setting the Boolean-valued <code class="docutils literal notranslate"><span class="pre">ard</span></code> argument when constructing the kernel.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you select a <code class="docutils literal notranslate"><span class="pre">PermInvKernel</span></code> in your model definition, make sure to set <code class="docutils literal notranslate"><span class="pre">debug:</span> <span class="pre">False</span></code> in the <code class="docutils literal notranslate"><span class="pre">training_conf</span></code> section of your configuration YAML.</p>
+</div>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<div role="list" class="citation-list">
+<div class="citation" id="dral2017" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Dral2017</a><span class="fn-bracket">]</span></span>
+<p>Dral, P. O.; Owens, A.; Yurchenko, S. N.; Thiel, W. Structure-Based Sampling and Self-Correcting Machine Learning for Accurate Calculations of Potential Energy Surfaces and Vibrational Levels. <em>J. Chem. Phys.</em> <strong>2017</strong>, <em>146</em> (24), 244108. <a class="reference external" href="https://doi.org/10.1063/1.4989536">https://doi.org/10.1063/1.4989536</a></p>
+</div>
+<div class="citation" id="bartok2015" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">Bartok2015</a><span class="fn-bracket">]</span></span>
+<p>Bartók, A. P.; Csányi, G. Gaussian Approximation Potentials: A Brief Tutorial Introduction. <em>Int. J. Quantum Chem.</em> <strong>2015</strong>, <em>115</em> (16), 1051–1057. <a class="reference external" href="https://doi.org/10.1002/qua.24927">https://doi.org/10.1002/qua.24927</a></p>
+</div>
+</div>
+</section>
 </section>
 
 
