@@ -107,7 +107,7 @@ Matérn-type behavior.
 - ``representation`` (``str``): Type of descriptor (e.g. ``"morse"``).
 - ``variance_constraint`` (``gpytorch.constraints.Constraint``, optional): Constraint on kernel variance.
 
-See :ref:`permutationally_invariant_kernels` for the theory behind these kernel functions.
+See :doc:`permutationally_invariant_kernels` for the theory behind these kernel functions.
 
 Adding More Custom Kernels
 ----------------------------

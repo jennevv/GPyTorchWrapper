@@ -35,7 +35,7 @@ HPC Support
 A SLURM-based submission script is available in `bash/sub_gp_training.sh`. Use `gp_training.sh` to configure and launch training jobs with CLI options.
 
 Docker Example
-----------
+--------------
 
 Run the example in Docker:
 
