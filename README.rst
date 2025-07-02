@@ -10,8 +10,6 @@ Features
 - Fully differentiable, permutationally invariant kernels
 - TorchScript export for deployment
 
-Read m
-
 Installation
 ------------
 
