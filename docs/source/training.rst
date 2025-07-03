@@ -117,7 +117,7 @@ Command-line Example
 
 .. code-block:: bash
 
-    python train.py \
+    python gpytorch_training.py \
         --input data.csv \
         --file-type csv \
         --config config.yaml \
